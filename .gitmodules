@@ -1,0 +1,3 @@
+[submodule "chibios"]
+	path = chibios
+	url = www.gniibe.org:git/chibios.git
