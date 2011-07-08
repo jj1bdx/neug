@@ -1,0 +1,9 @@
+*.hex
+*.bin
+neug.elf
+neug.dmp
+neug.ld
+neug.map
+config.h
+Makefile
+.dep

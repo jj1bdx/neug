@@ -26,9 +26,8 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "board.h"
 #include "usb_cdc.h"
-
-#include "hw_config.h"
 
 /*
  * USB Driver structure.
@@ -264,6 +263,9 @@ static const USBEndpointConfig ep3config = {
   NULL
 };
 
+#define CONFIGURED 1
+uint8_t bDeviceState;
+
 /*
  * Handles the USB driver global events.
  */
@@ -279,6 +281,7 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
        Note, this callback is invoked from an ISR so I-Class functions
        must be used.*/
     chSysLockFromIsr();
+    bDeviceState = CONFIGURED;
     usbInitEndpointI(usbp, DATA_REQUEST_EP, &ep1config);
     usbInitEndpointI(usbp, INTERRUPT_REQUEST_EP, &ep2config);
     usbInitEndpointI(usbp, DATA_AVAILABLE_EP, &ep3config);
@@ -308,120 +311,6 @@ static const SerialUSBConfig serusbcfg = {
   }
 };
 
-struct stdout {
-  Mutex m;
-  CondVar start_cnd;
-  CondVar finish_cnd;
-  const char *str;
-  int size;
-};
-
-static struct stdout stdout;
-
-static void
-stdout_init (void)
-{
-  chMtxInit (&stdout.m);
-  chCondInit (&stdout.start_cnd);
-  chCondInit (&stdout.finish_cnd);
-  stdout.size = 0;
-  stdout.str = NULL;
-}
-
-void
-write (const char *s, int size)
-{
-  if (size == 0)
-    return;
-
-  chMtxLock (&stdout.m);
-  while (stdout.str)
-    chCondWait (&stdout.finish_cnd);
-  stdout.str = s;
-  stdout.size = size;
-  chCondSignal (&stdout.start_cnd);
-  chCondWait (&stdout.finish_cnd);
-  chMtxUnlock ();
-}
-
-Thread *stdout_thread;
-static uint32_t count_in;
-static uint8_t buffer_in[VIRTUAL_COM_PORT_DATA_SIZE];
-
-static WORKING_AREA(waSTDOUTthread, 128);
-
-static msg_t
-STDOUTthread (void *arg)
-{
-  (void)arg;
-  stdout_thread = chThdSelf ();
-
- again:
-
-  while (1)
-    {
-      if (bDeviceState == CONFIGURED)
-	break;
-
-      chThdSleepMilliseconds (100);
-    }
-
-  while (1)
-    {
-      const char *p;
-      int len;
-
-      if (bDeviceState != CONFIGURED)
-	break;
-
-      chMtxLock (&stdout.m);
-      if (stdout.str == NULL)
-	chCondWait (&stdout.start_cnd);
-
-      p = stdout.str;
-      len = stdout.size;
-      while (len > 0)
-	{
-	  int i;
-
-	  if (len < VIRTUAL_COM_PORT_DATA_SIZE)
-	    {
-	      for (i = 0; i < len; i++)
-		buffer_in[i] = p[i];
-	      count_in = len;
-	      len = 0;
-	    }
-	  else
-	    {
-	      for (i = 0; i < VIRTUAL_COM_PORT_DATA_SIZE; i++)
-		buffer_in[i] = p[i];
-	      len -= VIRTUAL_COM_PORT_DATA_SIZE;
-	      count_in = VIRTUAL_COM_PORT_DATA_SIZE;
-	      p += count_in;
-	    }
-
-	  chEvtClear (EV_TX_READY);
-
-	  USB_SIL_Write (EP3_IN, buffer_in, count_in);
-	  SetEPTxValid (ENDP3);
-
-	  chEvtWaitOne (EV_TX_READY);
-	}
-
-      stdout.str = NULL;
-      stdout.size = 0;
-      chCondBroadcast (&stdout.finish_cnd);
-      chMtxUnlock ();
-    }
-
-  goto again;
-  return 0;
-}
-
-
-static WORKING_AREA(waUSBthread, 128);
-extern msg_t USBthread (void *arg);
-
 /*
  * main thread does 1-bit LED display output
  */
@@ -429,38 +318,6 @@ extern msg_t USBthread (void *arg);
 #define LED_TIMEOUT_ZERO	MS2ST(50)
 #define LED_TIMEOUT_ONE		MS2ST(200)
 #define LED_TIMEOUT_STOP	MS2ST(500)
-
-
-#define ID_OFFSET 12
-static void
-device_initialize_once (void)
-{
-  const uint8_t *p = &gnukStringSerial[ID_OFFSET];
-
-  if (p[0] == 0xff && p[1] == 0xff && p[2] == 0xff && p[3] == 0xff)
-    {
-      /*
-       * This is the first time invocation.
-       * Setup serial number by unique device ID.
-       */
-      const uint8_t *u = unique_device_id ();
-      int i;
-
-      for (i = 0; i < 4; i++)
-	{
-	  uint8_t b = u[i];
-	  uint8_t nibble; 
-
-	  nibble = (b >> 4);
-	  nibble += (nibble >= 10 ? ('A' - 10) : '0');
-	  flash_put_data_internal (&p[i*4], nibble);
-	  nibble = (b & 0x0f);
-	  nibble += (nibble >= 10 ? ('A' - 10) : '0');
-	  flash_put_data_internal (&p[i*4+2], nibble);
-	}
-    }
-}
-
 
 Thread *main_thread;
 
@@ -479,7 +336,7 @@ static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
 #define ADC_SAMPLE_13P5         2   /**< @brief 13.5 cycles sampling time.  */
 #define ADC_SAMPLE_239P5        7   /**< @brief 239.5 cycles sampling time. */
 
-static void adccb (adcsample_t *buffer, size_t n);
+static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
 
 /*
  * ADC conversion group.
@@ -490,6 +347,7 @@ static void adccb (adcsample_t *buffer, size_t n);
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,
   ADC_GRP1_NUM_CHANNELS,
+  adccb,
   0,
   ADC_CR2_EXTSEL_SWSTART | ADC_CR2_TSVREFE | ADC_CR2_CONT,
   ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5),
@@ -502,15 +360,13 @@ static const ADCConversionGroup adcgrpcfg = {
 /*
  * ADC end conversion callback.
  */
-static void adccb (adcsample_t *buffer, size_t n)
+static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
 {
-  ADCDriver *adcp = &ADCD1;
-
   (void) buffer; (void) n;
 
   chSysLockFromIsr();
-  if (adcp->ad_state == ADC_COMPLETE)
-    chEvtSignalI (main_thread, (eventmask_t)1);
+  if (adcp->state == ADC_COMPLETE)
+    chEvtSignalFlagsI (main_thread, (eventmask_t)1);
   chSysUnlockFromIsr();
 }
 
@@ -609,21 +465,8 @@ main (int argc, char **argv)
 
   main_thread = chThdSelf ();
 
-  device_initialize_once ();
-
   adcStart (&ADCD1, NULL);
-  adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH, adccb);
-
-  stdout_init ();
-
-  /*
-   * Creates 'stdout' thread.
-   */
-  chThdCreateStatic (waSTDOUTthread, sizeof(waSTDOUTthread),
-		     NORMALPRIO, STDOUTthread, NULL);
-
-  chThdCreateStatic (waUSBthread, sizeof(waUSBthread),
-		     NORMALPRIO, USBthread, NULL);
+  adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
   while (1)
     {
@@ -653,7 +496,7 @@ main (int argc, char **argv)
 		 | ((samp[6] & 0x01) << 7) | ((samp[7] & 0x01) << 6));
 
 	  adcStartConversion (&ADCD1, &adcgrpcfg, samp,
-			      ADC_GRP1_BUF_DEPTH, adccb);
+			      ADC_GRP1_BUF_DEPTH);
 
 	  ep_add (b);
 	  if (++round >= 7)
@@ -673,7 +516,7 @@ main (int argc, char **argv)
 
 		  led++;
 		  set_led ((led & 0x80) == 0);
-		  _write (s, 32);
+		  chIOWriteTimeout (&SDU1, (uint8_t *)s, 32, TIME_INFINITE);
 		}
 
 	      round = 0;

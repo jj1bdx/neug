@@ -16,7 +16,7 @@ void boardInit(void)
 }
 
 void
-USB_Cable_Config (FunctionalState NewState)
+USB_Cable_Config (int NewState)
 {
   if (NewState != DISABLE)
     palSetPad (IOPORT1, GPIOA_USB_ENABLE);

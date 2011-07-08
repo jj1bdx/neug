@@ -22,7 +22,7 @@
 #define CH_USE_MESSAGES                 FALSE
 #define CH_USE_MESSAGES_PRIORITY        FALSE
 #define CH_USE_MAILBOXES                FALSE
-#define CH_USE_QUEUES                   FALSE
+#define CH_USE_QUEUES                   TRUE
 #define CH_USE_MEMCORE                  TRUE
 #define CH_USE_HEAP                     TRUE
 #define CH_USE_MALLOC_HEAP              FALSE

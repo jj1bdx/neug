@@ -140,6 +140,8 @@
 extern "C" {
 #endif
   void boardInit(void);
+  void USB_Cable_Config (int NewState);
+  void set_led (int value);
 #ifdef __cplusplus
 }
 #endif
