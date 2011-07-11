@@ -30,6 +30,12 @@
 #include "usb_cdc.h"
 
 /*
+ * We are trying to avoid dependency to C library. 
+ * GCC built-in functions are declared here.
+ */
+void *memcpy(void *dest, const void *src, size_t n);
+
+/*
  * USB Driver structure.
  */
 static SerialUSBDriver SDU1;
@@ -92,7 +98,7 @@ static const uint8_t vcom_configuration_descriptor_data[67] = {
   USB_DESC_BYTE         (0x24),         /* bDescriptorType (CS_INTERFACE).  */
   USB_DESC_BYTE         (0x01),         /* bDescriptorSubtype (Call Management
                                            Functional Descriptor).          */
-  USB_DESC_BYTE         (0x00),         /* bmCapabilities (D0+D1).          */
+  USB_DESC_BYTE         (0x03),         /* bmCapabilities (D0+D1).          */
   USB_DESC_BYTE         (0x01),         /* bDataInterface.                  */
   /* ACM Functional Descriptor.*/
   USB_DESC_BYTE         (4),            /* bFunctionLength.                 */
@@ -263,9 +269,6 @@ static const USBEndpointConfig ep3config = {
   NULL
 };
 
-#define CONFIGURED 1
-uint8_t bDeviceState;
-
 /*
  * Handles the USB driver global events.
  */
@@ -281,7 +284,6 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
        Note, this callback is invoked from an ISR so I-Class functions
        must be used.*/
     chSysLockFromIsr();
-    bDeviceState = CONFIGURED;
     usbInitEndpointI(usbp, DATA_REQUEST_EP, &ep1config);
     usbInitEndpointI(usbp, INTERRUPT_REQUEST_EP, &ep2config);
     usbInitEndpointI(usbp, DATA_AVAILABLE_EP, &ep3config);
@@ -310,17 +312,9 @@ static const SerialUSBConfig serusbcfg = {
     NULL
   }
 };
-
-/*
- * main thread does 1-bit LED display output
- */
-#define LED_TIMEOUT_INTERVAL	MS2ST(100)
-#define LED_TIMEOUT_ZERO	MS2ST(50)
-#define LED_TIMEOUT_ONE		MS2ST(200)
-#define LED_TIMEOUT_STOP	MS2ST(500)
 
 Thread *main_thread;
-
+
 /* Total number of channels to be sampled by a single ADC operation.*/
 #define ADC_GRP1_NUM_CHANNELS   2
  
@@ -341,8 +335,8 @@ static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
 /*
  * ADC conversion group.
  * Mode:        Linear buffer, 4 samples of 2 channels, SW triggered.
- * Channels:    Vref   (239.5 cycles sample time)
- *              Sensor (239.5 cycles sample time)
+ * Channels:    Vref   (1.5 cycles sample time, violating the spec.)
+ *              Sensor (1.5 cycles sample time, violating the spec.)
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,
@@ -442,7 +436,6 @@ static uint32_t ep_value (void)
  * Entry point.
  *
  * NOTE: the main function is already a thread in the system on entry.
- *       See the hwinit1_common function.
  */
 int
 main (int argc, char **argv)
@@ -455,6 +448,7 @@ main (int argc, char **argv)
   halInit();
   chSysInit();
 
+  main_thread = chThdSelf ();
 
   /*
    * Activates the USB driver and then the USB bus pull-up on D+.
@@ -462,8 +456,6 @@ main (int argc, char **argv)
   sduObjectInit(&SDU1);
   sduStart(&SDU1, &serusbcfg);
   USB_Cable_Config (ENABLE);
-
-  main_thread = chThdSelf ();
 
   adcStart (&ADCD1, NULL);
   adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
@@ -473,9 +465,6 @@ main (int argc, char **argv)
       eventmask_t m;
 
       count++;
-
-      if (bDeviceState != CONFIGURED)
-	continue;
 
       m = chEvtWaitOne (ALL_EVENTS);
 
@@ -510,12 +499,14 @@ main (int argc, char **argv)
 
 	      memcpy (s + (r&7)*4, (const char *)&x, 4);
 	      r = (r + 1) & 7;
-	      if (r == 0)
+	      if (r == 0 && SDU1.config->usbp->state == USB_ACTIVE)
 		{
 		  static uint8_t led;
 
 		  led++;
 		  set_led ((led & 0x80) == 0);
+
+		  chIQResetI (&(SDU1.iqueue)); /* Ignore input */
 		  chIOWriteTimeout (&SDU1, (uint8_t *)s, 32, TIME_INFINITE);
 		}
 
@@ -531,5 +522,7 @@ void
 fatal (uint8_t code)
 {
   fatal_code = code;
+
+  set_led (1);
   for (;;);
 }

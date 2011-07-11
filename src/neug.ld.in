@@ -48,7 +48,8 @@ SECTIONS
     startup : ALIGN(16) SUBALIGN(16)
     {
         KEEP(*(vectors))
-    } > flash
+        . = ALIGN (16);
+    } > flash =0xffffffff
 
     constructors : ALIGN(4) SUBALIGN(4)
     {
@@ -117,6 +118,11 @@ SECTIONS
         . = ALIGN(4);
         PROVIDE(_bss_end = .);
     } > ram
+
+    .fill_ffff :
+    {
+        . = ALIGN (@FLASH_PAGE_SIZE@);
+    } > flash =0xffffffff
 }
 
 PROVIDE(end = .);
