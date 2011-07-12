@@ -75,7 +75,7 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        ../boards/common/board-common.c \
        $(BOARD_DIR)/board.c \
-       main.c
+       main.c random.c
 
 # List ASM source files here
 ASMSRC = $(PORTASM)

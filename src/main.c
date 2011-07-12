@@ -28,6 +28,7 @@
 #include "hal.h"
 #include "board.h"
 #include "usb_cdc.h"
+#include "neug.h"
 
 /*
  * We are trying to avoid dependency to C library. 
@@ -49,8 +50,8 @@ static const uint8_t vcom_device_descriptor_data[18] = {
                          0x00,          /* bDeviceSubClass.                 */
                          0x00,          /* bDeviceProtocol.                 */
                          0x40,          /* bMaxPacketSize.                  */
-                         0x234b,        /* idVendor (FSIJ).                   */
-                         0x0001,        /* idProduct.                       */
+                         0x234b,        /* idVendor (FSIJ).                 */
+                         0x0001,        /* idProduct (NeoG).                */
                          0x0100,        /* bcdDevice.                       */
                          1,             /* iManufacturer.                   */
                          2,             /* iProduct.                        */
@@ -313,124 +314,8 @@ static const SerialUSBConfig serusbcfg = {
   }
 };
 
-Thread *main_thread;
-
-/* Total number of channels to be sampled by a single ADC operation.*/
-#define ADC_GRP1_NUM_CHANNELS   2
- 
-/* Depth of the conversion buffer, channels are sampled one time each.*/
-#define ADC_GRP1_BUF_DEPTH      4
- 
-/*
- * ADC samples buffer.
- */
-static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
- 
-#define ADC_SAMPLE_1P5          0   /**< @brief 1.5 cycles sampling time.   */
-#define ADC_SAMPLE_13P5         2   /**< @brief 13.5 cycles sampling time.  */
-#define ADC_SAMPLE_239P5        7   /**< @brief 239.5 cycles sampling time. */
-
-static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
-
-/*
- * ADC conversion group.
- * Mode:        Linear buffer, 4 samples of 2 channels, SW triggered.
- * Channels:    Vref   (1.5 cycles sample time, violating the spec.)
- *              Sensor (1.5 cycles sample time, violating the spec.)
- */
-static const ADCConversionGroup adcgrpcfg = {
-  FALSE,
-  ADC_GRP1_NUM_CHANNELS,
-  adccb,
-  0,
-  ADC_CR2_EXTSEL_SWSTART | ADC_CR2_TSVREFE | ADC_CR2_CONT,
-  ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5),
-  0,
-  ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS),
-  0,
-  ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR) | ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
-};
-
-/*
- * ADC end conversion callback.
- */
-static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
-{
-  (void) buffer; (void) n;
-
-  chSysLockFromIsr();
-  if (adcp->state == ADC_COMPLETE)
-    chEvtSignalFlagsI (main_thread, (eventmask_t)1);
-  chSysUnlockFromIsr();
-}
-
-static volatile uint8_t fatal_code;
-
-#define TMT_MAT1 0x8f7011ee
-#define TMT_MAT2 0xfc78ff1f
-#define TMT_TMAT 0x3793fdff
-
-static uint32_t tmt[4] = { 0x56781234, TMT_MAT1, TMT_MAT2, TMT_TMAT };
-
-#define TMT_CALC_LASTWORD(y,v) (y^v)
-
-static void tmt_one_step (uint32_t v)
-{
-  uint32_t x, y;
-
-  y = tmt[3];
-  x = (tmt[0] & 0x7fffffff) ^ tmt[1] ^ tmt[2];
-  x ^= (x << 1);
-  y ^= (y >> 1) ^ x;
-  tmt[0] = tmt[1];
-  tmt[1] = tmt[2];
-  tmt[2] = x ^ (y << 10);
-  tmt[3] = TMT_CALC_LASTWORD(y, v);
-  if ((y & 1))
-    {
-      tmt[1] ^= TMT_MAT1;
-      tmt[2] ^= TMT_MAT2;
-    }
-}
-
-static uint32_t tmt_value (void)
-{
-  uint32_t t0, t1;
-
-  t0 = tmt[3];
-  t1 = tmt[0] + (tmt[2] >> 8);
-  t0 ^= t1;
-  if ((t1 & 1))
-    t0 ^= TMT_TMAT;
-  return t0;
-}
-
-/* 8 parallel CRC-16 shift registers */
-static uint8_t epool[16];	/* Big-endian */
-static uint8_t ep_count;
-
-static void ep_add (uint8_t bits)
-{
-  uint8_t v = epool[ep_count];
-
-  /* CRC-16-CCITT's Polynomial is: x^16 + x^12 + x^5 + 1 */
-  epool[ep_count] ^= bits;
-  epool[(ep_count - 5)& 0x0f] ^= v;
-  epool[(ep_count - 12)& 0x0f] ^= v;
-
-  ep_count = (ep_count + 1) & 0x0f;
-}
-
-static uint32_t ep_value (void)
-{
-  unsigned int v = (epool[ep_count] << 24)
-		    | (epool[(ep_count + 1) & 0x0f] << 16)
-		    | (epool[(ep_count + 2) & 0x0f] << 8)
-		    | epool[(ep_count + 3) & 0x0f];
-  return v;
-}
-
-
+#define RANDOM_BYTES_LENGTH 32
+static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
 /*
  * Entry point.
@@ -440,15 +325,13 @@ static uint32_t ep_value (void)
 int
 main (int argc, char **argv)
 {
-  int count = 0;
+  unsigned int count = 0;
 
   (void)argc;
   (void)argv;
 
   halInit();
   chSysInit();
-
-  main_thread = chThdSelf ();
 
   /*
    * Activates the USB driver and then the USB bus pull-up on D+.
@@ -457,72 +340,37 @@ main (int argc, char **argv)
   sduStart(&SDU1, &serusbcfg);
   USB_Cable_Config (ENABLE);
 
-  adcStart (&ADCD1, NULL);
-  adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
+  neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 
   while (1)
     {
-      eventmask_t m;
-
-      count++;
-
-      m = chEvtWaitOne (ALL_EVENTS);
-
-      if (m == (eventmask_t)1)
+      while (SDU1.config->usbp->state != USB_ACTIVE)
 	{
-	  static uint8_t round;
-	  uint8_t b;
+	  set_led ((count & 1) == 0);
+	  chThdSleep (MS2ST (250));
+	  count++;
+	}
 
-	  if ((round & 1))
-	    b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
-		 | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
-		 | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
-		 | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
-	  else
-	    b = (((samp[0] & 0x01) << 1) | ((samp[1] & 0x01) << 0)
-		 | ((samp[2] & 0x01) << 3) | ((samp[3] & 0x01) << 2)
-		 | ((samp[4] & 0x01) << 5) | ((samp[5] & 0x01) << 4)
-		 | ((samp[6] & 0x01) << 7) | ((samp[7] & 0x01) << 6));
+      count = 0;
 
-	  adcStartConversion (&ADCD1, &adcgrpcfg, samp,
-			      ADC_GRP1_BUF_DEPTH);
+      while (1)
+	{
+	  uint32_t v;
+	  const uint8_t *s = (const uint8_t *)&v;
 
-	  ep_add (b);
-	  if (++round >= 7)
-	    {
-	      static uint8_t r;
-	      char s[32];
-	      uint32_t x = ep_value ();
+	  count++;
 
-	      tmt_one_step (((SysTick->VAL) & 6) == 0);
-	      x ^= tmt_value ();
+	  if (SDU1.config->usbp->state != USB_ACTIVE)
+	    break;
 
-	      memcpy (s + (r&7)*4, (const char *)&x, 4);
-	      r = (r + 1) & 7;
-	      if (r == 0 && SDU1.config->usbp->state == USB_ACTIVE)
-		{
-		  static uint8_t led;
+	  v = neug_get (NEUG_KICK_FILLING);
 
-		  led++;
-		  set_led ((led & 0x80) == 0);
+	  set_led ((count & 0x400) == 0);
 
-		  chIQResetI (&(SDU1.iqueue)); /* Ignore input */
-		  chIOWriteTimeout (&SDU1, (uint8_t *)s, 32, TIME_INFINITE);
-		}
-
-	      round = 0;
-	    }
+	  chIQResetI (&(SDU1.iqueue)); /* Ignore input */
+	  chIOWriteTimeout (&SDU1, s, sizeof (v), TIME_INFINITE);
 	}
     }
 
   return 0;
-}
-
-void
-fatal (uint8_t code)
-{
-  fatal_code = code;
-
-  set_led (1);
-  for (;;);
 }
