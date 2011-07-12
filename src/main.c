@@ -1,6 +1,10 @@
 /*
  * main.c - main routine of neug
  *
+ * USB-CDC part:
+ * ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
+ *
+ * Main routine:
  * Copyright (C) 2011 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
@@ -32,9 +36,15 @@
 
 /*
  * We are trying to avoid dependency to C library. 
- * GCC built-in functions are declared here.
+ * GCC built-in function(s) are declared here.
  */
 void *memcpy(void *dest, const void *src, size_t n);
+
+
+/*
+ * USB CDC stuff taken from ChibiOS/RT's testhal/STM32/USB_CDC/main.c,
+ * and modified for NeuG.
+ */
 
 /*
  * USB Driver structure.
@@ -187,12 +197,15 @@ static const uint8_t vcom_string2[] = {
 };
 
 /*
- * Serial Number string.
+ * Serial Number string.  NOTE: This does not have CONST qualifier.
  */
-static const uint8_t vcom_string3[] = {
-  USB_DESC_BYTE(8),                     /* bLength.                         */
+static uint8_t vcom_string3[] = {
+  USB_DESC_BYTE(28),                    /* bLength.                         */
   USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
-  '0' , 0,  '.' , 0,  '1' , 0
+  '0', 0,  '.', 0,  '0', 0,  '0', 0,    /* Version number of NeuG.          */
+  '-', 0,
+  0, 0, 0, 0, 0, 0, 0, 0,	        /* Filled by Unique device ID.      */
+  0, 0, 0, 0, 0, 0, 0, 0,
 };
 
 /*
@@ -314,6 +327,27 @@ static const SerialUSBConfig serusbcfg = {
   }
 };
 
+static void fill_serial_no_by_unique_id (void)
+{
+  extern const uint8_t * unique_device_id (void);
+  uint8_t *p = &vcom_string3[12];
+  const uint8_t *u = unique_device_id ();
+  int i;
+
+  for (i = 0; i < 4; i++)
+    {
+      uint8_t b = u[i];
+      uint8_t nibble; 
+
+      nibble = (b >> 4);
+      nibble += (nibble >= 10 ? ('A' - 10) : '0');
+      p[i*4] = nibble;
+      nibble = (b & 0x0f);
+      nibble += (nibble >= 10 ? ('A' - 10) : '0');
+      p[i*4+2] = nibble;
+    }
+}
+
 #define RANDOM_BYTES_LENGTH 32
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
@@ -329,6 +363,8 @@ main (int argc, char **argv)
 
   (void)argc;
   (void)argv;
+
+  fill_serial_no_by_unique_id ();
 
   halInit();
   chSysInit();
@@ -367,7 +403,10 @@ main (int argc, char **argv)
 
 	  set_led ((count & 0x400) == 0);
 
-	  chIQResetI (&(SDU1.iqueue)); /* Ignore input */
+	  /*
+	   * Ignore input, just in case /dev/ttyACM0 echos our output
+	   */
+	  chIQResetI (&(SDU1.iqueue));
 	  chIOWriteTimeout (&SDU1, s, sizeof (v), TIME_INFINITE);
 	}
     }

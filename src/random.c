@@ -39,10 +39,6 @@ static Thread *rng_thread;
  */
 static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
  
-#define ADC_SAMPLE_1P5          0   /**< @brief 1.5 cycles sampling time.   */
-#define ADC_SAMPLE_13P5         2   /**< @brief 13.5 cycles sampling time.  */
-#define ADC_SAMPLE_239P5        7   /**< @brief 239.5 cycles sampling time. */
-
 static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
 
 /*
@@ -77,17 +73,31 @@ static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
   chSysUnlockFromIsr();
 }
 
+/*
+ * TinyMT routines.
+ *
+ * See
+ * "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
+ * by Mutsuo Saito and Makoto Matsumoto
+ *     http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/
+ */
+
+/* Use the first example of TinyMT */
 #define TMT_MAT1 0x8f7011ee
 #define TMT_MAT2 0xfc78ff1f
 #define TMT_TMAT 0x3793fdff
 
 static uint32_t tmt[4] = {
-  /* initial state of seed=1 */
+  /* Initial state of seed=1, precomputed */
   0x0cca24d8, 0x11ba5ad5, 0xf2dad045, 0xd95dd7b2
 };
 
 #define TMT_CALC_LASTWORD(y,v) (y^v)
 
+/**
+ * @brief  TinyMT one step function, call this every time before tmt_value.
+ * @note   We supply argument V, to shaken the state.
+ */
 static void tmt_one_step (uint32_t v)
 {
   uint32_t x, y;
@@ -107,6 +117,9 @@ static void tmt_one_step (uint32_t v)
     }
 }
 
+/**
+ * @brief  Get a random word (32-bit).
+ */
 static uint32_t tmt_value (void)
 {
   uint32_t t0, t1;
@@ -145,7 +158,7 @@ static uint32_t ep_value (void)
 }
 
 /*
- * Ring buffer, filled by generator, consumed by rng_get routine.
+ * Ring buffer, filled by generator, consumed by neug_get routine.
  */
 struct rng_rb {
   uint32_t *buf;
@@ -200,9 +213,10 @@ static uint32_t rb_del (struct rng_rb *rb)
  */
 #define NUM_NOISE_INPUTS 7
 
-/*
- * Called holding the mutex, with RB->full == 0.
- * Keep generating until RB->full == 1.
+/**
+ * @brief Random number generation from ADC sampling.
+ * @note  Called holding the mutex, with RB->full == 0.
+ *        Keep generating until RB->full == 1.
  */
 static void rng_gen (struct rng_rb *rb)
 {
@@ -246,6 +260,9 @@ static void rng_gen (struct rng_rb *rb)
   return;
 }
 
+/**
+ * @brief Random number generation thread.
+ */
 static msg_t rng (void *arg)
 {
   struct rng_rb *rb = (struct rng_rb *)arg;
@@ -271,6 +288,9 @@ static msg_t rng (void *arg)
 static struct rng_rb the_ring_buffer;
 static WORKING_AREA(wa_rng, 128);
 
+/**
+ * @brief Initialize NeuG.
+ */
 void
 neug_init (uint32_t *buf, uint8_t size)
 {
@@ -280,6 +300,9 @@ neug_init (uint32_t *buf, uint8_t size)
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
 }
 
+/**
+ * @brief  Wakes up RNG thread to generate random numbers.
+ */
 void
 neug_kick_filling (void)
 {
@@ -291,6 +314,12 @@ neug_kick_filling (void)
   chMtxUnlock ();
 }
 
+/**
+ * @brief  Get random word (32-bit) from NeuG.
+ * @detail With NEUG_KICK_FILLING, it wakes up RNG thread.
+ *         With NEUG_NO_KICK, it doesn't wake up automatically,
+ *         it is needed to call neug_kick_filling later.
+ */
 uint32_t
 neug_get (int kick)
 {
