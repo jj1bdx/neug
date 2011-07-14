@@ -1,0 +1,7 @@
+2011-07-14  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Support CQ_STARM.
+	* boards/CQ_STARM: Added.
+
+	* Version 0.00.
+
