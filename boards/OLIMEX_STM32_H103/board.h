@@ -27,22 +27,21 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "config.h"
 /*
- * Setup for the STBee Mini board.
+ * Setup for the Olimex STM32-H103 proto board.
  */
 
 /*
  * Board identifier.
  */
-#define BOARD_STBEE_MINI
-#define BOARD_NAME "STBee Mini"
+#define BOARD_OLIMEX_STM32_H103
+#define BOARD_NAME "Olimex STM32-H103"
 
 /*
  * Board frequencies.
  */
 #define STM32_LSECLK            32768
-#define STM32_HSECLK            12000000
+#define STM32_HSECLK            8000000
 
 /*
  * MCU type, this macro is used by both the ST library and the ChibiOS/RT
@@ -53,11 +52,16 @@
 /*
  * IO pins assignments.
  */
-#define GPIOA_LED1              13
-#define GPIOA_USB_ENABLE        14
-#define GPIOA_LED2              15
+#define GPIOA_BUTTON            0
+#define GPIOA_SPI1NSS           4
 
-#define GPIOC_BUTTON            13
+#define GPIOB_SPI2NSS           12
+
+#define GPIOC_MMCWP             6
+#define GPIOC_MMCCP             7
+#define GPIOC_CANCNTL           10
+#define GPIOC_DISC              11
+#define GPIOC_LED               12
 
 /*
  * I/O ports initial setup, this configuration is established soon after reset
@@ -85,32 +89,36 @@
 
 /*
  * Port A setup.
- * PA11 - input with pull-up (USBDM)
- * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
- * PA13 - Open Drain output (LED1 0:ON 1:OFF)
- * PA14 - Push pull output  (USB ENABLE 0:DISABLE 1:ENABLE)
- * PA15 - Open Drain output (LED2 0:ON 1:OFF)
+ * PA0  - Normal input      (BUTTON).
+ * PA2  - Alternate output  (USART2 TX).
+ * PA3  - Normal input      (USART2 RX).
  */
-#define VAL_GPIOACRL            0x88888888      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x63688888      /* PA15...PA8 */
+#define VAL_GPIOACRL            0x88884B84      /*  PA7...PA0 */
+#define VAL_GPIOACRH            0x88888888      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 
-/* Port B setup. */
-/* Everything input with pull-up */
+/*
+ * Port B setup.
+ * Everything input with pull-up except:
+ * PB13 - Alternate output  (MMC SPI2 SCK).
+ * PB14 - Normal input      (MMC SPI2 MISO).
+ * PB15 - Alternate output  (MMC SPI2 MOSI).
+ */
 #define VAL_GPIOBCRL            0x88888888      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88888888      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0xB4B88888      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*
  * Port C setup.
  * Everything input with pull-up except:
- * PC13 - Normal input.
- * PC14 - Normal input.
- * PC15 - Normal input.
+ * PC6  - Normal input because there is an external resistor.
+ * PC7  - Normal input because there is an external resistor.
+ * PC11 - Open Drain output (USB disconnect).
+ * PC12 - Push Pull output (LED).
  */
-#define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
-#define VAL_GPIOCCRH            0x44488888      /* PC15...PC8 */
+#define VAL_GPIOCCRL            0x44888888      /*  PC7...PC0 */
+#define VAL_GPIOCCRH            0x88837888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 
 /*

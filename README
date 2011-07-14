@@ -1,0 +1,240 @@
+NeuG - a random number generator implementation (for STM32F103)
+
+							   Version 0.00
+							     2011-07-14
+						           Niibe Yutaka
+				      Free Software Initiative of Japan
+
+What's NeuG?
+============
+
+NeuG is a set of routines of random number generator (RNG) which is
+based on physical noise.  It supports STM32F103.  It can be stand
+alone USB RNG device (with main routine), too.
+
+The name comes from Japanized English word "noidgy" (from English word
+"noisy"), where many Japanese (including me) don't distinguish
+pronunciations of "gee" and "zee".  NeuG includes my important letters
+of "g", "n", and "u", and the word "neu" (German spelling of "new").
+
+My primary intention was to incorporate NeuG routines into Gnuk for
+random number generation, but the stand alone version could be useful
+too.
+
+
+Release notes
+=============
+
+This is the first release of NeuG, which is experimental enough.  You
+can enjoy NeuG device, but I don't know how it is good yet.  Note that
+you need the snapshot of ChibiOS/RT (from trunk).  This means that it
+is covered by GNU GPL.  No "linking exception" option is available for
+the snapshot.
+
+
+FAQ
+===
+
+Q0: How NeuG device is good?
+A0: I don't know yet.  It is under evaluation now.
+A0-dash: For better entropy device, you can get EntropyKey.
+         See http://www.entropykey.co.uk/
+A0-double-dash: STM32F2xx has built-in TRNG, it would be better for you.
+
+Q1: How fast is NeuG device?
+A1: It's something around 24 Ki-byte/second.
+
+Q2: Should we check condition of noise sources?
+A2: Yes, we should.  It's not implemented yet, and I don't have an
+    good idea how to implement.  Please let me know your idea.
+
+
+Targets
+=======
+
+STBee Mini and Olimex STM32-H103 is supported.
+
+
+Souce code
+==========
+
+NeuG source code is under src/ directory.
+
+
+License
+=======
+
+It is distributed under GNU General Public Licence version 3 or later
+(GPLv3+).  Please see src/COPYING.
+
+
+External source code
+====================
+
+To build NeuG device, we need external source code.
+
+* chibios/  -- ChibiOS/RT 2.3.x snapshot
+
+  Please get it from http://chibios.sourceforge.net/
+  We use ChibiOS/RT as the kernel for NeuG device.
+
+
+How to compile
+==============
+
+You need GNU toolchain and newlib for 'arm-none-eabi' target.
+
+See http://github.com/uwehermann/summon-arm-toolchain/ for preparation
+of GNU Toolchain for 'arm-none-eabi' target.
+
+Change directory to `src':
+
+  $ cd neug-VERSION/src
+
+Then, run `configure':
+
+  $ ./configure
+
+Type:
+
+  $ make
+
+Then, we will have "neug.elf".
+
+
+How to install
+==============
+
+STBee Mini
+----------
+
+Reset the board with "USER" switch pushed.  Type following to write
+to flash:
+
+  # cd ../tool
+  # ./dfuse.py ../src/neug.hex
+
+Then, reset the board.
+
+
+Olimex STM32-H103 board
+-----------------------
+
+If you are using Olimex JTAG-Tiny, type following to invoke OpenOCD:
+
+  $ openocd -f interface/olimex-jtag-tiny.cfg -f board/olimex_stm32_h103.cfg
+
+Then, with another terminal, type following to write "gnuk.elf" to Flash ROM:
+
+  $ telnet localhost 4444
+  > reset halt
+  > flash write_image erase neug.elf
+  > reset
+  > exit
+  $ 
+
+
+
+Use of NeuG device
+==================
+
+It is USB CDC ACM device.  On GNU/Linux, it can be /dev/ttyACM0 or like.
+Before using /dev/ttyACM0, you need to configure its TTY discipline.
+
+  $ stty -F /dev/ttyACM0 -echo raw
+
+Then, you can use output of /dev/ttyACM0.
+
+
+
+Structure of the NeuG
+=====================
+
+NeuG consists of two RNG, one is the RNG based on physical noise, and
+another is "Mostly Pseudo" RNG.  Outputs of RNGs are exclusive or-ed
+to generate final output.  Here is a figure of the circuit.
+
+
+                        Entropy Pool (16-byte)
+                       +----------------+
+                   8   | 8 parallel     |   8  ||<-- [ Vref ]
+                 +-/-- |  CRC-16        |<--/--||
+                 |     | shift registers|      ||<-- [ Temperature Sensor ]
+                 |     +----------------+
+               =====    Physical-based RNG
+                 |
+                 / 32
+                 |
+  Random     32  v      32 +--------+        1
+  Number  <--/--[XOR]<--/--| TinyMT |<-------/------ SysTick
+  Output                   +--------+
+                         Mostly Pseudo RNG
+
+
+STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
+which are connected to A/D converter of 12-bit resolution.  NeuG uses
+LSBs of A/D converter's outputs and A/D converter's interrupt timings
+as entropy sources.
+
+By four samplings of two channels, we can get 8-bit, as we can get two
+bits (LSB of Vref and LSB of Temperature Sensor) from one sampling.
+We put this 8-bit noise to entropy pool.  Entropy pool consist of
+16-byte buffer, which is 8 parallel CRC-16 shift registers.  The noise
+source is not "white", but it can be used as RNG with this CRC-16
+filter.  An experiment shows that raw noise source of LSBs has more
+than 6 bit/byte entropy.  So, we put 7-byte to get 4-byte (32-bit)
+output.
+
+I don't know how stable the noise source is.
+
+So, NeuG comes with second RNG.  It is pseudo RNG, shaken by interrupt
+timings.  It is not pure pseudo RNG, where sequence is deterministic.
+We use TinyMT for pseudo RNG.  Please see following page for TinyMT:
+
+   "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
+   by Mutsuo Saito and Makoto Matsumoto
+     http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/
+
+
+Test results
+============
+
+See files under the directory test-results, for test result of
+"rngtest" in rng-tools, and NIST STS 2.1.1.  Currently, I am testing
+NeuG device by dieharder, but it seems that it takes a month or so (8
+days passed, it's running RGB Bit distribution test ntup=9).
+
+
+Read-only Git Repository
+========================
+
+You can browse at http://www.gniibe.org/gitweb?p=neug.git;a=summary
+
+You can get it by:
+
+  $ git clone git://www.gniibe.org/neug.git/
+
+or
+
+  $ git clone http://www.gniibe.org/git/neug.git/
+
+
+I put ChibiOS/RT as a submodule of Git.  Please do this:
+
+  $ git submodule init
+  $ git submodule update
+
+
+
+Information on the Web
+======================
+
+Not yet.
+
+
+Your Contributions
+==================
+
+FSIJ welcomes your contributions.  Please assign your copyright
+to FSIJ (if possible).
+-- 

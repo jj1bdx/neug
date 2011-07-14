@@ -1,6 +1,7 @@
 There is a tool named "rngtest" in rng-tools.  I use rng-tools of
 version 2-unofficial-mt.13-3 in Debian.
 
+=============================================
 rngtest: bits received from input: 2015920160
 rngtest: FIPS 140-2 successes: 100721
 rngtest: FIPS 140-2 failures: 75
@@ -12,4 +13,4 @@ rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
 rngtest: input channel speed: (min=122.503; avg=192.322; max=443.358)Kibits/s
 rngtest: FIPS tests speed: (min=1.351; avg=26.373; max=48.287)Mibits/s
 rngtest: Program run time: 10310668494 microseconds
-
+=============================================
