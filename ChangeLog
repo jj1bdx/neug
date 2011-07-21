@@ -1,3 +1,12 @@
+2011-07-21  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.h (NEUG_PRE_LOOP): New.
+
+	* src/main.c (led_blinker): New.
+	(main): Use led_blinker.
+	(main): Call neug_get before USB configuration at least
+	NEUG_PRE_LOOP times.
+
 2011-07-14  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/configure: Support CQ_STARM.

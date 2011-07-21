@@ -348,6 +348,29 @@ static void fill_serial_no_by_unique_id (void)
     }
 }
 
+static WORKING_AREA(wa_led, 64);
+
+#define LED_ONESHOT ((eventmask_t)1)
+static Thread *led_thread;
+
+static msg_t led_blinker (void *arg)
+{
+  (void)arg;
+
+  led_thread = chThdSelf ();
+  set_led (0);
+
+  while (1)
+    {
+      chEvtWaitOne (LED_ONESHOT);
+      set_led (1);
+      chThdSleep (MS2ST (100));
+      set_led (0);
+    }
+
+  return 0;
+}
+
 #define RANDOM_BYTES_LENGTH 32
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
@@ -376,24 +399,31 @@ main (int argc, char **argv)
   sduStart(&SDU1, &serusbcfg);
   USB_Cable_Config (ENABLE);
 
+  chThdCreateStatic (wa_led, sizeof (wa_led), NORMALPRIO, led_blinker, NULL);
+
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 
   while (1)
     {
+      uint32_t v;
+      const uint8_t *s = (const uint8_t *)&v;
+
       while (SDU1.config->usbp->state != USB_ACTIVE)
 	{
-	  set_led ((count & 1) == 0);
-	  chThdSleep (MS2ST (250));
+	  v = neug_get (NEUG_KICK_FILLING);
+	  if ((count & 15) == 0)
+	    chEvtSignalFlags (led_thread, LED_ONESHOT);
+	  chThdSleep (MS2ST (25));
 	  count++;
 	}
+
+      while (count++ < NEUG_PRE_LOOP)
+	v = neug_get (NEUG_KICK_FILLING);
 
       count = 0;
 
       while (1)
 	{
-	  uint32_t v;
-	  const uint8_t *s = (const uint8_t *)&v;
-
 	  count++;
 
 	  if (SDU1.config->usbp->state != USB_ACTIVE)
@@ -401,8 +431,8 @@ main (int argc, char **argv)
 
 	  v = neug_get (NEUG_KICK_FILLING);
 
-	  set_led ((count & 0x400) == 0);
-
+	  if ((count & 0x800) == 0)
+	    chEvtSignalFlags (led_thread, LED_ONESHOT);
 	  /*
 	   * Ignore input, just in case /dev/ttyACM0 echos our output
 	   */
