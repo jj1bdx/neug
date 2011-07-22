@@ -1,3 +1,7 @@
+2011-07-22  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (main): Fix one shot logic.
+
 2011-07-21  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/neug.h (NEUG_PRE_LOOP): New.

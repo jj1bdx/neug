@@ -353,6 +353,9 @@ static WORKING_AREA(wa_led, 64);
 #define LED_ONESHOT ((eventmask_t)1)
 static Thread *led_thread;
 
+/*
+ * LED blinker: When notified, let LED emit for 100ms.
+ */
 static msg_t led_blinker (void *arg)
 {
   (void)arg;
@@ -408,17 +411,15 @@ main (int argc, char **argv)
       uint32_t v;
       const uint8_t *s = (const uint8_t *)&v;
 
-      while (SDU1.config->usbp->state != USB_ACTIVE)
+      while (count++ < NEUG_PRE_LOOP
+	     || SDU1.config->usbp->state != USB_ACTIVE)
 	{
 	  v = neug_get (NEUG_KICK_FILLING);
-	  if ((count & 15) == 0)
+	  if ((count & 0x000f) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT);
 	  chThdSleep (MS2ST (25));
 	  count++;
 	}
-
-      while (count++ < NEUG_PRE_LOOP)
-	v = neug_get (NEUG_KICK_FILLING);
 
       count = 0;
 
@@ -431,7 +432,7 @@ main (int argc, char **argv)
 
 	  v = neug_get (NEUG_KICK_FILLING);
 
-	  if ((count & 0x800) == 0)
+	  if ((count & 0x07ff) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT);
 	  /*
 	   * Ignore input, just in case /dev/ttyACM0 echos our output
