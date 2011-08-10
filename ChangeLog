@@ -1,4 +1,12 @@
+2011-08-10  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* boards/STM8S_DISCOVERY/mcuconf.h: New.
+	* boards/STM8S_DISCOVERY/board.h: New.
+	* boards/STM8S_DISCOVERY/board.c: New.
+
 2011-07-22  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* boards/OLIMEX_STM32_H103/mcuconf.h (STM32_USBPRE): Add.
 
 	* src/main.c (main): Fix one shot logic.
 
