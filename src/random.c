@@ -94,13 +94,10 @@ static uint32_t tmt[4] = {
   0x0cca24d8, 0x11ba5ad5, 0xf2dad045, 0xd95dd7b2
 };
 
-#define TMT_CALC_LASTWORD(y,v) (y^v)
-
 /**
  * @brief  TinyMT one step function, call this every time before tmt_value.
- * @note   We supply argument V, to shaken the state.
  */
-static void tmt_one_step (uint32_t v)
+static void tmt_one_step (void)
 {
   uint32_t x, y;
 
@@ -111,7 +108,7 @@ static void tmt_one_step (uint32_t v)
   tmt[0] = tmt[1];
   tmt[1] = tmt[2];
   tmt[2] = x ^ (y << 10);
-  tmt[3] = TMT_CALC_LASTWORD (y, v);
+  tmt[3] = y;
   if ((y & 1))
     {
       tmt[1] ^= TMT_MAT1;
@@ -158,6 +155,32 @@ static uint32_t ep_value (void)
 		    | epool[(ep_count + 3) & 0x0f];
   return v;
 }
+
+/* CRC-32 shift register */
+static uint32_t crc32;
+
+/*
+ * CRC-32-IEEE's Polynomial is:
+ *    x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10
+ *    + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+ */
+static int crc32_top_bit (void)
+{
+  int v = (crc32 & 0x80000000) != 0;
+
+  return v;
+}
+
+static void crc32_add_bit (int bit)
+{
+  int v = crc32_top_bit ();
+
+  crc32 = (crc32 << 1) | (bit?1:0);
+
+  if (v)
+    crc32 ^= 0x04c11db7;
+}
+
 
 /*
  * Ring buffer, filled by generator, consumed by neug_get routine.
@@ -216,11 +239,13 @@ static uint32_t rb_del (struct rng_rb *rb)
 #define NUM_NOISE_INPUTS 7
 
 /**
- * @brief Random number generation from ADC sampling.
- * @note  Called holding the mutex, with RB->full == 0.
- *        Keep generating until RB->full == 1.
+ * @brief  Random number generation from ADC sampling.
+ * @param  RB: Pointer to ring buffer structure
+ * @return -1 when failure, 0 otherwise.
+ * @note   Called holding the mutex, with RB->full == 0.
+ *         Keep generating until RB->full == 1.
  */
-static void rng_gen (struct rng_rb *rb)
+static int rng_gen (struct rng_rb *rb)
 {
   static uint8_t round = 0;
   uint8_t b;
@@ -229,28 +254,47 @@ static void rng_gen (struct rng_rb *rb)
     {
       chEvtWaitOne (ADC_DATA_AVAILABLE);
 
+      /* Got, ADC sampling data */
       round++;
       if ((round & 1))
-	b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
-	     | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
-	     | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
-	     | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
+	{
+	  b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
+	       | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
+	       | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
+	       | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
+	}
       else
-	b = (((samp[0] & 0x01) << 1) | ((samp[1] & 0x01) << 0)
-	     | ((samp[2] & 0x01) << 3) | ((samp[3] & 0x01) << 2)
-	     | ((samp[4] & 0x01) << 5) | ((samp[5] & 0x01) << 4)
-	     | ((samp[6] & 0x01) << 7) | ((samp[7] & 0x01) << 6));
+	{
+	  b = (((samp[0] & 0x01) << 1) | ((samp[1] & 0x01) << 0)
+	       | ((samp[2] & 0x01) << 3) | ((samp[3] & 0x01) << 2)
+	       | ((samp[4] & 0x01) << 5) | ((samp[5] & 0x01) << 4)
+	       | ((samp[6] & 0x01) << 7) | ((samp[7] & 0x01) << 6));
+
+	  /*
+	   * Take second LSB of SysTick->VAL, and put to CRC32 shift register.
+	   * It seems that LSB is not good entropy source.
+	   */
+	  crc32_add_bit ((SysTick->VAL >> 1) & 0x01);
+	}
 
       adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
+      /*
+       * Put a random byte to entropy pool.
+       */
       ep_add (b);
 
       if ((round % NUM_NOISE_INPUTS) == 0)
-	{
-	  uint32_t v = ep_value ();
+	{		            /* We have enough entropy in the pool.  */
+	  uint32_t v = ep_value (); /* Get the random bits from the pool.  */
 
-	  tmt_one_step (((SysTick->VAL) & 6) == 0);
+	  /* Mix the random bits from the pool with the output of PRNG.  */
+	  tmt_one_step ();
+	  if (crc32_top_bit ())	/* We shake tmt's progress by 50%.  */
+	    tmt_one_step ();
 	  v ^= tmt_value ();
+
+	  /* We got the final random bits, add it to the ring buffer.  */
 	  rb_add (rb, v);
 	  round = 0;
 	  if (rb->full)
@@ -259,7 +303,7 @@ static void rng_gen (struct rng_rb *rb)
 	}
     }
 
-  return;
+  return 0;			/* success */
 }
 
 /**
