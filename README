@@ -151,24 +151,30 @@ Structure of the NeuG
 =====================
 
 NeuG consists of two RNG, one is the RNG based on physical noise, and
-another is "Mostly Pseudo" RNG.  Outputs of RNGs are exclusive or-ed
+another is Pseudo RNG.  Outputs of RNGs are exclusive or-ed
 to generate final output.  Here is a figure of the circuit.
 
 
                         Entropy Pool (16-byte)
                        +----------------+
+                       |                |
                    8   | 8 parallel     |   8  ||<-- [ Vref ]
                  +-/-- |  CRC-16        |<--/--||
                  |     | shift registers|      ||<-- [ Temperature Sensor ]
-                 |     +----------------+
+                 |     |                |
+                 |     |                |<----/------ SysTick
+                 |     +----------------+     1
                =====    Physical-based RNG
                  |
-                 / 32
-                 |
-  Random     32  v      32 +--------+        1
-  Number  <--/--[XOR]<--/--| TinyMT |<-------/------ SysTick
+                 +-------------+
+                 |             |
+                 / 32          / 32  Seed
+                 |             |
+                 |             v
+  Random     32  v      32 +--------+
+  Number  <--/--[XOR]<--/--| TinyMT |
   Output                   +--------+
-                         Mostly Pseudo RNG
+                           Pseudo RNG
 
 
 STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
@@ -187,9 +193,8 @@ output.
 
 I don't know how stable the noise source is.
 
-So, NeuG comes with second RNG.  It is pseudo RNG, shaken by interrupt
-timings.  It is not pure pseudo RNG, where sequence is deterministic.
-We use TinyMT for pseudo RNG.  Please see following page for TinyMT:
+So, NeuG comes with second RNG.  It is pseudo RNG timings.  We use
+TinyMT for pseudo RNG.  Please see following page for TinyMT:
 
    "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
    by Mutsuo Saito and Makoto Matsumoto

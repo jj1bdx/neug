@@ -89,10 +89,40 @@ static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
 #define TMT_MAT2 0xfc78ff1f
 #define TMT_TMAT 0x3793fdff
 
-static uint32_t tmt[4] = {
-  /* Initial state of seed=1, precomputed */
-  0x0cca24d8, 0x11ba5ad5, 0xf2dad045, 0xd95dd7b2
-};
+static uint32_t tmt[4];
+
+static void tmt_one_step (void);
+
+#define TMT_INIT_MIN_LOOP 8
+#define TMT_INIT_PRE_LOOP 8
+
+/**
+ * @brief  TinyMT initialize function.
+ */
+static void tmt_init (uint32_t seed)
+{
+  int i;
+
+  tmt[0] = seed;
+  tmt[1] = TMT_MAT1;
+  tmt[2] = TMT_MAT2;
+  tmt[3] = TMT_TMAT;
+
+  for (i = 1; i < TMT_INIT_MIN_LOOP; i++)
+    tmt[i & 3] ^= i + UINT32_C(1812433253) * (tmt[(i - 1) & 3]
+					      ^ (tmt[(i - 1) & 3] >> 30));
+
+  if ((tmt[0] & 0x7fffffff) == 0 && tmt[1] == 0 && tmt[2] == 0 && tmt[3] == 0)
+    {				/* Prevent all zero */
+      tmt[0] = 'T';
+      tmt[1] = 'I';
+      tmt[2] = 'N';
+      tmt[3] = 'Y';
+    }
+
+  for (i = 0; i < TMT_INIT_PRE_LOOP; i++)
+    tmt_one_step ();
+}
 
 /**
  * @brief  TinyMT one step function, call this every time before tmt_value.
@@ -131,16 +161,21 @@ static uint32_t tmt_value (void)
   return t0;
 }
 
-/* 8 parallel CRC-16 shift registers */
+/* 8 parallel CRC-16 shift registers, with randomly rotated feedback */
 static uint8_t epool[16];	/* Big-endian */
 static uint8_t ep_count;
 
-static void ep_add (uint8_t bits)
+#define ROTATE(f) ((f>>1)|((f&1)?0x80000000UL:0))
+
+static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
 {
   uint8_t v = epool[ep_count];
 
+  if (another_random_bit)
+    v = ROTATE (v);
+
   /* CRC-16-CCITT's Polynomial is: x^16 + x^12 + x^5 + 1 */
-  epool[ep_count] ^= bits;
+  epool[ep_count] ^= entropy_bits;
   epool[(ep_count - 5)& 0x0f] ^= v;
   epool[(ep_count - 12)& 0x0f] ^= v;
 
@@ -154,31 +189,6 @@ static uint32_t ep_value (void)
 		    | (epool[(ep_count + 2) & 0x0f] << 8)
 		    | epool[(ep_count + 3) & 0x0f];
   return v;
-}
-
-/* CRC-32 shift register */
-static uint32_t crc32;
-
-/*
- * CRC-32-IEEE's Polynomial is:
- *    x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10
- *    + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
- */
-static int crc32_top_bit (void)
-{
-  int v = (crc32 & 0x80000000) != 0;
-
-  return v;
-}
-
-static void crc32_add_bit (int bit)
-{
-  int v = crc32_top_bit ();
-
-  crc32 = (crc32 << 1) | (bit?1:0);
-
-  if (v)
-    crc32 ^= 0x04c11db7;
 }
 
 
@@ -256,33 +266,17 @@ static int rng_gen (struct rng_rb *rb)
 
       /* Got, ADC sampling data */
       round++;
-      if ((round & 1))
-	{
-	  b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
-	       | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
-	       | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
-	       | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
-	}
-      else
-	{
-	  b = (((samp[0] & 0x01) << 1) | ((samp[1] & 0x01) << 0)
-	       | ((samp[2] & 0x01) << 3) | ((samp[3] & 0x01) << 2)
-	       | ((samp[4] & 0x01) << 5) | ((samp[5] & 0x01) << 4)
-	       | ((samp[6] & 0x01) << 7) | ((samp[7] & 0x01) << 6));
-
-	  /*
-	   * Take second LSB of SysTick->VAL, and put to CRC32 shift register.
-	   * It seems that LSB is not good entropy source.
-	   */
-	  crc32_add_bit ((SysTick->VAL >> 1) & 0x01);
-	}
+      b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
+	   | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
+	   | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
+	   | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
 
       adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
       /*
        * Put a random byte to entropy pool.
        */
-      ep_add (b);
+      ep_add (b, (SysTick->VAL & 0x02) != 0);
 
       if ((round % NUM_NOISE_INPUTS) == 0)
 	{		            /* We have enough entropy in the pool.  */
@@ -290,8 +284,6 @@ static int rng_gen (struct rng_rb *rb)
 
 	  /* Mix the random bits from the pool with the output of PRNG.  */
 	  tmt_one_step ();
-	  if (crc32_top_bit ())	/* We shake tmt's progress by 50%.  */
-	    tmt_one_step ();
 	  v ^= tmt_value ();
 
 	  /* We got the final random bits, add it to the ring buffer.  */
@@ -342,8 +334,20 @@ neug_init (uint32_t *buf, uint8_t size)
 {
   struct rng_rb *rb = &the_ring_buffer;
 
+  tmt_init (0);
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
+}
+
+/**
+ * @breif Set seed to PRNG
+ */
+void
+neug_prng_reseed (void)
+{
+  uint32_t seed = ep_value ();
+
+  tmt_init (seed);
 }
 
 /**

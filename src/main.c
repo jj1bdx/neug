@@ -411,8 +411,7 @@ main (int argc, char **argv)
       uint32_t v;
       const uint8_t *s = (const uint8_t *)&v;
 
-      while (count++ < NEUG_PRE_LOOP
-	     || SDU1.config->usbp->state != USB_ACTIVE)
+      while (count < NEUG_PRE_LOOP || SDU1.config->usbp->state != USB_ACTIVE)
 	{
 	  v = neug_get (NEUG_KICK_FILLING);
 	  if ((count & 0x000f) == 0)
@@ -422,6 +421,7 @@ main (int argc, char **argv)
 	}
 
       count = 0;
+      neug_prng_reseed ();
 
       while (1)
 	{

@@ -1,3 +1,16 @@
+2011-08-29  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (ep_add): New argument another_random_bit.
+	(crc32_top_bit, crc32_add_bit): Delete.
+	(tmt_init): New.
+	(rng_gen): Call ep_add with SysTick->VAL shake.
+	Don't shake PRNG by interrupt timing.
+	(neug_prng_reseed): New.
+
+	* src/main.c (main): Call neug_prng_reseed after new connection.
+
+	* src/neug.h (neug_prng_reseed): New.
+
 2011-08-19  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (tmt_one_step): No argument.
