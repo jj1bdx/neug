@@ -66,6 +66,7 @@ Configuration:
 			   OLIMEX_STM32_H103
 			   STBEE_MINI
 			   CQ_STARM
+			   STBEE
   --with-dfu		build image for DFU 		[<target specific>]
 EOF
   exit 0

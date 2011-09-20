@@ -1,5 +1,11 @@
 2011-09-20  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* boards/STBEE/mcuconf.h, boards/STBEE/board.h: New.
+	* boards/STBEE/board.c: New.
+	* boards/common/board-common.c (pal_default_config): Add case for
+	STM32F10X_HD.
+	* src/configure: Support STBEE.
+
 	* src/random.c (PROBABILITY_50_BY_TICK): New.
 	(ep_add): Use ROTATE for final feedback only.
 	(fnv32_hash): New.
