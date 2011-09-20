@@ -1,3 +1,10 @@
+2011-09-20  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (PROBABILITY_50_BY_TICK): New.
+	(ep_add): Use ROTATE for final feedback only.
+	(fnv32_hash): New.
+	(ep_output): Rename (was: ep_value).  Use fnv32_hash.
+
 2011-08-29  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (ep_add): New argument another_random_bit.

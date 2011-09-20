@@ -162,8 +162,18 @@ static uint32_t tmt_value (void)
 }
 
 /* 8 parallel CRC-16 shift registers, with randomly rotated feedback */
-static uint8_t epool[16];	/* Big-endian */
+#define EPOOL_SIZE 16
+static uint8_t epool[EPOOL_SIZE];	/* Big-endian */
 static uint8_t ep_count;
+
+/*
+ * Magic number seven.
+ *
+ * We did an experiment of measuring entropy of ADC output with MUST.
+ * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
+ * So, it is considered OK to get 4-byte from 7-byte (6x7 = 42 > 32).
+ */
+#define NUM_NOISE_INPUTS 7
 
 #define ROTATE(f) ((f>>1)|((f&1)?0x80000000UL:0))
 
@@ -171,24 +181,51 @@ static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
 {
   uint8_t v = epool[ep_count];
 
-  if (another_random_bit)
-    v = ROTATE (v);
-
   /* CRC-16-CCITT's Polynomial is: x^16 + x^12 + x^5 + 1 */
-  epool[ep_count] ^= entropy_bits;
-  epool[(ep_count - 5)& 0x0f] ^= v;
   epool[(ep_count - 12)& 0x0f] ^= v;
+  epool[(ep_count - 5)& 0x0f] ^= v;
+  epool[ep_count] = (another_random_bit ? ROTATE (v): v) ^ entropy_bits;
 
   ep_count = (ep_count + 1) & 0x0f;
 }
 
-static uint32_t ep_value (void)
+#define FNV_INIT	2166136261U
+#define FNV_PRIME	16777619
+
+static uint32_t fnv32_hash (const uint8_t *buf, int len)
 {
-  uint32_t v = (epool[ep_count] << 24)
-		    | (epool[(ep_count + 1) & 0x0f] << 16)
-		    | (epool[(ep_count + 2) & 0x0f] << 8)
-		    | epool[(ep_count + 3) & 0x0f];
+  uint32_t v = FNV_INIT;
+  int i;
+
+  for (i = 0; i < len; i++)
+    {
+      v ^= buf[i];
+      v *= FNV_PRIME;
+    }
+
   return v;
+}
+
+#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
+
+static uint32_t ep_output (void)
+{
+  int i;
+  uint8_t buf[NUM_NOISE_INPUTS];
+  uint8_t *p = buf;
+
+  /* Use four outputs of CRC-16 buffer */
+  for (i = 0; i < 4; i++)
+    *p++ = epool[(ep_count+i) & 0x0f];
+
+  /*
+   * At some probability, we use other 3 outputs of CRC-16 buffer for final output
+   */
+  for (; i < NUM_NOISE_INPUTS; i++)
+    if (PROBABILITY_50_BY_TICK ())
+      *p++ = epool[(ep_count+i) & 0x0f] ^ epool[(ep_count+i-4) & 0x0f];
+
+  return fnv32_hash (buf, i);
 }
 
 
@@ -241,13 +278,6 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
-/*
- * We did an experiment of measuring entropy of ADC output with MUST.
- * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
- * So, it is considered OK to get 4-byte from 7-byte (6x7 = 42 > 32).
- */
-#define NUM_NOISE_INPUTS 7
-
 /**
  * @brief  Random number generation from ADC sampling.
  * @param  RB: Pointer to ring buffer structure
@@ -276,11 +306,11 @@ static int rng_gen (struct rng_rb *rb)
       /*
        * Put a random byte to entropy pool.
        */
-      ep_add (b, (SysTick->VAL & 0x02) != 0);
+      ep_add (b, PROBABILITY_50_BY_TICK ());
 
       if ((round % NUM_NOISE_INPUTS) == 0)
 	{		            /* We have enough entropy in the pool.  */
-	  uint32_t v = ep_value (); /* Get the random bits from the pool.  */
+	  uint32_t v = ep_output (); /* Get the random bits from the pool.  */
 
 	  /* Mix the random bits from the pool with the output of PRNG.  */
 	  tmt_one_step ();
@@ -345,7 +375,7 @@ neug_init (uint32_t *buf, uint8_t size)
 void
 neug_prng_reseed (void)
 {
-  uint32_t seed = ep_value ();
+  uint32_t seed = ep_output ();
 
   tmt_init (seed);
 }
