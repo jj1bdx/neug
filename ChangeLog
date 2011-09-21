@@ -2,6 +2,7 @@
 
 	* src/random.c (ep_output): Bug fix for second argument of
 	fnv32_hash, and change the way to place values into the buffer.
+	(ep_add): Feedback byte always shift 1-bit, entropy_bit sometimes.
 
 2011-09-20  NIIBE Yutaka  <gniibe@fsij.org>
 

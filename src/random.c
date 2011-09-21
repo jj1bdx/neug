@@ -175,7 +175,7 @@ static uint8_t ep_count;
  */
 #define NUM_NOISE_INPUTS 7
 
-#define ROTATE(f) ((f>>1)|((f&1)?0x80000000UL:0))
+#define ROTATE(f) (((f)>>1)|(((f)&1)?0x80000000UL:0))
 
 static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
 {
@@ -184,7 +184,13 @@ static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
   /* CRC-16-CCITT's Polynomial is: x^16 + x^12 + x^5 + 1 */
   epool[(ep_count - 12)& 0x0f] ^= v;
   epool[(ep_count - 5)& 0x0f] ^= v;
-  epool[ep_count] = (another_random_bit ? ROTATE (v): v) ^ entropy_bits;
+  if (another_random_bit)
+    {
+      v ^= entropy_bits;
+      epool[ep_count] = ROTATE (v);
+    }
+  else
+    epool[ep_count] = ROTATE (v) ^ entropy_bits;
 
   ep_count = (ep_count + 1) & 0x0f;
 }
