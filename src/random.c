@@ -214,18 +214,25 @@ static uint32_t ep_output (void)
   uint8_t buf[NUM_NOISE_INPUTS];
   uint8_t *p = buf;
 
-  /* Use four outputs of CRC-16 buffer */
-  for (i = 0; i < 4; i++)
-    *p++ = epool[(ep_count+i) & 0x0f];
-
   /*
-   * At some probability, we use other 3 outputs of CRC-16 buffer for final output
+   * NUM_NOISE_INPUTS is seven.
+   *
+   * There are sixteen bytes in the CRC-16 buffer.  We use seven
+   * outputs of CRC-16 buffer for final output.  There are two parts;
+   * former 4 outputs which will be used directly, and latter 3
+   * outputs which will be used with feedback loop.
    */
-  for (; i < NUM_NOISE_INPUTS; i++)
+
+  /* At some probability, use latter 3 outputs of CRC-16 buffer */
+  for (i = NUM_NOISE_INPUTS - 1; i >= 4; i--)
     if (PROBABILITY_50_BY_TICK ())
       *p++ = epool[(ep_count+i) & 0x0f] ^ epool[(ep_count+i-4) & 0x0f];
 
-  return fnv32_hash (buf, i);
+  /* Use former 4 outputs of CRC-16 buffer */
+  for (i = 3; i >= 0; i--)
+    *p++ = epool[(ep_count+i) & 0x0f];
+
+  return fnv32_hash (buf, p - buf);
 }
 
 
