@@ -52,7 +52,7 @@ A2: Yes, we should.  It's not implemented yet, and I don't have an
 Targets
 =======
 
-STBee Mini and Olimex STM32-H103 is supported.
+STBee Mini, Olimex STM32-H103, CQ-STARM, and STBee are supported.
 
 
 Souce code
@@ -105,8 +105,8 @@ Then, we will have "neug.elf".
 How to install
 ==============
 
-STBee Mini
-----------
+STBee Mini and STBee
+--------------------
 
 Reset the board with "USER" switch pushed.  Type following to write
 to flash:
@@ -158,13 +158,19 @@ to generate final output.  Here is a figure of the circuit.
                         Entropy Pool (16-byte)
                        +----------------+
                        |                |
-                   8   | 8 parallel     |   8  ||<-- [ Vref ]
-                 +-/-- |  CRC-16        |<--/--||
+                       | 8 parallel     |   8  ||<-- [ Vref ]
+                 +---- |  CRC-16        |<--/--||
                  |     | shift registers|      ||<-- [ Temperature Sensor ]
                  |     |                |
                  |     |                |<----/------ SysTick
                  |     +----------------+     1
-               =====    Physical-based RNG
+                 |     Physical-based RNG
+                 / 8
+                 |
+                 v
+               ===== Output function
+                 |
+                 / 32
                  |
                  +-------------+
                  |             |
@@ -235,6 +241,14 @@ Information on the Web
 ======================
 
 Not yet.
+
+
+Known Problem(s)
+================
+
+On STBee (high-density device of STM32), I observed stall of
+generation of random number, after two hours, two hours and half, etc.
+Not yet identified the bug.
 
 
 Your Contributions
