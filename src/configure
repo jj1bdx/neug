@@ -82,8 +82,10 @@ fi
 
 # Flash page size in byte
 FLASH_PAGE_SIZE=1024
-# Flash memory size in KB
+# Flash memory size in KiB
 FLASH_SIZE=128
+# Memory size in KiB
+MEMORY_SIZE=20
 
 # Settings for TARGET
 case $target in
@@ -94,10 +96,12 @@ CQ_STARM|STBEE_MINI)
 STM32_PRIMER2)
   FLASH_PAGE_SIZE=2048
   FLASH_SIZE=512
+  MEMORY_SIZE=64
   ;;
 STBEE)
   FLASH_PAGE_SIZE=2048
   FLASH_SIZE=512
+  MEMORY_SIZE=64
   if test "$with_dfu" = "default"; then
     with_dfu=yes;
   fi  ;;
@@ -123,6 +127,7 @@ fi
 sed -e "s%@BOARD_DIR@%$BOARD_DIR%" \
 	< Makefile.in > Makefile
 sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
+    -e "s/@MEMORY_SIZE@/$MEMORY_SIZE/" \
     -e "s/@FLASH_PAGE_SIZE@/$FLASH_PAGE_SIZE/" \
 	< neug.ld.in > neug.ld
 sed -e "s/@DFU_DEFINE@/$DFU_DEFINE/" \

@@ -42,6 +42,7 @@ static Thread *rng_thread;
 static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
  
 static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
+static void adccb_err (ADCDriver *adcp, adcerror_t err);
 
 /*
  * ADC conversion group.
@@ -53,6 +54,7 @@ static const ADCConversionGroup adcgrpcfg = {
   FALSE,
   ADC_GRP1_NUM_CHANNELS,
   adccb,
+  adccb_err,
   0,
   ADC_CR2_TSVREFE,
   ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5),
@@ -74,6 +76,12 @@ static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
     chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
   chSysUnlockFromIsr();
 }
+
+static void adccb_err (ADCDriver *adcp, adcerror_t err)
+{
+  (void)adcp;  (void)err;
+}
+
 
 /*
  * TinyMT routines.

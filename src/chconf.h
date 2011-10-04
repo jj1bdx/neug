@@ -44,6 +44,10 @@
   /* Add threads initialization code here.*/                            \
 }
 
+#define THREAD_CONTEXT_SWITCH_HOOK(ntp, otp) {                              \
+  /* System halt code here.*/                                               \
+}
+
 #define THREAD_EXT_EXIT(tp) {                                           \
   /* Add threads finalization code here.*/                              \
 }

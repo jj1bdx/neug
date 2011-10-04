@@ -1,3 +1,24 @@
+2011-10-04  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/chconf.h (THREAD_CONTEXT_SWITCH_HOOK): New.
+
+	* src/Makefile.in: Follow the change of ChibiOS 2.3.3 (new
+	directory structure of platforms/STM32F1xx).
+
+	* src/main.c (vcom_configuration_descriptor_data, usb_event):
+	Follow the change of ChibiOS 2.3.3 (USB_CDC_*).
+	(vcom_string3): Version 0.01.
+
+	* src/configure (MEMORY_SIZE): New.
+
+	* src/neug.ld.in (@MEMORY_SIZE@): New (for HD device like STBEE).
+	(.stacks): New in newer ChibiOS (>= 2.3.3).
+
+	* src/random.c (adccb_err): New.
+	(adcgrpcfg): Add adccb_err.
+
+	* chibios: Updated to trunk of 2.3.3.
+
 2011-09-27  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (adcgrpcfg): Fix configuration value (had old
