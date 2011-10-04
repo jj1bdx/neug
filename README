@@ -250,6 +250,25 @@ On STBee (high-density device of STM32), I observed stall of
 generation of random number, after two hours, two hours and half, etc.
 Not yet identified the bug.
 
+Identified somehow:
+	adcp->state = ADC_ACTIVE
+	main thread: wait on condition variable at neug_get
+	rng thread: holding rb->m, event wait at rng_gen for ADC_DATA_AVAILABLE
+	idle thread: running
+	LED thread: event wait
+
+Kicking DMA controller again (ADC is continuous mode).
+
+(gdb) set ADCD1.dmastp->channel->CCR = 0
+(gdb) set ADCD1.dmastp->channel->CNDTR = 8
+(gdb) set ADCD1.dmastp->channel->CCR = 0x258f
+(gdb) x/x 0x40020000		# DMA interrupt status register (DMA_ISR)
+0x40020000:	0x00000007
+
+Then, it goes again.
+
+Lost DMA finish interrupt?
+
 
 Your Contributions
 ==================
