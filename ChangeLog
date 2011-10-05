@@ -1,3 +1,8 @@
+2011-10-05  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* boards/common/board-common.c (__early_init): Set MSP register
+	in case of DFU.
+
 2011-10-04  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/chconf.h (THREAD_CONTEXT_SWITCH_HOOK): New.
