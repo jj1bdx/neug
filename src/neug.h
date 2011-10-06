@@ -7,3 +7,4 @@ void neug_init (uint32_t *buf, uint8_t size);
 void neug_prng_reseed (void);
 uint32_t neug_get (int kick);
 void neug_kick_filling (void);
+void neug_flush (void);

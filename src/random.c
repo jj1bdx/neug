@@ -388,6 +388,19 @@ neug_init (uint32_t *buf, uint8_t size)
 }
 
 /**
+ * @breif Flush random bytes.
+ */
+void
+neug_flush (void)
+{
+  chMtxLock (&rb->m);
+  while (!rb->empty)
+    (void)rb_del (rb);
+  chCondSignal (&rb->space_available);
+  chMtxUnlock ();
+}
+
+/**
  * @breif Set seed to PRNG
  */
 void
@@ -396,6 +409,7 @@ neug_prng_reseed (void)
   uint32_t seed = ep_output ();
 
   tmt_init (seed);
+  neug_flush ();
 }
 
 /**
@@ -415,7 +429,7 @@ neug_kick_filling (void)
 /**
  * @brief  Get random word (32-bit) from NeuG.
  * @detail With NEUG_KICK_FILLING, it wakes up RNG thread.
- *         With NEUG_NO_KICK, it doesn't wake up automatically,
+ *         With NEUG_NO_KICK, it doesn't wake up RNG thread automatically,
  *         it is needed to call neug_kick_filling later.
  */
 uint32_t
