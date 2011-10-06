@@ -372,7 +372,7 @@ static msg_t rng (void *arg)
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 64);
+static WORKING_AREA(wa_rng, 128);
 
 /**
  * @brief Initialize NeuG.
