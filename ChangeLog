@@ -2,6 +2,7 @@
 
 	* src/random.c (neug_flush): New.
 	(neug_prng_reseed): Call neug_flush.
+	(wa_rng): 64 is enough for working area.
 
 2011-10-05  NIIBE Yutaka  <gniibe@fsij.org>
 
