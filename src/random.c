@@ -372,7 +372,7 @@ static msg_t rng (void *arg)
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 128);
+static WORKING_AREA(wa_rng, 64);
 
 /**
  * @brief Initialize NeuG.
@@ -393,6 +393,8 @@ neug_init (uint32_t *buf, uint8_t size)
 void
 neug_flush (void)
 {
+  struct rng_rb *rb = &the_ring_buffer;
+
   chMtxLock (&rb->m);
   while (!rb->empty)
     (void)rb_del (rb);
