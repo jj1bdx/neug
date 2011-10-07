@@ -450,3 +450,14 @@ neug_get (int kick)
 
   return v;
 }
+
+void
+neug_wait_full (void)
+{
+  struct rng_rb *rb = &the_ring_buffer;
+
+  chMtxLock (&rb->m);
+  while (!rb->full)
+    chCondWait (&rb->data_available);
+  chMtxUnlock ();
+}

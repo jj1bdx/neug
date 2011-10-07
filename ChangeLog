@@ -1,3 +1,7 @@
+2011-10-07  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (neug_wait_full): New (from Gnuk).
+
 2011-10-06  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (neug_flush): New.
