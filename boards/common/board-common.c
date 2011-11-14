@@ -57,10 +57,6 @@ void
 __early_init(void)
 {
 #ifdef DFU_SUPPORT
-  extern void __main_stack_end__(void);
-  uint32_t msp = (uint32_t)__main_stack_end__;
-
-  asm volatile ("msr     MSP, %0" : : "r" (msp));
   SCB->VTOR = 0x08003000;
 #endif
 

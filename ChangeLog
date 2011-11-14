@@ -1,3 +1,21 @@
+2011-11-14  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/Makefile.in (MCFLAGS): Override MCFLAGS option for newer
+	GCC of summon-arm-toolchain to add -mfix-cortex-m3-ldrd.
+	NOTE: This should not be needed (as -mcpu=cortex-m3 defaults
+	to -mfix-cortex-m3-ldrd for GCC-proper), but it is needed
+	to select arm-none-eabi/lib/thumb2/libc.a correctly.
+
+	* boards/common/board-common.c (__early_init): Revert change of
+	2011-10-05.
+
+	* boards/FST_01/{mcuconf.h,board.h,board.c}: New.
+
+	* src/main.c (my_sduRequestsHook): New.
+	(LED_ONESHOT_SHORT, LED_ONESHOT_LONG): New.
+	(led_blinker): Support LED_ONESHOT_SHORT and LED_ONESHOT_LONG.
+	(main): Call neug_prng_reseed for each new connection.
+
 2011-10-07  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (neug_wait_full): New (from Gnuk).

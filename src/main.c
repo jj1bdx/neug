@@ -313,6 +313,30 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
   return;
 }
 
+static uint8_t connected;
+
+/* Taken from serial_usb.c and modified for NeuG.  */
+static bool_t
+my_sduRequestsHook (USBDriver *usbp)
+{
+  bool_t r = sduRequestsHook (usbp);
+
+  if ((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS
+      && usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE)
+    {
+      if (usbp->setup[2] != 0)
+	{		   /* Open call or setting line state again */
+	  if ((connected & 1) == 0)
+	    /* It's Open call */
+	    connected++;
+	}
+      else
+	/* Close call */
+	connected++;
+    }
+
+  return r;
+}
 
 /*
  * Serial over USB driver configuration.
@@ -322,7 +346,7 @@ static const SerialUSBConfig serusbcfg = {
   {
     usb_event,
     get_descriptor,
-    sduRequestsHook,
+    my_sduRequestsHook,
     NULL
   }
 };
@@ -350,7 +374,8 @@ static void fill_serial_no_by_unique_id (void)
 
 static WORKING_AREA(wa_led, 64);
 
-#define LED_ONESHOT ((eventmask_t)1)
+#define LED_ONESHOT_SHORT ((eventmask_t)1)
+#define LED_ONESHOT_LONG  ((eventmask_t)2)
 static Thread *led_thread;
 
 /*
@@ -365,9 +390,14 @@ static msg_t led_blinker (void *arg)
 
   while (1)
     {
-      chEvtWaitOne (LED_ONESHOT);
+      eventmask_t m;
+
+      m = chEvtWaitOne (ALL_EVENTS);
       set_led (1);
-      chThdSleep (MS2ST (100));
+      if (m == LED_ONESHOT_SHORT)
+	chThdSleep (MS2ST (100));
+      else
+	chThdSleep (MS2ST (250));
       set_led (0);
     }
 
@@ -385,8 +415,6 @@ static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 int
 main (int argc, char **argv)
 {
-  unsigned int count = 0;
-
   (void)argc;
   (void)argv;
 
@@ -410,16 +438,26 @@ main (int argc, char **argv)
     {
       uint32_t v;
       const uint8_t *s = (const uint8_t *)&v;
+      unsigned int count = 0;
 
+      connected = 0;
       while (count < NEUG_PRE_LOOP || SDU1.config->usbp->state != USB_ACTIVE)
 	{
 	  v = neug_get (NEUG_KICK_FILLING);
 	  if ((count & 0x000f) == 0)
-	    chEvtSignalFlags (led_thread, LED_ONESHOT);
+	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 	  chThdSleep (MS2ST (25));
 	  count++;
 	}
 
+    waiting_connection:
+      while ((connected & 1) == 0)
+	{
+	  chEvtSignalFlags (led_thread, LED_ONESHOT_LONG);
+	  chThdSleep (MS2ST (2500));
+	}
+
+      /* The connection opened.  */
       count = 0;
       neug_prng_reseed ();
 
@@ -427,13 +465,16 @@ main (int argc, char **argv)
 	{
 	  count++;
 
+	  if ((connected & 1) == 0)
+	    goto waiting_connection;
+
 	  if (SDU1.config->usbp->state != USB_ACTIVE)
 	    break;
 
 	  v = neug_get (NEUG_KICK_FILLING);
 
 	  if ((count & 0x07ff) == 0)
-	    chEvtSignalFlags (led_thread, LED_ONESHOT);
+	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 	  /*
 	   * Ignore input, just in case /dev/ttyACM0 echos our output
 	   */

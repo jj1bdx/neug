@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
-							   Version 0.00
-							     2011-07-14
+							   Version 0.01
+							     2011-11-14
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -25,10 +25,10 @@ too.
 Release notes
 =============
 
-This is the first release of NeuG, which is experimental enough.  You
-can enjoy NeuG device, but I don't know how it is good yet.  Note that
-you need the snapshot of ChibiOS/RT (from trunk).  This means that it
-is covered by GNU GPL.  No "linking exception" option is available for
+This is the second release of NeuG, which is experimental.  You can
+enjoy NeuG device, but I don't know how it is good yet.  Note that you
+need the snapshot of ChibiOS/RT (from trunk).  This means that it is
+covered by GNU GPL.  No "linking exception" option is available for
 the snapshot.
 
 
@@ -36,7 +36,9 @@ FAQ
 ===
 
 Q0: How NeuG device is good?
-A0: I don't know yet.  It is under evaluation now.
+A0: I believe it's good enough.  I evaluated it with rngtest of
+    RNG-tools, NIST STS test and Dieharder.
+    See the directory neug/test-results/.
 A0-dash: For better entropy device, you can get EntropyKey.
          See http://www.entropykey.co.uk/
 A0-double-dash: STM32F2xx has built-in TRNG, it would be better for you.
@@ -246,24 +248,26 @@ Not yet.
 Known Problem(s)
 ================
 
-On STBee (high-density device of STM32), I observed stall of
-generation of random number, after two hours, two hours and half, etc.
-Not yet identified the bug.
+On STBee (high-density device of STM32), sometimes, I observed stall
+of generation of random number, after two hours, two hours and half,
+etc.
 
-Identified somehow:
+Identified somehow.  When it stalls, status is like this (by OpenOCD, GDB):
+
 	adcp->state = ADC_ACTIVE
 	main thread: wait on condition variable at neug_get
 	rng thread: holding rb->m, event wait at rng_gen for ADC_DATA_AVAILABLE
 	idle thread: running
 	LED thread: event wait
 
-Kicking DMA controller again (ADC is continuous mode).
+Kicking DMA controller again (note: ADC is continuous mode, no need to
+kick), by doing following:
 
-(gdb) set ADCD1.dmastp->channel->CCR = 0
-(gdb) set ADCD1.dmastp->channel->CNDTR = 8
-(gdb) set ADCD1.dmastp->channel->CCR = 0x258f
-(gdb) x/x 0x40020000		# DMA interrupt status register (DMA_ISR)
-0x40020000:	0x00000007
+  (gdb) set ADCD1.dmastp->channel->CCR = 0
+  (gdb) set ADCD1.dmastp->channel->CNDTR = 8
+  (gdb) set ADCD1.dmastp->channel->CCR = 0x258f
+  (gdb) x/x 0x40020000		# DMA interrupt status register (DMA_ISR)
+  0x40020000:	0x00000007
 
 Then, it goes again.
 
