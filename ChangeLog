@@ -1,3 +1,8 @@
+2012-08-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/sys.h, src/sys.c: New files (from Gnuk).
+	* src/usb_lld.h, src/usb_lld.c: New files (from Gnuk).
+
 2011-11-14  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.01.
