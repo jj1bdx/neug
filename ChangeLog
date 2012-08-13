@@ -1,5 +1,13 @@
 2012-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (RANDOM_BYTES_LENGTH): It's now 60 (was: 32).
+	(neug_device_reset, neug_ctrl_write_finish)
+	(vcom_port_data_setup, neug_setup, neug_get_descriptor)
+	(neug_setup_endpoints_for_interface, neug_usb_event)
+	(neug_interface, Vector90, EP1_IN_Callback, EP2_IN_Callback)
+	(EP3_OUT_Callback): New.
+	(main): Now use usb_lld_* functions (was: ChibiOS SDU driver).
+
 	* boards/*/board.c (USB_Cable_Config, set_led): Remove.
 	, boards/*/board.h (SET_USB_CONDITION, SET_LED_CONDITION)
 	(GPIO_USB, IOPORT_USB, GPIO_LED, IOPORT_LED): Define.
