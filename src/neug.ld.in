@@ -33,9 +33,14 @@ __process_stack_size__  = 0x0400;
 
 MEMORY
 {
-    flash : org = @ORIGIN@, len = @FLASH_SIZE@k
+    flash0 : org = @ORIGIN@, len = 4k
+    flash : org = @ORIGIN@+0x1000, len = @FLASH_SIZE@k - 4k
     ram : org = 0x20000000, len = @MEMORY_SIZE@k
 }
+
+/* __flash_start__: flash ROM start address regardless of DFU_SUPPORT */
+__flash_start__         = 0x08001000;
+__flash_end__		= ORIGIN(flash) + LENGTH(flash);
 
 __ram_start__           = ORIGIN(ram);
 __ram_size__            = LENGTH(ram);
@@ -44,6 +49,23 @@ __ram_end__             = __ram_start__ + __ram_size__;
 SECTIONS
 {
     . = 0;
+
+    .sys : ALIGN(16) SUBALIGN(16)
+    {
+        _sys = .;
+        KEEP(*(.vectors))
+	. = ALIGN(16);
+	*(.sys.version)
+	sys.o(.text)
+	sys.o(.text.*)
+        sys.o(.rodata)
+	sys.o(.rodata.*)
+	. = ALIGN(1024);
+	*(.sys.0)
+	*(.sys.1)
+	*(.sys.2)
+    } > flash0
+
     _text = .;
 
     startup : ALIGN(16) SUBALIGN(16)

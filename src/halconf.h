@@ -16,10 +16,10 @@
 #define HAL_USE_PWM              FALSE
 #define HAL_USE_SDC              FALSE
 #define HAL_USE_SERIAL           FALSE
-#define HAL_USE_SERIAL_USB       TRUE
+#define HAL_USE_SERIAL_USB       FALSE
 #define HAL_USE_SPI              FALSE
 #define HAL_USE_UART             FALSE
-#define HAL_USE_USB              TRUE
+#define HAL_USE_USB              FALSE
 
 #define ADC_USE_WAIT             FALSE
 #define ADC_USE_MUTUAL_EXCLUSION FALSE

@@ -1,5 +1,7 @@
 2012-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/halconf.h (HAL_USE_SERIAL_USB, HAL_USE_USB): Not define.
+	* src/Makefile.in (CSRC): Add sys.c and usb_lld.c
 	* src/sys.h, src/sys.c: New files (from Gnuk).
 	* src/usb_lld.h, src/usb_lld.c: New files (from Gnuk).
 
