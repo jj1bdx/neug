@@ -30,6 +30,12 @@
 /*
  * Setup for the Olimex STM32-H103 proto board.
  */
+#define	SET_USB_CONDITION(en) (!en)	/* To connect USB, call palClearPad */
+#define	SET_LED_CONDITION(on) (!on)	/* To emit light, call palClearPad */
+#define GPIO_USB	GPIOC_DISC
+#define IOPORT_USB	GPIOC
+#define GPIO_LED	GPIOC_LED
+#define IOPORT_LED	GPIOC
 
 /*
  * Board identifier.
@@ -144,8 +150,6 @@
 extern "C" {
 #endif
   void boardInit(void);
-  void USB_Cable_Config (int NewState);
-  void set_led (int value);
 #ifdef __cplusplus
 }
 #endif

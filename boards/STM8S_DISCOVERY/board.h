@@ -30,6 +30,10 @@
 /*
  * Setup for the ST-Link part of STM8S-Discovery board.
  */
+#undef	SET_USB_CONDITION		/* No functionality to disconnect USB */
+#define	SET_LED_CONDITION(on) on	/* To emit light, call palSetPad */
+#define GPIO_LED	GPIOA_LED
+#define IOPORT_LED	GPIOA
 
 /*
  * Board identifier.
@@ -128,8 +132,6 @@
 extern "C" {
 #endif
   void boardInit(void);
-  void USB_Cable_Config (int NewState);
-  void set_led (int value);
 #ifdef __cplusplus
 }
 #endif

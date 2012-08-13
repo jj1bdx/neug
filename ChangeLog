@@ -1,5 +1,12 @@
 2012-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
+	* boards/*/board.c (USB_Cable_Config, set_led): Remove.
+	, boards/*/board.h (SET_USB_CONDITION, SET_LED_CONDITION)
+	(GPIO_USB, IOPORT_USB, GPIO_LED, IOPORT_LED): Define.
+
+	* boards/common/board-common.c [DFU_SUPPORT] (__early_init): Don't
+	set SCB->VTOR here (it's done in reset in src/sys.c).
+
 	* src/halconf.h (HAL_USE_SERIAL_USB, HAL_USE_USB): Not define.
 	* src/Makefile.in (CSRC): Add sys.c and usb_lld.c
 	* src/sys.h, src/sys.c: New files (from Gnuk).

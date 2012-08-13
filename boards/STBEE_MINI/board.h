@@ -31,6 +31,12 @@
 /*
  * Setup for the STBee Mini board.
  */
+#define	SET_USB_CONDITION(en) (en)	/* To connect USB, call palSetPad */
+#define	SET_LED_CONDITION(on) (!on)	/* To emit light, call palClearPad */
+#define GPIO_USB	GPIOA_USB_ENABLE
+#define IOPORT_USB	GPIOA
+#define GPIO_LED	GPIOA_LED1
+#define IOPORT_LED	GPIOA
 
 /*
  * Board identifier.
@@ -136,8 +142,6 @@
 extern "C" {
 #endif
   void boardInit(void);
-  void USB_Cable_Config (int NewState);
-  void set_led (int value);
 #ifdef __cplusplus
 }
 #endif

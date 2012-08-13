@@ -30,6 +30,12 @@
 /*
  * Setup for the FST-01 board.
  */
+#define	SET_USB_CONDITION(en) en	/* To connect USB, call palSetPad */
+#define	SET_LED_CONDITION(on) on	/* To emit light, call palSetPad */
+#define GPIO_USB	GPIOA_USB_ENABLE
+#define IOPORT_USB	GPIOA
+#define GPIO_LED	GPIOB_LED
+#define IOPORT_LED	GPIOB
 
 /*
  * Board identifier.
@@ -132,8 +138,6 @@
 extern "C" {
 #endif
   void boardInit(void);
-  void USB_Cable_Config (int NewState);
-  void set_led (int value);
 #ifdef __cplusplus
 }
 #endif
