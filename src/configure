@@ -131,5 +131,6 @@ sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
     -e "s/@FLASH_PAGE_SIZE@/$FLASH_PAGE_SIZE/" \
 	< neug.ld.in > neug.ld
 sed -e "s/@DFU_DEFINE@/$DFU_DEFINE/" \
+    -e "s/@FLASH_PAGE_SIZE@/$FLASH_PAGE_SIZE/" \
 	< config.h.in > config.h
 exit 0
