@@ -54,7 +54,8 @@ A2: Yes, we should.  It's not implemented yet, and I don't have an
 Targets
 =======
 
-STBee Mini, Olimex STM32-H103, CQ-STARM, and STBee are supported.
+FST-01, STBee Mini, Olimex STM32-H103, CQ-STARM, and STBee are
+supported.
 
 
 Souce code
@@ -164,13 +165,13 @@ to generate final output.  Here is a figure of the circuit.
                  +---- |  CRC-16        |<--/--||
                  |     | shift registers|      ||<-- [ Temperature Sensor ]
                  |     |                |
-                 |     |                |<----/------ SysTick
-                 |     +----------------+     1
-                 |     Physical-based RNG
-                 / 8
-                 |
-                 v
-               ===== Output function
+                 |     |                |<--+--/------ SysTick
+                 |     +----------------+   |  1
+                 |     Physical-based RNG   |
+                 / 8                        |
+                 |                          |
+                 v                          |
+               ===== Output function  <-----+
                  |
                  / 32
                  |
@@ -187,8 +188,7 @@ to generate final output.  Here is a figure of the circuit.
 
 STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
 which are connected to A/D converter of 12-bit resolution.  NeuG uses
-LSBs of A/D converter's outputs and A/D converter's interrupt timings
-as entropy sources.
+LSBs of A/D converter's outputs as entropy sources.
 
 By four samplings of two channels, we can get 8-bit, as we can get two
 bits (LSB of Vref and LSB of Temperature Sensor) from one sampling.
@@ -201,8 +201,8 @@ output.
 
 I don't know how stable the noise source is.
 
-So, NeuG comes with second RNG.  It is pseudo RNG timings.  We use
-TinyMT for pseudo RNG.  Please see following page for TinyMT:
+So, NeuG comes with second RNG, that is, TinyMT pseudo RNG.  Please
+see following page for TinyMT:
 
    "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
    by Mutsuo Saito and Makoto Matsumoto
