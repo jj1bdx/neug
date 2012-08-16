@@ -688,13 +688,13 @@ main (int argc, char **argv)
     waiting_connection:
       while ((connected & 1) == 0)
 	{
+	  neug_flush ();
 	  chEvtSignalFlags (led_thread, LED_ONESHOT_LONG);
 	  chThdSleep (MS2ST (2500));
 	}
 
       /* The connection opened.  */
       count = 0;
-      neug_prng_reseed ();
 
       while (1)
 	{
@@ -706,7 +706,7 @@ main (int argc, char **argv)
 
 	  neug_wait_full ();
 
-	  if ((count & 0x07ff) == 0)
+	  if ((count & 0x00ff) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 
 	  usb_lld_txcpy (random_word, ENDP1, 0, RANDOM_BYTES_LENGTH);

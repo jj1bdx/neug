@@ -83,105 +83,21 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err)
 }
 
 
-/*
- * TinyMT routines.
- *
- * See
- * "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
- * by Mutsuo Saito and Makoto Matsumoto
- *     http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/
- */
-
-/* Use the first example of TinyMT */
-#define TMT_MAT1 0x8f7011ee
-#define TMT_MAT2 0xfc78ff1f
-#define TMT_TMAT 0x3793fdff
-
-static uint32_t tmt[4];
-
-static void tmt_one_step (void);
-
-#define TMT_INIT_MIN_LOOP 8
-#define TMT_INIT_PRE_LOOP 8
-
-/**
- * @brief  TinyMT initialize function.
- */
-static void tmt_init (uint32_t seed)
-{
-  int i;
-
-  tmt[0] = seed;
-  tmt[1] = TMT_MAT1;
-  tmt[2] = TMT_MAT2;
-  tmt[3] = TMT_TMAT;
-
-  for (i = 1; i < TMT_INIT_MIN_LOOP; i++)
-    tmt[i & 3] ^= i + UINT32_C(1812433253) * (tmt[(i - 1) & 3]
-					      ^ (tmt[(i - 1) & 3] >> 30));
-
-  if ((tmt[0] & 0x7fffffff) == 0 && tmt[1] == 0 && tmt[2] == 0 && tmt[3] == 0)
-    {				/* Prevent all zero */
-      tmt[0] = 'T';
-      tmt[1] = 'I';
-      tmt[2] = 'N';
-      tmt[3] = 'Y';
-    }
-
-  for (i = 0; i < TMT_INIT_PRE_LOOP; i++)
-    tmt_one_step ();
-}
-
-/**
- * @brief  TinyMT one step function, call this every time before tmt_value.
- */
-static void tmt_one_step (void)
-{
-  uint32_t x, y;
-
-  y = tmt[3];
-  x = (tmt[0] & 0x7fffffff) ^ tmt[1] ^ tmt[2];
-  x ^= (x << 1);
-  y ^= (y >> 1) ^ x;
-  tmt[0] = tmt[1];
-  tmt[1] = tmt[2];
-  tmt[2] = x ^ (y << 10);
-  tmt[3] = y;
-  if ((y & 1))
-    {
-      tmt[1] ^= TMT_MAT1;
-      tmt[2] ^= TMT_MAT2;
-    }
-}
-
-/**
- * @brief  Get a random word (32-bit).
- */
-static uint32_t tmt_value (void)
-{
-  uint32_t t0, t1;
-
-  t0 = tmt[3];
-  t1 = tmt[0] + (tmt[2] >> 8);
-  t0 ^= t1;
-  if ((t1 & 1))
-    t0 ^= TMT_TMAT;
-  return t0;
-}
-
-/* 8 parallel CRC-16 shift registers, with randomly rotated feedback */
-#define EPOOL_SIZE 16
+/* 8 parallel CRC-32 shift registers, with randomly rotated feedback */
+#define EPOOL_SIZE 32
 static uint8_t epool[EPOOL_SIZE];	/* Big-endian */
 static uint8_t ep_count;
+
+#define EP_INDEX(count, i) ((count - i) & (EPOOL_SIZE - 1))
 
 /*
  * Magic number seven.
  *
  * We did an experiment of measuring entropy of ADC output with MUST.
  * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
- * So, it is considered OK to get 4-byte from 7-byte (6x7 = 42 > 32).
+ * So, it is considered OK to get 4-byte from 6-byte (6x6 = 36 > 32).
  */
-#define NUM_NOISE_INPUTS 7
+#define NUM_NOISE_INPUTS 6
 
 #define SHIFT_RIGHT(f) ((f)>>1)
 
@@ -189,15 +105,29 @@ static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
 {
   uint8_t v = epool[ep_count];
 
-  /* CRC-16-CCITT's Polynomial is: x^16 + x^12 + x^5 + 1 */
-  epool[(ep_count - 12)& 0x0f] ^= v;
-  epool[(ep_count - 5)& 0x0f] ^= v;
+  /*
+   * CRC-32 Polynomial:
+   * x^32+x^26+x^23+x^22+x^16+x^12+x^11+x^10+x^8+x^7+x^5+x^4+x^2+x+1
+   */
+  epool[EP_INDEX (ep_count, 26)] ^= v;
+  epool[EP_INDEX (ep_count, 23)] ^= v;
+  epool[EP_INDEX (ep_count, 22)] ^= v;
+  epool[EP_INDEX (ep_count, 16)] ^= v;
+  epool[EP_INDEX (ep_count, 12)] ^= v;
+  epool[EP_INDEX (ep_count, 11)] ^= v;
+  epool[EP_INDEX (ep_count, 10)] ^= v;
+  epool[EP_INDEX (ep_count,  8)] ^= v;
+  epool[EP_INDEX (ep_count,  7)] ^= v;
+  epool[EP_INDEX (ep_count,  5)] ^= v;
+  epool[EP_INDEX (ep_count,  4)] ^= v;
+  epool[EP_INDEX (ep_count,  2)] ^= v;
+  epool[EP_INDEX (ep_count,  1)] ^= v;
   epool[ep_count] = SHIFT_RIGHT (v) ^ entropy_bits;
 
-  if ((v&1) || another_random_bit)
+  if ((v&1) && another_random_bit)
     epool[ep_count] ^= 0xff;
 
-  ep_count = (ep_count + 1) & 0x0f;
+  ep_count = (ep_count + 1) & (EPOOL_SIZE - 1);
 }
 
 #define FNV_INIT	2166136261U
@@ -217,33 +147,17 @@ static uint32_t fnv32_hash (const uint8_t *buf, int len)
   return v;
 }
 
-#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
 
 static uint32_t ep_output (void)
 {
   int i;
   uint8_t buf[NUM_NOISE_INPUTS];
-  uint8_t *p = buf;
 
-  /*
-   * NUM_NOISE_INPUTS is seven.
-   *
-   * There are sixteen bytes in the CRC-16 buffer.  We use seven
-   * outputs of CRC-16 buffer for final output.  There are two parts;
-   * former 4 outputs which will be used directly, and latter 3
-   * outputs which will be used with feedback loop.
-   */
+  /* We use six outputs of CRC-32 buffer for final output.  */
+  for (i = 0; i < NUM_NOISE_INPUTS; i++)
+    buf[i] = epool[(ep_count+i) & (EPOOL_SIZE - 1)];
 
-  /* At some probability, use latter 3 outputs of CRC-16 buffer */
-  for (i = NUM_NOISE_INPUTS - 1; i >= 4; i--)
-    if (PROBABILITY_50_BY_TICK ())
-      *p++ = epool[(ep_count+i) & 0x0f] ^ epool[(ep_count+i-4) & 0x0f];
-
-  /* Use former 4 outputs of CRC-16 buffer */
-  for (i = 3; i >= 0; i--)
-    *p++ = epool[(ep_count+i) & 0x0f];
-
-  return fnv32_hash (buf, p - buf);
+  return fnv32_hash (buf, NUM_NOISE_INPUTS);
 }
 
 
@@ -296,6 +210,8 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
+#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
+
 /**
  * @brief  Random number generation from ADC sampling.
  * @param  RB: Pointer to ring buffer structure
@@ -329,10 +245,6 @@ static int rng_gen (struct rng_rb *rb)
       if ((round % NUM_NOISE_INPUTS) == 0)
 	{		            /* We have enough entropy in the pool.  */
 	  uint32_t v = ep_output (); /* Get the random bits from the pool.  */
-
-	  /* Mix the random bits from the pool with the output of PRNG.  */
-	  tmt_one_step ();
-	  v ^= tmt_value ();
 
 	  /* We got the final random bits, add it to the ring buffer.  */
 	  rb_add (rb, v);
@@ -382,7 +294,6 @@ neug_init (uint32_t *buf, uint8_t size)
 {
   struct rng_rb *rb = &the_ring_buffer;
 
-  tmt_init (0);
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
 }
@@ -402,17 +313,6 @@ neug_flush (void)
   chMtxUnlock ();
 }
 
-/**
- * @breif Set seed to PRNG
- */
-void
-neug_prng_reseed (void)
-{
-  uint32_t seed = ep_output ();
-
-  tmt_init (seed);
-  neug_flush ();
-}
 
 /**
  * @brief  Wakes up RNG thread to generate random numbers.

@@ -158,32 +158,26 @@ another is Pseudo RNG.  Outputs of RNGs are exclusive or-ed
 to generate final output.  Here is a figure of the circuit.
 
 
-                        Entropy Pool (16-byte)
+                        Entropy Pool (32-byte)
                        +----------------+
                        |                |
                        | 8 parallel     |   8  ||<-- [ Vref ]
-                 +---- |  CRC-16        |<--/--||
+                 +---- |  CRC-32        |<--/--||
                  |     | shift registers|      ||<-- [ Temperature Sensor ]
                  |     |                |
-                 |     |                |<--+--/------ SysTick
-                 |     +----------------+   |  1
-                 |     Physical-based RNG   |
-                 / 8                        |
-                 |                          |
-                 v                          |
-               ===== Output function  <-----+
+                 |     |                |<-----/------ SysTick
+                 |     +----------------+      1
+                 |     Physical-based RNG
+                 / 8
+                 |
+                 v
+               ===== Output function
                  |
                  / 32
                  |
-                 +-------------+
-                 |             |
-                 / 32          / 32  Seed
-                 |             |
-                 |             v
-  Random     32  v      32 +--------+
-  Number  <--/--[XOR]<--/--| TinyMT |
-  Output                   +--------+
-                           Pseudo RNG
+                 v
+        Random Number Output       
+               
 
 
 STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
@@ -193,20 +187,13 @@ LSBs of A/D converter's outputs as entropy sources.
 By four samplings of two channels, we can get 8-bit, as we can get two
 bits (LSB of Vref and LSB of Temperature Sensor) from one sampling.
 We put this 8-bit noise to entropy pool.  Entropy pool consist of
-16-byte buffer, which is 8 parallel CRC-16 shift registers.  The noise
-source is not "white", but it can be used as RNG with this CRC-16
+16-byte buffer, which is 8 parallel CRC-32 shift registers.  The noise
+source is not "white", but it can be used as RNG with this CRC-32
 filter.  An experiment shows that raw noise source of LSBs has more
-than 6 bit/byte entropy.  So, we put 7-byte to get 4-byte (32-bit)
-output.
+than 6 bit/byte entropy.  So, we put 6-byte (36-bit) to get 4-byte
+(32-bit) output.
 
 I don't know how stable the noise source is.
-
-So, NeuG comes with second RNG, that is, TinyMT pseudo RNG.  Please
-see following page for TinyMT:
-
-   "Tiny Mersenne Twister (TinyMT): A small-sized variant of Mersenne Twister"
-   by Mutsuo Saito and Makoto Matsumoto
-     http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/
 
 
 Test results
