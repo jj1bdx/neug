@@ -1,7 +1,7 @@
 #define NEUG_NO_KICK      0
 #define NEUG_KICK_FILLING 1
 
-#define NEUG_PRE_LOOP 32
+#define NEUG_PRE_LOOP 64
 
 void neug_init (uint32_t *buf, uint8_t size);
 void neug_prng_reseed (void);

@@ -83,81 +83,69 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err)
 }
 
 
-/* 8 parallel CRC-32 shift registers, with randomly rotated feedback */
-#define EPOOL_SIZE 32
-static uint8_t epool[EPOOL_SIZE];	/* Big-endian */
-static uint8_t ep_count;
+#define EPOOL_SIZE (64 / sizeof (uint32_t))
+#define EP_INDEX(cnt, i)  ((cnt + i) & (EPOOL_SIZE - 1))
+#define EP_INCREMENT(cnt) ((cnt + 15) & (EPOOL_SIZE - 1))
 
-#define EP_INDEX(count, i) ((count - i) & (EPOOL_SIZE - 1))
+static uint8_t ep_count;
+static uint32_t epool[EPOOL_SIZE];
+
 
 /*
- * Magic number seven.
- *
  * We did an experiment of measuring entropy of ADC output with MUST.
  * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
  * So, it is considered OK to get 4-byte from 6-byte (6x6 = 36 > 32).
  */
 #define NUM_NOISE_INPUTS 6
 
-#define SHIFT_RIGHT(f) ((f)>>1)
-
-static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit)
+static void well512a_step (void)
 {
-  uint8_t v = epool[ep_count];
+  uint32_t v = epool[ep_count];	/* V0 */
+  uint32_t z1, z2;
 
-  /*
-   * CRC-32 Polynomial:
-   * x^32+x^26+x^23+x^22+x^16+x^12+x^11+x^10+x^8+x^7+x^5+x^4+x^2+x+1
-   */
-  epool[EP_INDEX (ep_count, 26)] ^= v;
-  epool[EP_INDEX (ep_count, 23)] ^= v;
-  epool[EP_INDEX (ep_count, 22)] ^= v;
-  epool[EP_INDEX (ep_count, 16)] ^= v;
-  epool[EP_INDEX (ep_count, 12)] ^= v;
-  epool[EP_INDEX (ep_count, 11)] ^= v;
-  epool[EP_INDEX (ep_count, 10)] ^= v;
-  epool[EP_INDEX (ep_count,  8)] ^= v;
-  epool[EP_INDEX (ep_count,  7)] ^= v;
-  epool[EP_INDEX (ep_count,  5)] ^= v;
-  epool[EP_INDEX (ep_count,  4)] ^= v;
-  epool[EP_INDEX (ep_count,  2)] ^= v;
-  epool[EP_INDEX (ep_count,  1)] ^= v;
-  epool[ep_count] = SHIFT_RIGHT (v) ^ entropy_bits;
+  z1  = (v ^ (v << 16));
+  v = epool[EP_INDEX (ep_count, 13)]; /* VM1 */
+  z1 ^= (v ^ (v << 15));
+  v = epool[EP_INDEX (ep_count, 9)]; /* VM2 */
+  z2 = v ^ (v >> 11);
+  v = z1 ^ z2;
+  
+  /* newV1 */
+  epool[ep_count] = v;
 
-  if ((v&1) && another_random_bit)
-    epool[ep_count] ^= 0xff;
+  v = (v ^ ((v<<5) & 0xda442d24U));
+  z1 = (z1 ^ (z1 << 18));
+  z2 = (z2 << 28);
+  ep_count = EP_INCREMENT (ep_count);
 
-  ep_count = (ep_count + 1) & (EPOOL_SIZE - 1);
+  /* newV0 */
+  epool[ep_count] ^= (epool[ep_count] << 2) ^ z1 ^ z2 ^ v;
 }
 
 #define FNV_INIT	2166136261U
 #define FNV_PRIME	16777619
 
-static uint32_t fnv32_hash (const uint8_t *buf, int len)
+static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit,
+		    uint8_t round)
 {
   uint32_t v = FNV_INIT;
-  int i;
 
-  for (i = 0; i < len; i++)
-    {
-      v ^= buf[i];
-      v *= FNV_PRIME;
-    }
+  v ^= (another_random_bit << 8) | round;
+  v *= FNV_PRIME;
+  v ^= entropy_bits;
+  v *= FNV_PRIME;
+  v ^= epool[ep_count] & 0xff;
+  v *= FNV_PRIME;
 
-  return v;
+  epool[ep_count] ^= v;
 }
-
 
 static uint32_t ep_output (void)
 {
-  int i;
-  uint8_t buf[NUM_NOISE_INPUTS];
-
-  /* We use six outputs of CRC-32 buffer for final output.  */
-  for (i = 0; i < NUM_NOISE_INPUTS; i++)
-    buf[i] = epool[(ep_count+i) & (EPOOL_SIZE - 1)];
-
-  return fnv32_hash (buf, NUM_NOISE_INPUTS);
+  well512a_step ();
+  well512a_step ();
+  well512a_step ();
+  return epool[ep_count];
 }
 
 
@@ -229,7 +217,6 @@ static int rng_gen (struct rng_rb *rb)
       chEvtWaitOne (ADC_DATA_AVAILABLE);
 
       /* Got, ADC sampling data */
-      round++;
       b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
 	   | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
 	   | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
@@ -240,15 +227,14 @@ static int rng_gen (struct rng_rb *rb)
       /*
        * Put a random byte to entropy pool.
        */
-      ep_add (b, PROBABILITY_50_BY_TICK ());
-
+      ep_add (b, PROBABILITY_50_BY_TICK (), round);
+      round++;
       if ((round % NUM_NOISE_INPUTS) == 0)
 	{		            /* We have enough entropy in the pool.  */
 	  uint32_t v = ep_output (); /* Get the random bits from the pool.  */
 
 	  /* We got the final random bits, add it to the ring buffer.  */
 	  rb_add (rb, v);
-	  round = 0;
 	  if (rb->full)
 	    /* fully generated */
 	    break;
