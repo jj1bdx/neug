@@ -132,13 +132,11 @@ static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit,
 
   v ^= entropy_bits;
   v *= FNV_PRIME;
-  v ^= (round >> 19);
-  v *= FNV_PRIME;
-  v ^= (another_random_bit ? 'R' : 'L');
+  v ^= (round >> 19) & 0xff;
   v *= FNV_PRIME;
 
   epool[ep_count] ^= v;
-  if ((round % 5) == 0)
+  if ((round % 5) == 0 && another_random_bit)
     well512a_step ();
 }
 
