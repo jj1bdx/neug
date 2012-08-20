@@ -126,24 +126,24 @@ static void well512a_step (void)
 #define FNV_PRIME	16777619
 
 static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit,
-		    uint8_t round)
+		    uint32_t round)
 {
   uint32_t v = FNV_INIT;
 
   v ^= entropy_bits;
   v *= FNV_PRIME;
-  v ^= round;
+  v ^= (round >> 19);
   v *= FNV_PRIME;
   v ^= (another_random_bit ? 'R' : 'L');
   v *= FNV_PRIME;
 
   epool[ep_count] ^= v;
+  if ((round % 5) == 0)
+    well512a_step ();
 }
 
 static uint32_t ep_output (void)
 {
-  well512a_step ();
-  well512a_step ();
   well512a_step ();
   return epool[ep_count];
 }
@@ -209,7 +209,7 @@ static uint32_t rb_del (struct rng_rb *rb)
  */
 static int rng_gen (struct rng_rb *rb)
 {
-  static uint8_t round = 0;
+  static uint32_t round = 0;
   uint8_t b;
 
   while (1)
