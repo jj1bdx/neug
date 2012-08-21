@@ -132,7 +132,7 @@ static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit,
 
   v ^= entropy_bits;
   v *= FNV_PRIME;
-  v ^= (round >> 19) & 0xff;
+  v ^= ((round >> 19) & 0xff) ^ another_random_bit;
   v *= FNV_PRIME;
 
   epool[ep_count] ^= v;
