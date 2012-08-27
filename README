@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
-							   Version 0.01
-							     2011-11-14
+							   Version 0.02
+							     2012-09-XX
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -44,7 +44,7 @@ A0-dash: For better entropy device, you can get EntropyKey.
 A0-double-dash: STM32F2xx has built-in TRNG, it would be better for you.
 
 Q1: How fast is NeuG device?
-A1: It's something around 24 Ki-byte/second.
+A1: It's something around 30 Ki-byte/second.
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  It's not implemented yet, and I don't have an
@@ -153,31 +153,24 @@ Then, you can use output of /dev/ttyACM0.
 Structure of the NeuG
 =====================
 
-NeuG consists of two RNG, one is the RNG based on physical noise, and
-another is Pseudo RNG.  Outputs of RNGs are exclusive or-ed
-to generate final output.  Here is a figure of the circuit.
+Here is a figure of the circuit.
 
 
-                        Entropy Pool (32-byte)
-                       +----------------+
-                       |                |
-                       | 8 parallel     |   8  ||<-- [ Vref ]
-                 +---- |  CRC-32        |<--/--||
-                 |     | shift registers|      ||<-- [ Temperature Sensor ]
-                 |     |                |
-                 |     |                |<-----/------ SysTick
-                 |     +----------------+      1
-                 |     Physical-based RNG
-                 / 8
-                 |
-                 v
-               ===== Output function
-                 |
-                 / 32
-                 |
-                 v
-        Random Number Output       
-               
+             Entropy Pool (64-byte)
+            +----------------+
+            |                |
+            | 16-word        |	      8  ||<-- [ Vref ]
+      +---- | registers      |	  |<--/--||
+      |     |   in           | 32 |      ||<-- [ Temperature Sensor ]
+      |     | WELL512a       |<-/-|
+      |     |  structure     |	  |<----/------ SysTick
+      |     +----------------+          1
+      |     Physical-based RNG
+      |
+      / 32
+      |
+      v
+ Random Number Output
 
 
 STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
@@ -186,12 +179,13 @@ LSBs of A/D converter's outputs as entropy sources.
 
 By four samplings of two channels, we can get 8-bit, as we can get two
 bits (LSB of Vref and LSB of Temperature Sensor) from one sampling.
-We put this 8-bit noise to entropy pool.  Entropy pool consist of
-16-byte buffer, which is 8 parallel CRC-32 shift registers.  The noise
-source is not "white", but it can be used as RNG with this CRC-32
-filter.  An experiment shows that raw noise source of LSBs has more
-than 6 bit/byte entropy.  So, we put 6-byte (36-bit) to get 4-byte
-(32-bit) output.
+We put this 8-bit noise and SysTick to entropy pool.  Entropy pool
+consist of 16-word buffer, which has WELL 512a structure.
+
+Since the noise source is not "white", signal is whiten by this WELL
+512a structure.  An experiment shows that raw noise source of LSBs has
+more than 6 bit/byte entropy.  So, we put 6-byte (36-bit) to get
+4-byte (32-bit) output.
 
 I don't know how stable the noise source is.
 
@@ -200,9 +194,10 @@ Test results
 ============
 
 See files under the directory test-results, for test result of
-"rngtest" in rng-tools, and NIST STS 2.1.1.  Currently, I am testing
-NeuG device by dieharder, but it seems that it takes a month or so (8
-days passed, it's running RGB Bit distribution test ntup=9).
+"rngtest" in rng-tools, NIST STS 2.1.1, and Dieharder.
+
+For Dieharder, I correct 13GiB (it took five days and six hours
+and more), and use scripts to invoke dieharder.
 
 
 Read-only Git Repository

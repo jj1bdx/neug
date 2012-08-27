@@ -1,7 +1,7 @@
 /*
  * random.c - random number generation
  *
- * Copyright (C) 2011 Free Software Initiative of Japan
+ * Copyright (C) 2011, 2012 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
  * This file is a part of NeuG, a Random Number Generator

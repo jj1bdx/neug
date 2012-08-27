@@ -1,3 +1,18 @@
+2012-08-27  Niibe Yutaka  <gniibe@fsij.org>
+
+	Use WELL random number generator to whiten noise input.
+	* src/random.c (NUM_NOISE_INPUTS): Now, it's 6.
+	(tmt_init, tmt_one_step, tmt_value): Remove.
+	(well512a_step): New function.  WELL random number generator.
+	(neug_prng_reseed): Remove.
+
+	* src/main.c (main): Call neug_flash with time interval 2500ms,
+	while disconnected.
+	Don't call neug_prng_reseed.
+	More blinks.
+
+	* src/neug.h (NEUG_PRE_LOOP): It's 64 now (was: 32).
+
 2012-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (RANDOM_BYTES_LENGTH): It's now 60 (was: 32).
