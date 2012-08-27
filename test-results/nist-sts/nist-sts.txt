@@ -1,5 +1,4 @@
-Script started on Fri 21 Oct 2011 09:26:28 AM JST
-gniibe@corei7:~/random/sts-2.1.1$ ./assess 1048576
+gniibe@vps182808:~/rng/sts-2.1.1$ ./assess 1048576
            G E N E R A T O R    S E L E C T I O N 
            ______________________________________
 
@@ -12,7 +11,7 @@ gniibe@corei7:~/random/sts-2.1.1$ ./assess 1048576
    Enter Choice: 0
 
 
-		User Prescribed Input File: ../1015/rand-000.bin
+		User Prescribed Input File: /home/gniibe/rng/rand-00.bin
 
                 S T A T I S T I C A L   T E S T S
                 _________________________________
@@ -55,6 +54,4 @@ gniibe@corei7:~/random/sts-2.1.1$ ./assess 1048576
 
      Statistical Testing Complete!!!!!!!!!!!!
 
-gniibe@corei7:~/random/sts-2.1.1$ exit
-
-Script done on Fri 21 Oct 2011 10:17:33 AM JST
+gniibe@vps182808:~/rng/sts-2.1.1$ exit

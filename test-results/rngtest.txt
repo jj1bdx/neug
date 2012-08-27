@@ -1,625 +1,3091 @@
-Script started on Sat 22 Oct 2011 03:52:42 PM JST
-rngtest 2-unofficial-mt.13
+$ script -c "cat rand-*.bin | rngtest -b 20000" rngtest-out.txt 
+
+Script started on Mon 27 Aug 2012 03:47:16 PM JST
+rngtest 2-unofficial-mt.14
 Copyright (c) 2004 by Henrique de Moraes Holschuh
 This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 rngtest: starting FIPS tests...
-rngtest: bits received from input: 2000000032
-rngtest: FIPS 140-2 successes: 99933
-rngtest: FIPS 140-2 failures: 67
-rngtest: FIPS 140-2(2001-10-10) Monobit: 9
+rngtest: bits received from input: 400000032
+rngtest: FIPS 140-2 successes: 19990
+rngtest: FIPS 140-2 failures: 10
+rngtest: FIPS 140-2(2001-10-10) Monobit: 1
+rngtest: FIPS 140-2(2001-10-10) Poker: 3
+rngtest: FIPS 140-2(2001-10-10) Runs: 3
+rngtest: FIPS 140-2(2001-10-10) Long run: 3
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=346.791; avg=5947.825; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=137.480; max=151.377)Mibits/s
+rngtest: Program run time: 2842723 microseconds
+rngtest: bits received from input: 800000032
+rngtest: FIPS 140-2 successes: 39969
+rngtest: FIPS 140-2 failures: 31
+rngtest: FIPS 140-2(2001-10-10) Monobit: 4
+rngtest: FIPS 140-2(2001-10-10) Poker: 5
+rngtest: FIPS 140-2(2001-10-10) Runs: 11
+rngtest: FIPS 140-2(2001-10-10) Long run: 11
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=207.321; avg=6377.599; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=142.520; max=151.377)Mibits/s
+rngtest: Program run time: 5479057 microseconds
+rngtest: bits received from input: 1200000032
+rngtest: FIPS 140-2 successes: 59953
+rngtest: FIPS 140-2 failures: 47
+rngtest: FIPS 140-2(2001-10-10) Monobit: 7
+rngtest: FIPS 140-2(2001-10-10) Poker: 6
+rngtest: FIPS 140-2(2001-10-10) Runs: 18
+rngtest: FIPS 140-2(2001-10-10) Long run: 16
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=207.321; avg=6576.422; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=144.286; max=151.377)Mibits/s
+rngtest: Program run time: 8114251 microseconds
+rngtest: bits received from input: 1600000032
+rngtest: FIPS 140-2 successes: 79930
+rngtest: FIPS 140-2 failures: 70
+rngtest: FIPS 140-2(2001-10-10) Monobit: 10
 rngtest: FIPS 140-2(2001-10-10) Poker: 8
-rngtest: FIPS 140-2(2001-10-10) Runs: 27
-rngtest: FIPS 140-2(2001-10-10) Long run: 24
+rngtest: FIPS 140-2(2001-10-10) Runs: 24
+rngtest: FIPS 140-2(2001-10-10) Long run: 28
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=127.234; avg=75146.259; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=67.397; avg=142.946; max=151.377)Mibits/s
-rngtest: Program run time: 39345572 microseconds
-rngtest: bits received from input: 4000000032
-rngtest: FIPS 140-2 successes: 199862
-rngtest: FIPS 140-2 failures: 138
+rngtest: input channel speed: (min=207.321; avg=6669.663; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=145.189; max=151.377)Mibits/s
+rngtest: Program run time: 10749550 microseconds
+rngtest: bits received from input: 2000000032
+rngtest: FIPS 140-2 successes: 99915
+rngtest: FIPS 140-2 failures: 85
+rngtest: FIPS 140-2(2001-10-10) Monobit: 11
+rngtest: FIPS 140-2(2001-10-10) Poker: 8
+rngtest: FIPS 140-2(2001-10-10) Runs: 30
+rngtest: FIPS 140-2(2001-10-10) Long run: 36
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6816.536; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=145.795; max=151.377)Mibits/s
+rngtest: Program run time: 13375680 microseconds
+rngtest: bits received from input: 2400000032
+rngtest: FIPS 140-2 successes: 119900
+rngtest: FIPS 140-2 failures: 100
+rngtest: FIPS 140-2(2001-10-10) Monobit: 13
+rngtest: FIPS 140-2(2001-10-10) Poker: 8
+rngtest: FIPS 140-2(2001-10-10) Runs: 36
+rngtest: FIPS 140-2(2001-10-10) Long run: 43
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6871.595; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=146.175; max=151.377)Mibits/s
+rngtest: Program run time: 16007001 microseconds
+rngtest: bits received from input: 2800000032
+rngtest: FIPS 140-2 successes: 139891
+rngtest: FIPS 140-2 failures: 109
+rngtest: FIPS 140-2(2001-10-10) Monobit: 14
+rngtest: FIPS 140-2(2001-10-10) Poker: 10
+rngtest: FIPS 140-2(2001-10-10) Runs: 39
+rngtest: FIPS 140-2(2001-10-10) Long run: 46
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6926.099; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=146.463; max=151.377)Mibits/s
+rngtest: Program run time: 18635591 microseconds
+rngtest: bits received from input: 3200000032
+rngtest: FIPS 140-2 successes: 159878
+rngtest: FIPS 140-2 failures: 122
 rngtest: FIPS 140-2(2001-10-10) Monobit: 17
-rngtest: FIPS 140-2(2001-10-10) Poker: 20
-rngtest: FIPS 140-2(2001-10-10) Runs: 52
-rngtest: FIPS 140-2(2001-10-10) Long run: 52
+rngtest: FIPS 140-2(2001-10-10) Poker: 11
+rngtest: FIPS 140-2(2001-10-10) Runs: 44
+rngtest: FIPS 140-2(2001-10-10) Long run: 50
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=114500.321; avg=66524883.292; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=143.487; max=151.377)Mibits/s
-rngtest: Program run time: 86736525 microseconds
+rngtest: input channel speed: (min=190.735; avg=6913.642; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=146.654; max=151.377)Mibits/s
+rngtest: Program run time: 21271265 microseconds
+rngtest: bits received from input: 3600000032
+rngtest: FIPS 140-2 successes: 179864
+rngtest: FIPS 140-2 failures: 136
+rngtest: FIPS 140-2(2001-10-10) Monobit: 21
+rngtest: FIPS 140-2(2001-10-10) Poker: 14
+rngtest: FIPS 140-2(2001-10-10) Runs: 50
+rngtest: FIPS 140-2(2001-10-10) Long run: 51
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6917.534; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=28.008; avg=146.816; max=152.588)Mibits/s
+rngtest: Program run time: 23903978 microseconds
+rngtest: bits received from input: 4000000032
+rngtest: FIPS 140-2 successes: 199852
+rngtest: FIPS 140-2 failures: 148
+rngtest: FIPS 140-2(2001-10-10) Monobit: 23
+rngtest: FIPS 140-2(2001-10-10) Poker: 15
+rngtest: FIPS 140-2(2001-10-10) Runs: 54
+rngtest: FIPS 140-2(2001-10-10) Long run: 56
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6905.092; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.379; max=152.588)Mibits/s
+rngtest: Program run time: 26638447 microseconds
+rngtest: bits received from input: 4400000032
+rngtest: FIPS 140-2 successes: 219843
+rngtest: FIPS 140-2 failures: 157
+rngtest: FIPS 140-2(2001-10-10) Monobit: 25
+rngtest: FIPS 140-2(2001-10-10) Poker: 17
+rngtest: FIPS 140-2(2001-10-10) Runs: 58
+rngtest: FIPS 140-2(2001-10-10) Long run: 57
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6932.799; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.213; max=152.588)Mibits/s
+rngtest: Program run time: 29332233 microseconds
+rngtest: bits received from input: 4800000032
+rngtest: FIPS 140-2 successes: 239825
+rngtest: FIPS 140-2 failures: 175
+rngtest: FIPS 140-2(2001-10-10) Monobit: 29
+rngtest: FIPS 140-2(2001-10-10) Poker: 20
+rngtest: FIPS 140-2(2001-10-10) Runs: 65
+rngtest: FIPS 140-2(2001-10-10) Long run: 61
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6948.225; max=19073.486)Mibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.370; max=152.588)Mibits/s
+rngtest: Program run time: 31963649 microseconds
+rngtest: bits received from input: 5200000032
+rngtest: FIPS 140-2 successes: 259813
+rngtest: FIPS 140-2 failures: 187
+rngtest: FIPS 140-2(2001-10-10) Monobit: 29
+rngtest: FIPS 140-2(2001-10-10) Poker: 20
+rngtest: FIPS 140-2(2001-10-10) Runs: 72
+rngtest: FIPS 140-2(2001-10-10) Long run: 66
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=190.735; avg=6976.737; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.511; max=152.588)Mibits/s
+rngtest: Program run time: 34591483 microseconds
+rngtest: bits received from input: 5600000032
+rngtest: FIPS 140-2 successes: 279802
+rngtest: FIPS 140-2 failures: 198
+rngtest: FIPS 140-2(2001-10-10) Monobit: 30
+rngtest: FIPS 140-2(2001-10-10) Poker: 22
+rngtest: FIPS 140-2(2001-10-10) Runs: 76
+rngtest: FIPS 140-2(2001-10-10) Long run: 70
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=10.968; avg=6930.962; max=9536.743)Mibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.596; max=152.588)Mibits/s
+rngtest: Program run time: 37236141 microseconds
 rngtest: bits received from input: 6000000032
 rngtest: FIPS 140-2 successes: 299786
 rngtest: FIPS 140-2 failures: 214
-rngtest: FIPS 140-2(2001-10-10) Monobit: 24
-rngtest: FIPS 140-2(2001-10-10) Poker: 39
-rngtest: FIPS 140-2(2001-10-10) Runs: 76
-rngtest: FIPS 140-2(2001-10-10) Long run: 78
+rngtest: FIPS 140-2(2001-10-10) Monobit: 33
+rngtest: FIPS 140-2(2001-10-10) Poker: 26
+rngtest: FIPS 140-2(2001-10-10) Runs: 81
+rngtest: FIPS 140-2(2001-10-10) Long run: 75
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=111.817; avg=64657.936; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.120; max=151.377)Mibits/s
-rngtest: Program run time: 130358756 microseconds
+rngtest: input channel speed: (min=339.037; avg=6588734.761; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=27.967; avg=146.596; max=152.588)Mibits/s
+rngtest: Program run time: 39959528 microseconds
+rngtest: bits received from input: 6400000032
+rngtest: FIPS 140-2 successes: 319771
+rngtest: FIPS 140-2 failures: 229
+rngtest: FIPS 140-2(2001-10-10) Monobit: 33
+rngtest: FIPS 140-2(2001-10-10) Poker: 27
+rngtest: FIPS 140-2(2001-10-10) Runs: 89
+rngtest: FIPS 140-2(2001-10-10) Long run: 81
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=6541481.892; max=1302083.333)Kibits/s
+rngtest: FIPS tests speed: (min=27.763; avg=145.863; max=152.588)Mibits/s
+rngtest: Program run time: 42839695 microseconds
+rngtest: bits received from input: 6800000032
+rngtest: FIPS 140-2 successes: 339761
+rngtest: FIPS 140-2 failures: 239
+rngtest: FIPS 140-2(2001-10-10) Monobit: 33
+rngtest: FIPS 140-2(2001-10-10) Poker: 30
+rngtest: FIPS 140-2(2001-10-10) Runs: 92
+rngtest: FIPS 140-2(2001-10-10) Long run: 85
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=6169021.791; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=27.763; avg=145.763; max=152.588)Mibits/s
+rngtest: Program run time: 45609223 microseconds
+rngtest: bits received from input: 7200000032
+rngtest: FIPS 140-2 successes: 359746
+rngtest: FIPS 140-2 failures: 254
+rngtest: FIPS 140-2(2001-10-10) Monobit: 35
+rngtest: FIPS 140-2(2001-10-10) Poker: 33
+rngtest: FIPS 140-2(2001-10-10) Runs: 96
+rngtest: FIPS 140-2(2001-10-10) Long run: 91
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=6142535.656; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=27.763; avg=145.480; max=152.588)Mibits/s
+rngtest: Program run time: 48388720 microseconds
+rngtest: bits received from input: 7600000032
+rngtest: FIPS 140-2 successes: 379723
+rngtest: FIPS 140-2 failures: 277
+rngtest: FIPS 140-2(2001-10-10) Monobit: 36
+rngtest: FIPS 140-2(2001-10-10) Poker: 37
+rngtest: FIPS 140-2(2001-10-10) Runs: 104
+rngtest: FIPS 140-2(2001-10-10) Long run: 101
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5697769.756; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=144.940; max=152.588)Mibits/s
+rngtest: Program run time: 51356971 microseconds
 rngtest: bits received from input: 8000000032
-rngtest: FIPS 140-2 successes: 399709
-rngtest: FIPS 140-2 failures: 291
-rngtest: FIPS 140-2(2001-10-10) Monobit: 34
-rngtest: FIPS 140-2(2001-10-10) Poker: 48
-rngtest: FIPS 140-2(2001-10-10) Runs: 107
-rngtest: FIPS 140-2(2001-10-10) Long run: 106
+rngtest: FIPS 140-2 successes: 399710
+rngtest: FIPS 140-2 failures: 290
+rngtest: FIPS 140-2(2001-10-10) Monobit: 37
+rngtest: FIPS 140-2(2001-10-10) Poker: 38
+rngtest: FIPS 140-2(2001-10-10) Runs: 111
+rngtest: FIPS 140-2(2001-10-10) Long run: 105
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=114500.321; avg=88212863.727; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.133; max=151.377)Mibits/s
-rngtest: Program run time: 143667885 microseconds
+rngtest: input channel speed: (min=339.037; avg=5687472.564; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=144.542; max=152.588)Mibits/s
+rngtest: Program run time: 54207460 microseconds
+rngtest: bits received from input: 8400000032
+rngtest: FIPS 140-2 successes: 419697
+rngtest: FIPS 140-2 failures: 303
+rngtest: FIPS 140-2(2001-10-10) Monobit: 37
+rngtest: FIPS 140-2(2001-10-10) Poker: 40
+rngtest: FIPS 140-2(2001-10-10) Runs: 119
+rngtest: FIPS 140-2(2001-10-10) Long run: 108
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=347174.004; avg=5482076871.770; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=144.053; max=152.588)Mibits/s
+rngtest: Program run time: 57196164 microseconds
+rngtest: bits received from input: 8800000032
+rngtest: FIPS 140-2 successes: 439689
+rngtest: FIPS 140-2 failures: 311
+rngtest: FIPS 140-2(2001-10-10) Monobit: 37
+rngtest: FIPS 140-2(2001-10-10) Poker: 40
+rngtest: FIPS 140-2(2001-10-10) Runs: 124
+rngtest: FIPS 140-2(2001-10-10) Long run: 111
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5358878.856; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.858; max=152.588)Mibits/s
+rngtest: Program run time: 59997022 microseconds
+rngtest: bits received from input: 9200000032
+rngtest: FIPS 140-2 successes: 459667
+rngtest: FIPS 140-2 failures: 333
+rngtest: FIPS 140-2(2001-10-10) Monobit: 43
+rngtest: FIPS 140-2(2001-10-10) Poker: 41
+rngtest: FIPS 140-2(2001-10-10) Runs: 129
+rngtest: FIPS 140-2(2001-10-10) Long run: 121
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5403378.053; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.621; max=152.588)Mibits/s
+rngtest: Program run time: 62810940 microseconds
+rngtest: bits received from input: 9600000032
+rngtest: FIPS 140-2 successes: 479651
+rngtest: FIPS 140-2 failures: 349
+rngtest: FIPS 140-2(2001-10-10) Monobit: 45
+rngtest: FIPS 140-2(2001-10-10) Poker: 42
+rngtest: FIPS 140-2(2001-10-10) Runs: 135
+rngtest: FIPS 140-2(2001-10-10) Long run: 128
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5411167.958; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.430; max=152.588)Mibits/s
+rngtest: Program run time: 65624654 microseconds
 rngtest: bits received from input: 10000000032
-rngtest: FIPS 140-2 successes: 499635
-rngtest: FIPS 140-2 failures: 365
-rngtest: FIPS 140-2(2001-10-10) Monobit: 41
-rngtest: FIPS 140-2(2001-10-10) Poker: 63
-rngtest: FIPS 140-2(2001-10-10) Runs: 137
-rngtest: FIPS 140-2(2001-10-10) Long run: 129
+rngtest: FIPS 140-2 successes: 499638
+rngtest: FIPS 140-2 failures: 362
+rngtest: FIPS 140-2(2001-10-10) Monobit: 46
+rngtest: FIPS 140-2(2001-10-10) Poker: 43
+rngtest: FIPS 140-2(2001-10-10) Runs: 140
+rngtest: FIPS 140-2(2001-10-10) Long run: 134
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=111.817; avg=107602.004; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.223; max=151.377)Mibits/s
-rngtest: Program run time: 156938235 microseconds
-rngtest: bits received from input: 12000000032
-rngtest: FIPS 140-2 successes: 599566
-rngtest: FIPS 140-2 failures: 434
+rngtest: input channel speed: (min=347174.004; avg=5598367516.032; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.253; max=152.588)Mibits/s
+rngtest: Program run time: 68422442 microseconds
+rngtest: bits received from input: 10400000032
+rngtest: FIPS 140-2 successes: 519621
+rngtest: FIPS 140-2 failures: 379
+rngtest: FIPS 140-2(2001-10-10) Monobit: 47
+rngtest: FIPS 140-2(2001-10-10) Poker: 45
+rngtest: FIPS 140-2(2001-10-10) Runs: 147
+rngtest: FIPS 140-2(2001-10-10) Long run: 141
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=347174.004; avg=5618514734.825; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.108; max=152.588)Mibits/s
+rngtest: Program run time: 71222955 microseconds
+rngtest: bits received from input: 10800000032
+rngtest: FIPS 140-2 successes: 539605
+rngtest: FIPS 140-2 failures: 395
 rngtest: FIPS 140-2(2001-10-10) Monobit: 49
-rngtest: FIPS 140-2(2001-10-10) Poker: 71
-rngtest: FIPS 140-2(2001-10-10) Runs: 166
-rngtest: FIPS 140-2(2001-10-10) Long run: 153
+rngtest: FIPS 140-2(2001-10-10) Poker: 46
+rngtest: FIPS 140-2(2001-10-10) Runs: 153
+rngtest: FIPS 140-2(2001-10-10) Long run: 148
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=114500.321; avg=132121951.203; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.343; max=151.377)Mibits/s
-rngtest: Program run time: 170176817 microseconds
+rngtest: input channel speed: (min=339.037; avg=5533495.173; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.259; max=152.588)Mibits/s
+rngtest: Program run time: 73870191 microseconds
+rngtest: bits received from input: 11200000032
+rngtest: FIPS 140-2 successes: 559595
+rngtest: FIPS 140-2 failures: 405
+rngtest: FIPS 140-2(2001-10-10) Monobit: 49
+rngtest: FIPS 140-2(2001-10-10) Poker: 46
+rngtest: FIPS 140-2(2001-10-10) Runs: 156
+rngtest: FIPS 140-2(2001-10-10) Long run: 155
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5530693.770; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.359; max=152.588)Mibits/s
+rngtest: Program run time: 76554857 microseconds
+rngtest: bits received from input: 11600000032
+rngtest: FIPS 140-2 successes: 579578
+rngtest: FIPS 140-2 failures: 422
+rngtest: FIPS 140-2(2001-10-10) Monobit: 52
+rngtest: FIPS 140-2(2001-10-10) Poker: 49
+rngtest: FIPS 140-2(2001-10-10) Runs: 165
+rngtest: FIPS 140-2(2001-10-10) Long run: 158
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5524281.603; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.162; max=152.588)Mibits/s
+rngtest: Program run time: 79397549 microseconds
+rngtest: bits received from input: 12000000032
+rngtest: FIPS 140-2 successes: 599564
+rngtest: FIPS 140-2 failures: 436
+rngtest: FIPS 140-2(2001-10-10) Monobit: 53
+rngtest: FIPS 140-2(2001-10-10) Poker: 51
+rngtest: FIPS 140-2(2001-10-10) Runs: 169
+rngtest: FIPS 140-2(2001-10-10) Long run: 165
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=347174.004; avg=5655045077.778; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=143.009; max=152.588)Mibits/s
+rngtest: Program run time: 82222128 microseconds
+rngtest: bits received from input: 12400000032
+rngtest: FIPS 140-2 successes: 619547
+rngtest: FIPS 140-2 failures: 453
+rngtest: FIPS 140-2(2001-10-10) Monobit: 55
+rngtest: FIPS 140-2(2001-10-10) Poker: 51
+rngtest: FIPS 140-2(2001-10-10) Runs: 176
+rngtest: FIPS 140-2(2001-10-10) Long run: 173
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5496546.211; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.951; max=152.588)Mibits/s
+rngtest: Program run time: 85006641 microseconds
+rngtest: bits received from input: 12800000032
+rngtest: FIPS 140-2 successes: 639528
+rngtest: FIPS 140-2 failures: 472
+rngtest: FIPS 140-2(2001-10-10) Monobit: 57
+rngtest: FIPS 140-2(2001-10-10) Poker: 57
+rngtest: FIPS 140-2(2001-10-10) Runs: 182
+rngtest: FIPS 140-2(2001-10-10) Long run: 178
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5291612.287; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.667; max=152.588)Mibits/s
+rngtest: Program run time: 88006615 microseconds
+rngtest: bits received from input: 13200000032
+rngtest: FIPS 140-2 successes: 659512
+rngtest: FIPS 140-2 failures: 488
+rngtest: FIPS 140-2(2001-10-10) Monobit: 58
+rngtest: FIPS 140-2(2001-10-10) Poker: 58
+rngtest: FIPS 140-2(2001-10-10) Runs: 191
+rngtest: FIPS 140-2(2001-10-10) Long run: 183
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5304803.598; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.486; max=152.588)Mibits/s
+rngtest: Program run time: 90862918 microseconds
+rngtest: bits received from input: 13600000032
+rngtest: FIPS 140-2 successes: 679495
+rngtest: FIPS 140-2 failures: 505
+rngtest: FIPS 140-2(2001-10-10) Monobit: 59
+rngtest: FIPS 140-2(2001-10-10) Poker: 61
+rngtest: FIPS 140-2(2001-10-10) Runs: 199
+rngtest: FIPS 140-2(2001-10-10) Long run: 188
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5213299.256; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.285; max=152.588)Mibits/s
+rngtest: Program run time: 93789383 microseconds
 rngtest: bits received from input: 14000000032
-rngtest: FIPS 140-2 successes: 699466
-rngtest: FIPS 140-2 failures: 534
+rngtest: FIPS 140-2 successes: 699482
+rngtest: FIPS 140-2 failures: 518
 rngtest: FIPS 140-2(2001-10-10) Monobit: 61
-rngtest: FIPS 140-2(2001-10-10) Poker: 85
-rngtest: FIPS 140-2(2001-10-10) Runs: 203
-rngtest: FIPS 140-2(2001-10-10) Long run: 190
+rngtest: FIPS 140-2(2001-10-10) Poker: 62
+rngtest: FIPS 140-2(2001-10-10) Runs: 204
+rngtest: FIPS 140-2(2001-10-10) Long run: 193
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=105.373; avg=135239.950; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.189; max=151.377)Mibits/s
-rngtest: Program run time: 193769471 microseconds
+rngtest: input channel speed: (min=339.037; avg=5236211.923; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.353; max=152.588)Mibits/s
+rngtest: Program run time: 96491094 microseconds
+rngtest: bits received from input: 14400000032
+rngtest: FIPS 140-2 successes: 719469
+rngtest: FIPS 140-2 failures: 531
+rngtest: FIPS 140-2(2001-10-10) Monobit: 63
+rngtest: FIPS 140-2(2001-10-10) Poker: 62
+rngtest: FIPS 140-2(2001-10-10) Runs: 212
+rngtest: FIPS 140-2(2001-10-10) Long run: 196
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5230709.145; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.145; max=152.588)Mibits/s
+rngtest: Program run time: 99392531 microseconds
+rngtest: bits received from input: 14800000032
+rngtest: FIPS 140-2 successes: 739453
+rngtest: FIPS 140-2 failures: 547
+rngtest: FIPS 140-2(2001-10-10) Monobit: 64
+rngtest: FIPS 140-2(2001-10-10) Poker: 67
+rngtest: FIPS 140-2(2001-10-10) Runs: 216
+rngtest: FIPS 140-2(2001-10-10) Long run: 202
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5266546.224; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.261; max=152.588)Mibits/s
+rngtest: Program run time: 102053766 microseconds
+rngtest: bits received from input: 15200000032
+rngtest: FIPS 140-2 successes: 759434
+rngtest: FIPS 140-2 failures: 566
+rngtest: FIPS 140-2(2001-10-10) Monobit: 65
+rngtest: FIPS 140-2(2001-10-10) Poker: 68
+rngtest: FIPS 140-2(2001-10-10) Runs: 225
+rngtest: FIPS 140-2(2001-10-10) Long run: 210
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5302619.490; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.405; max=152.588)Mibits/s
+rngtest: Program run time: 104689546 microseconds
+rngtest: bits received from input: 15600000032
+rngtest: FIPS 140-2 successes: 779414
+rngtest: FIPS 140-2 failures: 586
+rngtest: FIPS 140-2(2001-10-10) Monobit: 71
+rngtest: FIPS 140-2(2001-10-10) Poker: 69
+rngtest: FIPS 140-2(2001-10-10) Runs: 231
+rngtest: FIPS 140-2(2001-10-10) Long run: 217
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=339.037; avg=5192199.350; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.269; max=152.588)Mibits/s
+rngtest: Program run time: 107605227 microseconds
 rngtest: bits received from input: 16000000032
-rngtest: FIPS 140-2 successes: 799369
-rngtest: FIPS 140-2 failures: 631
-rngtest: FIPS 140-2(2001-10-10) Monobit: 77
-rngtest: FIPS 140-2(2001-10-10) Poker: 93
-rngtest: FIPS 140-2(2001-10-10) Runs: 242
-rngtest: FIPS 140-2(2001-10-10) Long run: 224
+rngtest: FIPS 140-2 successes: 799401
+rngtest: FIPS 140-2 failures: 599
+rngtest: FIPS 140-2(2001-10-10) Monobit: 74
+rngtest: FIPS 140-2(2001-10-10) Poker: 70
+rngtest: FIPS 140-2(2001-10-10) Runs: 237
+rngtest: FIPS 140-2(2001-10-10) Long run: 220
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=107901.637; avg=132925355.509; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.168; max=151.377)Mibits/s
-rngtest: Program run time: 226299367 microseconds
+rngtest: input channel speed: (min=339.037; avg=5212381.616; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.250; max=152.588)Mibits/s
+rngtest: Program run time: 110367271 microseconds
+rngtest: bits received from input: 16400000032
+rngtest: FIPS 140-2 successes: 819386
+rngtest: FIPS 140-2 failures: 614
+rngtest: FIPS 140-2(2001-10-10) Monobit: 75
+rngtest: FIPS 140-2(2001-10-10) Poker: 72
+rngtest: FIPS 140-2(2001-10-10) Runs: 244
+rngtest: FIPS 140-2(2001-10-10) Long run: 225
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=5096333.329; max=1148897.059)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.072; max=152.588)Mibits/s
+rngtest: Program run time: 113334307 microseconds
+rngtest: bits received from input: 16800000032
+rngtest: FIPS 140-2 successes: 839370
+rngtest: FIPS 140-2 failures: 630
+rngtest: FIPS 140-2(2001-10-10) Monobit: 78
+rngtest: FIPS 140-2(2001-10-10) Poker: 72
+rngtest: FIPS 140-2(2001-10-10) Runs: 246
+rngtest: FIPS 140-2(2001-10-10) Long run: 236
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=5076426.814; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=142.058; max=152.588)Mibits/s
+rngtest: Program run time: 116121844 microseconds
+rngtest: bits received from input: 17200000032
+rngtest: FIPS 140-2 successes: 859360
+rngtest: FIPS 140-2 failures: 640
+rngtest: FIPS 140-2(2001-10-10) Monobit: 78
+rngtest: FIPS 140-2(2001-10-10) Poker: 74
+rngtest: FIPS 140-2(2001-10-10) Runs: 250
+rngtest: FIPS 140-2(2001-10-10) Long run: 240
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4939047.286; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.866; max=152.588)Mibits/s
+rngtest: Program run time: 119135579 microseconds
+rngtest: bits received from input: 17600000032
+rngtest: FIPS 140-2 successes: 879343
+rngtest: FIPS 140-2 failures: 657
+rngtest: FIPS 140-2(2001-10-10) Monobit: 79
+rngtest: FIPS 140-2(2001-10-10) Poker: 77
+rngtest: FIPS 140-2(2001-10-10) Runs: 255
+rngtest: FIPS 140-2(2001-10-10) Long run: 248
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4910952.818; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.693; max=152.588)Mibits/s
+rngtest: Program run time: 122070092 microseconds
 rngtest: bits received from input: 18000000032
-rngtest: FIPS 140-2 successes: 899281
-rngtest: FIPS 140-2 failures: 719
-rngtest: FIPS 140-2(2001-10-10) Monobit: 94
-rngtest: FIPS 140-2(2001-10-10) Poker: 100
+rngtest: FIPS 140-2 successes: 899318
+rngtest: FIPS 140-2 failures: 682
+rngtest: FIPS 140-2(2001-10-10) Monobit: 82
+rngtest: FIPS 140-2(2001-10-10) Poker: 80
+rngtest: FIPS 140-2(2001-10-10) Runs: 265
+rngtest: FIPS 140-2(2001-10-10) Long run: 257
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4802249.430; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.534; max=152.588)Mibits/s
+rngtest: Program run time: 125061400 microseconds
+rngtest: bits received from input: 18400000032
+rngtest: FIPS 140-2 successes: 919304
+rngtest: FIPS 140-2 failures: 696
+rngtest: FIPS 140-2(2001-10-10) Monobit: 83
+rngtest: FIPS 140-2(2001-10-10) Poker: 82
 rngtest: FIPS 140-2(2001-10-10) Runs: 270
-rngtest: FIPS 140-2(2001-10-10) Long run: 261
+rngtest: FIPS 140-2(2001-10-10) Long run: 263
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=107901.637; avg=118379267.087; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.040; max=151.377)Mibits/s
-rngtest: Program run time: 271331222 microseconds
+rngtest: input channel speed: (min=326.560; avg=4726610.855; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.378; max=152.588)Mibits/s
+rngtest: Program run time: 128037330 microseconds
+rngtest: bits received from input: 18800000032
+rngtest: FIPS 140-2 successes: 939291
+rngtest: FIPS 140-2 failures: 709
+rngtest: FIPS 140-2(2001-10-10) Monobit: 85
+rngtest: FIPS 140-2(2001-10-10) Poker: 83
+rngtest: FIPS 140-2(2001-10-10) Runs: 275
+rngtest: FIPS 140-2(2001-10-10) Long run: 268
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4751882.959; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.358; max=152.588)Mibits/s
+rngtest: Program run time: 130818491 microseconds
+rngtest: bits received from input: 19200000032
+rngtest: FIPS 140-2 successes: 959275
+rngtest: FIPS 140-2 failures: 725
+rngtest: FIPS 140-2(2001-10-10) Monobit: 88
+rngtest: FIPS 140-2(2001-10-10) Poker: 85
+rngtest: FIPS 140-2(2001-10-10) Runs: 281
+rngtest: FIPS 140-2(2001-10-10) Long run: 273
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4676199.963; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.221; max=152.588)Mibits/s
+rngtest: Program run time: 133791653 microseconds
+rngtest: bits received from input: 19600000032
+rngtest: FIPS 140-2 successes: 979263
+rngtest: FIPS 140-2 failures: 737
+rngtest: FIPS 140-2(2001-10-10) Monobit: 90
+rngtest: FIPS 140-2(2001-10-10) Poker: 87
+rngtest: FIPS 140-2(2001-10-10) Runs: 282
+rngtest: FIPS 140-2(2001-10-10) Long run: 280
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4657107.904; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.205; max=152.588)Mibits/s
+rngtest: Program run time: 136610390 microseconds
 rngtest: bits received from input: 20000000032
-rngtest: FIPS 140-2 successes: 999210
-rngtest: FIPS 140-2 failures: 790
-rngtest: FIPS 140-2(2001-10-10) Monobit: 102
-rngtest: FIPS 140-2(2001-10-10) Poker: 113
-rngtest: FIPS 140-2(2001-10-10) Runs: 289
-rngtest: FIPS 140-2(2001-10-10) Long run: 292
+rngtest: FIPS 140-2 successes: 999248
+rngtest: FIPS 140-2 failures: 752
+rngtest: FIPS 140-2(2001-10-10) Monobit: 91
+rngtest: FIPS 140-2(2001-10-10) Poker: 89
+rngtest: FIPS 140-2(2001-10-10) Runs: 290
+rngtest: FIPS 140-2(2001-10-10) Long run: 284
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=105.373; avg=93095.915; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.193; max=151.377)Mibits/s
-rngtest: Program run time: 342187360 microseconds
+rngtest: input channel speed: (min=326.560; avg=4580487.715; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.073; max=152.588)Mibits/s
+rngtest: Program run time: 139595024 microseconds
+rngtest: bits received from input: 20400000032
+rngtest: FIPS 140-2 successes: 1019241
+rngtest: FIPS 140-2 failures: 759
+rngtest: FIPS 140-2(2001-10-10) Monobit: 92
+rngtest: FIPS 140-2(2001-10-10) Poker: 91
+rngtest: FIPS 140-2(2001-10-10) Runs: 291
+rngtest: FIPS 140-2(2001-10-10) Long run: 287
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4585601.462; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=141.000; max=152.588)Mibits/s
+rngtest: Program run time: 142453838 microseconds
+rngtest: bits received from input: 20800000032
+rngtest: FIPS 140-2 successes: 1039230
+rngtest: FIPS 140-2 failures: 770
+rngtest: FIPS 140-2(2001-10-10) Monobit: 93
+rngtest: FIPS 140-2(2001-10-10) Poker: 92
+rngtest: FIPS 140-2(2001-10-10) Runs: 296
+rngtest: FIPS 140-2(2001-10-10) Long run: 291
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4514064.436; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.876; max=152.588)Mibits/s
+rngtest: Program run time: 145440821 microseconds
+rngtest: bits received from input: 21200000032
+rngtest: FIPS 140-2 successes: 1059216
+rngtest: FIPS 140-2 failures: 784
+rngtest: FIPS 140-2(2001-10-10) Monobit: 94
+rngtest: FIPS 140-2(2001-10-10) Poker: 92
+rngtest: FIPS 140-2(2001-10-10) Runs: 303
+rngtest: FIPS 140-2(2001-10-10) Long run: 297
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4440658.062; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.757; max=152.588)Mibits/s
+rngtest: Program run time: 148435042 microseconds
+rngtest: bits received from input: 21600000032
+rngtest: FIPS 140-2 successes: 1079200
+rngtest: FIPS 140-2 failures: 800
+rngtest: FIPS 140-2(2001-10-10) Monobit: 98
+rngtest: FIPS 140-2(2001-10-10) Poker: 96
+rngtest: FIPS 140-2(2001-10-10) Runs: 307
+rngtest: FIPS 140-2(2001-10-10) Long run: 301
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=334397.833; avg=4532311604.816; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.672; max=152.588)Mibits/s
+rngtest: Program run time: 151339102 microseconds
 rngtest: bits received from input: 22000000032
-rngtest: FIPS 140-2 successes: 1099127
-rngtest: FIPS 140-2 failures: 873
-rngtest: FIPS 140-2(2001-10-10) Monobit: 116
-rngtest: FIPS 140-2(2001-10-10) Poker: 118
+rngtest: FIPS 140-2 successes: 1099184
+rngtest: FIPS 140-2 failures: 816
+rngtest: FIPS 140-2(2001-10-10) Monobit: 103
+rngtest: FIPS 140-2(2001-10-10) Poker: 98
+rngtest: FIPS 140-2(2001-10-10) Runs: 311
+rngtest: FIPS 140-2(2001-10-10) Long run: 306
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4403941.873; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.738; max=152.588)Mibits/s
+rngtest: Program run time: 154096550 microseconds
+rngtest: bits received from input: 22400000032
+rngtest: FIPS 140-2 successes: 1119173
+rngtest: FIPS 140-2 failures: 827
+rngtest: FIPS 140-2(2001-10-10) Monobit: 105
+rngtest: FIPS 140-2(2001-10-10) Poker: 99
+rngtest: FIPS 140-2(2001-10-10) Runs: 315
+rngtest: FIPS 140-2(2001-10-10) Long run: 311
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4393486.914; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.711; max=152.588)Mibits/s
+rngtest: Program run time: 156939045 microseconds
+rngtest: bits received from input: 22800000032
+rngtest: FIPS 140-2 successes: 1139160
+rngtest: FIPS 140-2 failures: 840
+rngtest: FIPS 140-2(2001-10-10) Monobit: 108
+rngtest: FIPS 140-2(2001-10-10) Poker: 101
+rngtest: FIPS 140-2(2001-10-10) Runs: 318
+rngtest: FIPS 140-2(2001-10-10) Long run: 316
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4340540.918; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.601; max=152.588)Mibits/s
+rngtest: Program run time: 159924701 microseconds
+rngtest: bits received from input: 23200000032
+rngtest: FIPS 140-2 successes: 1159151
+rngtest: FIPS 140-2 failures: 849
+rngtest: FIPS 140-2(2001-10-10) Monobit: 109
+rngtest: FIPS 140-2(2001-10-10) Poker: 103
 rngtest: FIPS 140-2(2001-10-10) Runs: 321
-rngtest: FIPS 140-2(2001-10-10) Long run: 324
+rngtest: FIPS 140-2(2001-10-10) Long run: 320
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=105.373; avg=85843.654; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.201; max=151.377)Mibits/s
-rngtest: Program run time: 395894396 microseconds
+rngtest: input channel speed: (min=334397.833; avg=4441848260.720; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.519; max=152.588)Mibits/s
+rngtest: Program run time: 162825898 microseconds
+rngtest: bits received from input: 23600000032
+rngtest: FIPS 140-2 successes: 1179134
+rngtest: FIPS 140-2 failures: 866
+rngtest: FIPS 140-2(2001-10-10) Monobit: 113
+rngtest: FIPS 140-2(2001-10-10) Poker: 105
+rngtest: FIPS 140-2(2001-10-10) Runs: 323
+rngtest: FIPS 140-2(2001-10-10) Long run: 329
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=334397.833; avg=4378992931.823; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.411; max=152.588)Mibits/s
+rngtest: Program run time: 165832182 microseconds
 rngtest: bits received from input: 24000000032
-rngtest: FIPS 140-2 successes: 1199044
-rngtest: FIPS 140-2 failures: 956
-rngtest: FIPS 140-2(2001-10-10) Monobit: 124
-rngtest: FIPS 140-2(2001-10-10) Poker: 127
+rngtest: FIPS 140-2 successes: 1199114
+rngtest: FIPS 140-2 failures: 886
+rngtest: FIPS 140-2(2001-10-10) Monobit: 118
+rngtest: FIPS 140-2(2001-10-10) Poker: 106
+rngtest: FIPS 140-2(2001-10-10) Runs: 334
+rngtest: FIPS 140-2(2001-10-10) Long run: 333
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4277986.336; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.337; max=152.588)Mibits/s
+rngtest: Program run time: 168727385 microseconds
+rngtest: bits received from input: 24400000032
+rngtest: FIPS 140-2 successes: 1219100
+rngtest: FIPS 140-2 failures: 900
+rngtest: FIPS 140-2(2001-10-10) Monobit: 120
+rngtest: FIPS 140-2(2001-10-10) Poker: 108
+rngtest: FIPS 140-2(2001-10-10) Runs: 340
+rngtest: FIPS 140-2(2001-10-10) Long run: 337
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=334397.833; avg=4333564397.566; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.240; max=152.588)Mibits/s
+rngtest: Program run time: 171715329 microseconds
+rngtest: bits received from input: 24800000032
+rngtest: FIPS 140-2 successes: 1239087
+rngtest: FIPS 140-2 failures: 913
+rngtest: FIPS 140-2(2001-10-10) Monobit: 121
+rngtest: FIPS 140-2(2001-10-10) Poker: 111
 rngtest: FIPS 140-2(2001-10-10) Runs: 345
-rngtest: FIPS 140-2(2001-10-10) Long run: 366
+rngtest: FIPS 140-2(2001-10-10) Long run: 341
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=103012.604; avg=84539500.361; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.289; max=151.377)Mibits/s
-rngtest: Program run time: 442652988 microseconds
+rngtest: input channel speed: (min=326.560; avg=4178252.917; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.142; max=152.588)Mibits/s
+rngtest: Program run time: 174721666 microseconds
+rngtest: bits received from input: 25200000032
+rngtest: FIPS 140-2 successes: 1259069
+rngtest: FIPS 140-2 failures: 931
+rngtest: FIPS 140-2(2001-10-10) Monobit: 124
+rngtest: FIPS 140-2(2001-10-10) Poker: 115
+rngtest: FIPS 140-2(2001-10-10) Runs: 355
+rngtest: FIPS 140-2(2001-10-10) Long run: 344
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4179819.164; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.129; max=152.588)Mibits/s
+rngtest: Program run time: 177552964 microseconds
+rngtest: bits received from input: 25600000032
+rngtest: FIPS 140-2 successes: 1279058
+rngtest: FIPS 140-2 failures: 942
+rngtest: FIPS 140-2(2001-10-10) Monobit: 126
+rngtest: FIPS 140-2(2001-10-10) Poker: 117
+rngtest: FIPS 140-2(2001-10-10) Runs: 357
+rngtest: FIPS 140-2(2001-10-10) Long run: 349
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4169488.716; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.040; max=152.588)Mibits/s
+rngtest: Program run time: 180496788 microseconds
 rngtest: bits received from input: 26000000032
-rngtest: FIPS 140-2 successes: 1298963
-rngtest: FIPS 140-2 failures: 1037
-rngtest: FIPS 140-2(2001-10-10) Monobit: 132
-rngtest: FIPS 140-2(2001-10-10) Poker: 132
+rngtest: FIPS 140-2 successes: 1299050
+rngtest: FIPS 140-2 failures: 950
+rngtest: FIPS 140-2(2001-10-10) Monobit: 127
+rngtest: FIPS 140-2(2001-10-10) Poker: 118
+rngtest: FIPS 140-2(2001-10-10) Runs: 361
+rngtest: FIPS 140-2(2001-10-10) Long run: 351
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4162448.036; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=140.023; max=152.588)Mibits/s
+rngtest: Program run time: 183349717 microseconds
+rngtest: bits received from input: 26400000032
+rngtest: FIPS 140-2 successes: 1319038
+rngtest: FIPS 140-2 failures: 962
+rngtest: FIPS 140-2(2001-10-10) Monobit: 127
+rngtest: FIPS 140-2(2001-10-10) Poker: 119
+rngtest: FIPS 140-2(2001-10-10) Runs: 369
+rngtest: FIPS 140-2(2001-10-10) Long run: 354
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4114093.374; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.940; max=152.588)Mibits/s
+rngtest: Program run time: 186350294 microseconds
+rngtest: bits received from input: 26800000032
+rngtest: FIPS 140-2 successes: 1339022
+rngtest: FIPS 140-2 failures: 978
+rngtest: FIPS 140-2(2001-10-10) Monobit: 127
+rngtest: FIPS 140-2(2001-10-10) Poker: 124
+rngtest: FIPS 140-2(2001-10-10) Runs: 373
+rngtest: FIPS 140-2(2001-10-10) Long run: 361
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4116686.407; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.869; max=152.588)Mibits/s
+rngtest: Program run time: 189262095 microseconds
+rngtest: bits received from input: 27200000032
+rngtest: FIPS 140-2 successes: 1359006
+rngtest: FIPS 140-2 failures: 994
+rngtest: FIPS 140-2(2001-10-10) Monobit: 130
+rngtest: FIPS 140-2(2001-10-10) Poker: 124
 rngtest: FIPS 140-2(2001-10-10) Runs: 378
-rngtest: FIPS 140-2(2001-10-10) Long run: 401
+rngtest: FIPS 140-2(2001-10-10) Long run: 369
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=100.598; avg=85393.250; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.240; max=151.377)Mibits/s
-rngtest: Program run time: 469388494 microseconds
+rngtest: input channel speed: (min=326.560; avg=4086221.622; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.793; max=152.588)Mibits/s
+rngtest: Program run time: 192236132 microseconds
+rngtest: bits received from input: 27600000032
+rngtest: FIPS 140-2 successes: 1378985
+rngtest: FIPS 140-2 failures: 1015
+rngtest: FIPS 140-2(2001-10-10) Monobit: 133
+rngtest: FIPS 140-2(2001-10-10) Poker: 125
+rngtest: FIPS 140-2(2001-10-10) Runs: 387
+rngtest: FIPS 140-2(2001-10-10) Long run: 377
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4063146.335; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.731; max=152.588)Mibits/s
+rngtest: Program run time: 195183478 microseconds
 rngtest: bits received from input: 28000000032
-rngtest: FIPS 140-2 successes: 1398882
-rngtest: FIPS 140-2 failures: 1118
-rngtest: FIPS 140-2(2001-10-10) Monobit: 144
-rngtest: FIPS 140-2(2001-10-10) Poker: 145
-rngtest: FIPS 140-2(2001-10-10) Runs: 405
-rngtest: FIPS 140-2(2001-10-10) Long run: 430
+rngtest: FIPS 140-2 successes: 1398968
+rngtest: FIPS 140-2 failures: 1032
+rngtest: FIPS 140-2(2001-10-10) Monobit: 135
+rngtest: FIPS 140-2(2001-10-10) Poker: 129
+rngtest: FIPS 140-2(2001-10-10) Runs: 395
+rngtest: FIPS 140-2(2001-10-10) Long run: 380
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=100.598; avg=91936.542; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.337; max=151.377)Mibits/s
-rngtest: Program run time: 482581772 microseconds
+rngtest: input channel speed: (min=326.560; avg=4052220.836; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.752; max=152.588)Mibits/s
+rngtest: Program run time: 198002416 microseconds
+rngtest: bits received from input: 28400000032
+rngtest: FIPS 140-2 successes: 1418952
+rngtest: FIPS 140-2 failures: 1048
+rngtest: FIPS 140-2(2001-10-10) Monobit: 137
+rngtest: FIPS 140-2(2001-10-10) Poker: 131
+rngtest: FIPS 140-2(2001-10-10) Runs: 399
+rngtest: FIPS 140-2(2001-10-10) Long run: 388
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4038510.655; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.787; max=152.588)Mibits/s
+rngtest: Program run time: 200805784 microseconds
+rngtest: bits received from input: 28800000032
+rngtest: FIPS 140-2 successes: 1438925
+rngtest: FIPS 140-2 failures: 1075
+rngtest: FIPS 140-2(2001-10-10) Monobit: 143
+rngtest: FIPS 140-2(2001-10-10) Poker: 131
+rngtest: FIPS 140-2(2001-10-10) Runs: 409
+rngtest: FIPS 140-2(2001-10-10) Long run: 400
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4030785.600; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.714; max=152.588)Mibits/s
+rngtest: Program run time: 203748961 microseconds
+rngtest: bits received from input: 29200000032
+rngtest: FIPS 140-2 successes: 1458917
+rngtest: FIPS 140-2 failures: 1083
+rngtest: FIPS 140-2(2001-10-10) Monobit: 143
+rngtest: FIPS 140-2(2001-10-10) Poker: 133
+rngtest: FIPS 140-2(2001-10-10) Runs: 411
+rngtest: FIPS 140-2(2001-10-10) Long run: 404
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4019329.712; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.655; max=152.588)Mibits/s
+rngtest: Program run time: 206684210 microseconds
+rngtest: bits received from input: 29600000032
+rngtest: FIPS 140-2 successes: 1478904
+rngtest: FIPS 140-2 failures: 1096
+rngtest: FIPS 140-2(2001-10-10) Monobit: 145
+rngtest: FIPS 140-2(2001-10-10) Poker: 135
+rngtest: FIPS 140-2(2001-10-10) Runs: 416
+rngtest: FIPS 140-2(2001-10-10) Long run: 408
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=4016558.259; max=1502403.846)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.635; max=152.588)Mibits/s
+rngtest: Program run time: 209549248 microseconds
 rngtest: bits received from input: 30000000032
-rngtest: FIPS 140-2 successes: 1498786
-rngtest: FIPS 140-2 failures: 1214
+rngtest: FIPS 140-2 successes: 1498889
+rngtest: FIPS 140-2 failures: 1111
+rngtest: FIPS 140-2(2001-10-10) Monobit: 147
+rngtest: FIPS 140-2(2001-10-10) Poker: 138
+rngtest: FIPS 140-2(2001-10-10) Runs: 423
+rngtest: FIPS 140-2(2001-10-10) Long run: 411
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3982489.180; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.566; max=152.588)Mibits/s
+rngtest: Program run time: 212545389 microseconds
+rngtest: bits received from input: 30400000032
+rngtest: FIPS 140-2 successes: 1518874
+rngtest: FIPS 140-2 failures: 1126
+rngtest: FIPS 140-2(2001-10-10) Monobit: 149
+rngtest: FIPS 140-2(2001-10-10) Poker: 140
+rngtest: FIPS 140-2(2001-10-10) Runs: 432
+rngtest: FIPS 140-2(2001-10-10) Long run: 413
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3958661.638; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.515; max=152.588)Mibits/s
+rngtest: Program run time: 215499297 microseconds
+rngtest: bits received from input: 30800000032
+rngtest: FIPS 140-2 successes: 1538852
+rngtest: FIPS 140-2 failures: 1148
 rngtest: FIPS 140-2(2001-10-10) Monobit: 153
-rngtest: FIPS 140-2(2001-10-10) Poker: 155
-rngtest: FIPS 140-2(2001-10-10) Runs: 445
-rngtest: FIPS 140-2(2001-10-10) Long run: 468
+rngtest: FIPS 140-2(2001-10-10) Poker: 145
+rngtest: FIPS 140-2(2001-10-10) Runs: 438
+rngtest: FIPS 140-2(2001-10-10) Long run: 420
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=100.598; avg=98475.803; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.423; max=151.377)Mibits/s
-rngtest: Program run time: 495772536 microseconds
+rngtest: input channel speed: (min=326.560; avg=3934571.248; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.451; max=152.588)Mibits/s
+rngtest: Program run time: 218479045 microseconds
+rngtest: bits received from input: 31200000032
+rngtest: FIPS 140-2 successes: 1558833
+rngtest: FIPS 140-2 failures: 1167
+rngtest: FIPS 140-2(2001-10-10) Monobit: 156
+rngtest: FIPS 140-2(2001-10-10) Poker: 149
+rngtest: FIPS 140-2(2001-10-10) Runs: 446
+rngtest: FIPS 140-2(2001-10-10) Long run: 424
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3906459.346; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.394; max=152.588)Mibits/s
+rngtest: Program run time: 221458747 microseconds
+rngtest: bits received from input: 31600000032
+rngtest: FIPS 140-2 successes: 1578816
+rngtest: FIPS 140-2 failures: 1184
+rngtest: FIPS 140-2(2001-10-10) Monobit: 161
+rngtest: FIPS 140-2(2001-10-10) Poker: 151
+rngtest: FIPS 140-2(2001-10-10) Runs: 448
+rngtest: FIPS 140-2(2001-10-10) Long run: 432
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3901370.324; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.329; max=152.588)Mibits/s
+rngtest: Program run time: 224408902 microseconds
 rngtest: bits received from input: 32000000032
-rngtest: FIPS 140-2 successes: 1598705
-rngtest: FIPS 140-2 failures: 1295
+rngtest: FIPS 140-2 successes: 1598804
+rngtest: FIPS 140-2 failures: 1196
+rngtest: FIPS 140-2(2001-10-10) Monobit: 161
+rngtest: FIPS 140-2(2001-10-10) Poker: 153
+rngtest: FIPS 140-2(2001-10-10) Runs: 454
+rngtest: FIPS 140-2(2001-10-10) Long run: 436
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3895658.192; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.286; max=152.588)Mibits/s
+rngtest: Program run time: 227328869 microseconds
+rngtest: bits received from input: 32400000032
+rngtest: FIPS 140-2 successes: 1618794
+rngtest: FIPS 140-2 failures: 1206
 rngtest: FIPS 140-2(2001-10-10) Monobit: 162
-rngtest: FIPS 140-2(2001-10-10) Poker: 170
-rngtest: FIPS 140-2(2001-10-10) Runs: 476
-rngtest: FIPS 140-2(2001-10-10) Long run: 494
+rngtest: FIPS 140-2(2001-10-10) Poker: 153
+rngtest: FIPS 140-2(2001-10-10) Runs: 458
+rngtest: FIPS 140-2(2001-10-10) Long run: 441
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=96864.748; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.925; avg=144.373; max=151.377)Mibits/s
-rngtest: Program run time: 534176919 microseconds
+rngtest: input channel speed: (min=326.560; avg=3901853.911; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.269; max=152.588)Mibits/s
+rngtest: Program run time: 230186180 microseconds
+rngtest: bits received from input: 32800000032
+rngtest: FIPS 140-2 successes: 1638768
+rngtest: FIPS 140-2 failures: 1232
+rngtest: FIPS 140-2(2001-10-10) Monobit: 164
+rngtest: FIPS 140-2(2001-10-10) Poker: 156
+rngtest: FIPS 140-2(2001-10-10) Runs: 466
+rngtest: FIPS 140-2(2001-10-10) Long run: 454
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=326.560; avg=3893801.706; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.234; max=152.588)Mibits/s
+rngtest: Program run time: 233100302 microseconds
+rngtest: bits received from input: 33200000032
+rngtest: FIPS 140-2 successes: 1658752
+rngtest: FIPS 140-2 failures: 1248
+rngtest: FIPS 140-2(2001-10-10) Monobit: 165
+rngtest: FIPS 140-2(2001-10-10) Poker: 159
+rngtest: FIPS 140-2(2001-10-10) Runs: 471
+rngtest: FIPS 140-2(2001-10-10) Long run: 461
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=318.358; avg=3868475.502; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.199; max=152.588)Mibits/s
+rngtest: Program run time: 236054351 microseconds
+rngtest: bits received from input: 33600000032
+rngtest: FIPS 140-2 successes: 1678739
+rngtest: FIPS 140-2 failures: 1261
+rngtest: FIPS 140-2(2001-10-10) Monobit: 166
+rngtest: FIPS 140-2(2001-10-10) Poker: 161
+rngtest: FIPS 140-2(2001-10-10) Runs: 475
+rngtest: FIPS 140-2(2001-10-10) Long run: 467
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=325998.370; avg=3951869057.642; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.145; max=152.588)Mibits/s
+rngtest: Program run time: 239008232 microseconds
 rngtest: bits received from input: 34000000032
-rngtest: FIPS 140-2 successes: 1698631
-rngtest: FIPS 140-2 failures: 1369
-rngtest: FIPS 140-2(2001-10-10) Monobit: 175
-rngtest: FIPS 140-2(2001-10-10) Poker: 182
-rngtest: FIPS 140-2(2001-10-10) Runs: 504
-rngtest: FIPS 140-2(2001-10-10) Long run: 515
+rngtest: FIPS 140-2 successes: 1698720
+rngtest: FIPS 140-2 failures: 1280
+rngtest: FIPS 140-2(2001-10-10) Monobit: 170
+rngtest: FIPS 140-2(2001-10-10) Poker: 163
+rngtest: FIPS 140-2(2001-10-10) Runs: 482
+rngtest: FIPS 140-2(2001-10-10) Long run: 473
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=88968616.166; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.277; max=151.377)Mibits/s
-rngtest: Program run time: 607091367 microseconds
+rngtest: input channel speed: (min=318.358; avg=3848720.682; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.116; max=152.588)Mibits/s
+rngtest: Program run time: 241925727 microseconds
+rngtest: bits received from input: 34400000032
+rngtest: FIPS 140-2 successes: 1718709
+rngtest: FIPS 140-2 failures: 1291
+rngtest: FIPS 140-2(2001-10-10) Monobit: 172
+rngtest: FIPS 140-2(2001-10-10) Poker: 163
+rngtest: FIPS 140-2(2001-10-10) Runs: 488
+rngtest: FIPS 140-2(2001-10-10) Long run: 476
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=325998.370; avg=3919586939.344; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.059; max=152.588)Mibits/s
+rngtest: Program run time: 244917444 microseconds
+rngtest: bits received from input: 34800000032
+rngtest: FIPS 140-2 successes: 1738693
+rngtest: FIPS 140-2 failures: 1307
+rngtest: FIPS 140-2(2001-10-10) Monobit: 173
+rngtest: FIPS 140-2(2001-10-10) Poker: 168
+rngtest: FIPS 140-2(2001-10-10) Runs: 494
+rngtest: FIPS 140-2(2001-10-10) Long run: 480
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=281.950; avg=3784957.344; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.003; max=152.588)Mibits/s
+rngtest: Program run time: 247961282 microseconds
+rngtest: bits received from input: 35200000032
+rngtest: FIPS 140-2 successes: 1758676
+rngtest: FIPS 140-2 failures: 1324
+rngtest: FIPS 140-2(2001-10-10) Monobit: 173
+rngtest: FIPS 140-2(2001-10-10) Poker: 169
+rngtest: FIPS 140-2(2001-10-10) Runs: 502
+rngtest: FIPS 140-2(2001-10-10) Long run: 488
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=281.950; avg=3797614.490; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.993; max=152.588)Mibits/s
+rngtest: Program run time: 250798789 microseconds
+rngtest: bits received from input: 35600000032
+rngtest: FIPS 140-2 successes: 1778665
+rngtest: FIPS 140-2 failures: 1335
+rngtest: FIPS 140-2(2001-10-10) Monobit: 174
+rngtest: FIPS 140-2(2001-10-10) Poker: 170
+rngtest: FIPS 140-2(2001-10-10) Runs: 510
+rngtest: FIPS 140-2(2001-10-10) Long run: 490
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=288716.942; avg=3885941504.137; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.961; max=152.588)Mibits/s
+rngtest: Program run time: 253711026 microseconds
 rngtest: bits received from input: 36000000032
-rngtest: FIPS 140-2 successes: 1798561
-rngtest: FIPS 140-2 failures: 1439
-rngtest: FIPS 140-2(2001-10-10) Monobit: 183
-rngtest: FIPS 140-2(2001-10-10) Poker: 185
-rngtest: FIPS 140-2(2001-10-10) Runs: 527
-rngtest: FIPS 140-2(2001-10-10) Long run: 551
+rngtest: FIPS 140-2 successes: 1798654
+rngtest: FIPS 140-2 failures: 1346
+rngtest: FIPS 140-2(2001-10-10) Monobit: 178
+rngtest: FIPS 140-2(2001-10-10) Poker: 172
+rngtest: FIPS 140-2(2001-10-10) Runs: 512
+rngtest: FIPS 140-2(2001-10-10) Long run: 493
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=79568.936; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.362; max=151.377)Mibits/s
-rngtest: Program run time: 679858299 microseconds
+rngtest: input channel speed: (min=281.950; avg=3812299.687; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.050; max=152.588)Mibits/s
+rngtest: Program run time: 256361500 microseconds
+rngtest: bits received from input: 36400000032
+rngtest: FIPS 140-2 successes: 1818637
+rngtest: FIPS 140-2 failures: 1363
+rngtest: FIPS 140-2(2001-10-10) Monobit: 178
+rngtest: FIPS 140-2(2001-10-10) Poker: 173
+rngtest: FIPS 140-2(2001-10-10) Runs: 518
+rngtest: FIPS 140-2(2001-10-10) Long run: 503
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=288716.942; avg=3878697362.933; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=139.004; max=152.588)Mibits/s
+rngtest: Program run time: 259353801 microseconds
+rngtest: bits received from input: 36800000032
+rngtest: FIPS 140-2 successes: 1838619
+rngtest: FIPS 140-2 failures: 1381
+rngtest: FIPS 140-2(2001-10-10) Monobit: 180
+rngtest: FIPS 140-2(2001-10-10) Poker: 176
+rngtest: FIPS 140-2(2001-10-10) Runs: 522
+rngtest: FIPS 140-2(2001-10-10) Long run: 512
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3743769.196; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.946; max=152.588)Mibits/s
+rngtest: Program run time: 262420426 microseconds
+rngtest: bits received from input: 37200000032
+rngtest: FIPS 140-2 successes: 1858596
+rngtest: FIPS 140-2 failures: 1404
+rngtest: FIPS 140-2(2001-10-10) Monobit: 184
+rngtest: FIPS 140-2(2001-10-10) Poker: 177
+rngtest: FIPS 140-2(2001-10-10) Runs: 530
+rngtest: FIPS 140-2(2001-10-10) Long run: 522
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=259470.680; avg=3831270832.535; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.924; max=152.588)Mibits/s
+rngtest: Program run time: 265320047 microseconds
+rngtest: bits received from input: 37600000032
+rngtest: FIPS 140-2 successes: 1878580
+rngtest: FIPS 140-2 failures: 1420
+rngtest: FIPS 140-2(2001-10-10) Monobit: 187
+rngtest: FIPS 140-2(2001-10-10) Poker: 179
+rngtest: FIPS 140-2(2001-10-10) Runs: 535
+rngtest: FIPS 140-2(2001-10-10) Long run: 528
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3719615.144; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.875; max=152.588)Mibits/s
+rngtest: Program run time: 268322286 microseconds
 rngtest: bits received from input: 38000000032
-rngtest: FIPS 140-2 successes: 1898500
-rngtest: FIPS 140-2 failures: 1500
+rngtest: FIPS 140-2 successes: 1898559
+rngtest: FIPS 140-2 failures: 1441
+rngtest: FIPS 140-2(2001-10-10) Monobit: 189
+rngtest: FIPS 140-2(2001-10-10) Poker: 182
+rngtest: FIPS 140-2(2001-10-10) Runs: 542
+rngtest: FIPS 140-2(2001-10-10) Long run: 537
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=259470.680; avg=3825019067.217; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.887; max=152.588)Mibits/s
+rngtest: Program run time: 271111035 microseconds
+rngtest: bits received from input: 38400000032
+rngtest: FIPS 140-2 successes: 1918542
+rngtest: FIPS 140-2 failures: 1458
 rngtest: FIPS 140-2(2001-10-10) Monobit: 190
-rngtest: FIPS 140-2(2001-10-10) Poker: 194
-rngtest: FIPS 140-2(2001-10-10) Runs: 546
-rngtest: FIPS 140-2(2001-10-10) Long run: 577
+rngtest: FIPS 140-2(2001-10-10) Poker: 183
+rngtest: FIPS 140-2(2001-10-10) Runs: 548
+rngtest: FIPS 140-2(2001-10-10) Long run: 546
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=74886.117; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.331; max=151.377)Mibits/s
-rngtest: Program run time: 746845410 microseconds
+rngtest: input channel speed: (min=253.389; avg=3731150.229; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.848; max=152.588)Mibits/s
+rngtest: Program run time: 274050331 microseconds
+rngtest: bits received from input: 38800000032
+rngtest: FIPS 140-2 successes: 1938533
+rngtest: FIPS 140-2 failures: 1467
+rngtest: FIPS 140-2(2001-10-10) Monobit: 191
+rngtest: FIPS 140-2(2001-10-10) Poker: 183
+rngtest: FIPS 140-2(2001-10-10) Runs: 552
+rngtest: FIPS 140-2(2001-10-10) Long run: 550
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3747884.493; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.932; max=152.588)Mibits/s
+rngtest: Program run time: 276698848 microseconds
+rngtest: bits received from input: 39200000032
+rngtest: FIPS 140-2 successes: 1958524
+rngtest: FIPS 140-2 failures: 1476
+rngtest: FIPS 140-2(2001-10-10) Monobit: 192
+rngtest: FIPS 140-2(2001-10-10) Poker: 183
+rngtest: FIPS 140-2(2001-10-10) Runs: 554
+rngtest: FIPS 140-2(2001-10-10) Long run: 556
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3732710.572; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.905; max=152.588)Mibits/s
+rngtest: Program run time: 279645734 microseconds
+rngtest: bits received from input: 39600000032
+rngtest: FIPS 140-2 successes: 1978509
+rngtest: FIPS 140-2 failures: 1491
+rngtest: FIPS 140-2(2001-10-10) Monobit: 194
+rngtest: FIPS 140-2(2001-10-10) Poker: 188
+rngtest: FIPS 140-2(2001-10-10) Runs: 559
+rngtest: FIPS 140-2(2001-10-10) Long run: 559
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3719190.139; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.859; max=152.588)Mibits/s
+rngtest: Program run time: 282627003 microseconds
 rngtest: bits received from input: 40000000032
-rngtest: FIPS 140-2 successes: 1998429
-rngtest: FIPS 140-2 failures: 1571
-rngtest: FIPS 140-2(2001-10-10) Monobit: 199
-rngtest: FIPS 140-2(2001-10-10) Poker: 202
+rngtest: FIPS 140-2 successes: 1998494
+rngtest: FIPS 140-2 failures: 1506
+rngtest: FIPS 140-2(2001-10-10) Monobit: 194
+rngtest: FIPS 140-2(2001-10-10) Poker: 189
+rngtest: FIPS 140-2(2001-10-10) Runs: 565
+rngtest: FIPS 140-2(2001-10-10) Long run: 567
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3716910.222; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.826; max=152.588)Mibits/s
+rngtest: Program run time: 285553784 microseconds
+rngtest: bits received from input: 40400000032
+rngtest: FIPS 140-2 successes: 2018479
+rngtest: FIPS 140-2 failures: 1521
+rngtest: FIPS 140-2(2001-10-10) Monobit: 196
+rngtest: FIPS 140-2(2001-10-10) Poker: 191
 rngtest: FIPS 140-2(2001-10-10) Runs: 570
-rngtest: FIPS 140-2(2001-10-10) Long run: 609
+rngtest: FIPS 140-2(2001-10-10) Long run: 573
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=74927.565; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.424; max=151.377)Mibits/s
-rngtest: Program run time: 785693848 microseconds
+rngtest: input channel speed: (min=253.389; avg=3711258.983; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.863; max=152.588)Mibits/s
+rngtest: Program run time: 288350040 microseconds
+rngtest: bits received from input: 40800000032
+rngtest: FIPS 140-2 successes: 2038460
+rngtest: FIPS 140-2 failures: 1540
+rngtest: FIPS 140-2(2001-10-10) Monobit: 197
+rngtest: FIPS 140-2(2001-10-10) Poker: 194
+rngtest: FIPS 140-2(2001-10-10) Runs: 574
+rngtest: FIPS 140-2(2001-10-10) Long run: 584
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3725709.427; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.900; max=152.588)Mibits/s
+rngtest: Program run time: 291088518 microseconds
+rngtest: bits received from input: 41200000032
+rngtest: FIPS 140-2 successes: 2058445
+rngtest: FIPS 140-2 failures: 1555
+rngtest: FIPS 140-2(2001-10-10) Monobit: 198
+rngtest: FIPS 140-2(2001-10-10) Poker: 196
+rngtest: FIPS 140-2(2001-10-10) Runs: 581
+rngtest: FIPS 140-2(2001-10-10) Long run: 589
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3706875.179; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.864; max=152.588)Mibits/s
+rngtest: Program run time: 294071299 microseconds
+rngtest: bits received from input: 41600000032
+rngtest: FIPS 140-2 successes: 2078427
+rngtest: FIPS 140-2 failures: 1573
+rngtest: FIPS 140-2(2001-10-10) Monobit: 199
+rngtest: FIPS 140-2(2001-10-10) Poker: 198
+rngtest: FIPS 140-2(2001-10-10) Runs: 591
+rngtest: FIPS 140-2(2001-10-10) Long run: 594
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3715832.860; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.873; max=152.588)Mibits/s
+rngtest: Program run time: 296881051 microseconds
 rngtest: bits received from input: 42000000032
-rngtest: FIPS 140-2 successes: 2098335
-rngtest: FIPS 140-2 failures: 1665
-rngtest: FIPS 140-2(2001-10-10) Monobit: 213
-rngtest: FIPS 140-2(2001-10-10) Poker: 213
-rngtest: FIPS 140-2(2001-10-10) Runs: 603
-rngtest: FIPS 140-2(2001-10-10) Long run: 645
+rngtest: FIPS 140-2 successes: 2098414
+rngtest: FIPS 140-2 failures: 1586
+rngtest: FIPS 140-2(2001-10-10) Monobit: 200
+rngtest: FIPS 140-2(2001-10-10) Poker: 199
+rngtest: FIPS 140-2(2001-10-10) Runs: 597
+rngtest: FIPS 140-2(2001-10-10) Long run: 599
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=77412840.031; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.415; max=151.377)Mibits/s
-rngtest: Program run time: 820138532 microseconds
+rngtest: input channel speed: (min=253.389; avg=3701319.568; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.832; max=152.588)Mibits/s
+rngtest: Program run time: 299863915 microseconds
+rngtest: bits received from input: 42400000032
+rngtest: FIPS 140-2 successes: 2118394
+rngtest: FIPS 140-2 failures: 1606
+rngtest: FIPS 140-2(2001-10-10) Monobit: 202
+rngtest: FIPS 140-2(2001-10-10) Poker: 199
+rngtest: FIPS 140-2(2001-10-10) Runs: 607
+rngtest: FIPS 140-2(2001-10-10) Long run: 607
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3714074.000; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.820; max=152.588)Mibits/s
+rngtest: Program run time: 302706696 microseconds
+rngtest: bits received from input: 42800000032
+rngtest: FIPS 140-2 successes: 2138372
+rngtest: FIPS 140-2 failures: 1628
+rngtest: FIPS 140-2(2001-10-10) Monobit: 205
+rngtest: FIPS 140-2(2001-10-10) Poker: 199
+rngtest: FIPS 140-2(2001-10-10) Runs: 619
+rngtest: FIPS 140-2(2001-10-10) Long run: 614
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3696460.003; max=1220703.125)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.782; max=152.588)Mibits/s
+rngtest: Program run time: 305696567 microseconds
+rngtest: bits received from input: 43200000032
+rngtest: FIPS 140-2 successes: 2158357
+rngtest: FIPS 140-2 failures: 1643
+rngtest: FIPS 140-2(2001-10-10) Monobit: 207
+rngtest: FIPS 140-2(2001-10-10) Poker: 201
+rngtest: FIPS 140-2(2001-10-10) Runs: 627
+rngtest: FIPS 140-2(2001-10-10) Long run: 617
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3688455.900; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.742; max=152.588)Mibits/s
+rngtest: Program run time: 308664312 microseconds
+rngtest: bits received from input: 43600000032
+rngtest: FIPS 140-2 successes: 2178342
+rngtest: FIPS 140-2 failures: 1658
+rngtest: FIPS 140-2(2001-10-10) Monobit: 208
+rngtest: FIPS 140-2(2001-10-10) Poker: 203
+rngtest: FIPS 140-2(2001-10-10) Runs: 633
+rngtest: FIPS 140-2(2001-10-10) Long run: 623
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3699949.312; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.730; max=152.588)Mibits/s
+rngtest: Program run time: 311512681 microseconds
 rngtest: bits received from input: 44000000032
-rngtest: FIPS 140-2 successes: 2198258
-rngtest: FIPS 140-2 failures: 1742
-rngtest: FIPS 140-2(2001-10-10) Monobit: 225
-rngtest: FIPS 140-2(2001-10-10) Poker: 223
-rngtest: FIPS 140-2(2001-10-10) Runs: 632
-rngtest: FIPS 140-2(2001-10-10) Long run: 673
+rngtest: FIPS 140-2 successes: 2198333
+rngtest: FIPS 140-2 failures: 1667
+rngtest: FIPS 140-2(2001-10-10) Monobit: 210
+rngtest: FIPS 140-2(2001-10-10) Poker: 204
+rngtest: FIPS 140-2(2001-10-10) Runs: 636
+rngtest: FIPS 140-2(2001-10-10) Long run: 626
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=79187.932; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.380; max=151.377)Mibits/s
-rngtest: Program run time: 833499555 microseconds
-rngtest: bits received from input: 46000000032
-rngtest: FIPS 140-2 successes: 2298185
-rngtest: FIPS 140-2 failures: 1815
-rngtest: FIPS 140-2(2001-10-10) Monobit: 233
-rngtest: FIPS 140-2(2001-10-10) Poker: 237
+rngtest: input channel speed: (min=253.389; avg=3696524.332; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.715; max=152.588)Mibits/s
+rngtest: Program run time: 314412958 microseconds
+rngtest: bits received from input: 44400000032
+rngtest: FIPS 140-2 successes: 2218316
+rngtest: FIPS 140-2 failures: 1684
+rngtest: FIPS 140-2(2001-10-10) Monobit: 213
+rngtest: FIPS 140-2(2001-10-10) Poker: 206
+rngtest: FIPS 140-2(2001-10-10) Runs: 639
+rngtest: FIPS 140-2(2001-10-10) Long run: 636
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3705342.966; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.679; max=152.588)Mibits/s
+rngtest: Program run time: 317324807 microseconds
+rngtest: bits received from input: 44800000032
+rngtest: FIPS 140-2 successes: 2238297
+rngtest: FIPS 140-2 failures: 1703
+rngtest: FIPS 140-2(2001-10-10) Monobit: 216
+rngtest: FIPS 140-2(2001-10-10) Poker: 206
+rngtest: FIPS 140-2(2001-10-10) Runs: 649
+rngtest: FIPS 140-2(2001-10-10) Long run: 642
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3690766.882; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.637; max=152.588)Mibits/s
+rngtest: Program run time: 320321929 microseconds
+rngtest: bits received from input: 45200000032
+rngtest: FIPS 140-2 successes: 2258286
+rngtest: FIPS 140-2 failures: 1714
+rngtest: FIPS 140-2(2001-10-10) Monobit: 219
+rngtest: FIPS 140-2(2001-10-10) Poker: 207
+rngtest: FIPS 140-2(2001-10-10) Runs: 654
+rngtest: FIPS 140-2(2001-10-10) Long run: 644
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3702887.423; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.609; max=152.588)Mibits/s
+rngtest: Program run time: 323206211 microseconds
+rngtest: bits received from input: 45600000032
+rngtest: FIPS 140-2 successes: 2278272
+rngtest: FIPS 140-2 failures: 1728
+rngtest: FIPS 140-2(2001-10-10) Monobit: 220
+rngtest: FIPS 140-2(2001-10-10) Poker: 208
 rngtest: FIPS 140-2(2001-10-10) Runs: 658
-rngtest: FIPS 140-2(2001-10-10) Long run: 699
+rngtest: FIPS 140-2(2001-10-10) Long run: 652
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=82776.390; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.350; max=151.377)Mibits/s
-rngtest: Program run time: 846856500 microseconds
+rngtest: input channel speed: (min=253.389; avg=3676154.037; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.571; max=152.588)Mibits/s
+rngtest: Program run time: 326239932 microseconds
+rngtest: bits received from input: 46000000032
+rngtest: FIPS 140-2 successes: 2298252
+rngtest: FIPS 140-2 failures: 1748
+rngtest: FIPS 140-2(2001-10-10) Monobit: 225
+rngtest: FIPS 140-2(2001-10-10) Poker: 209
+rngtest: FIPS 140-2(2001-10-10) Runs: 664
+rngtest: FIPS 140-2(2001-10-10) Long run: 660
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3675017.274; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.600; max=152.588)Mibits/s
+rngtest: Program run time: 329038322 microseconds
+rngtest: bits received from input: 46400000032
+rngtest: FIPS 140-2 successes: 2318232
+rngtest: FIPS 140-2 failures: 1768
+rngtest: FIPS 140-2(2001-10-10) Monobit: 226
+rngtest: FIPS 140-2(2001-10-10) Poker: 211
+rngtest: FIPS 140-2(2001-10-10) Runs: 671
+rngtest: FIPS 140-2(2001-10-10) Long run: 670
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3673513.894; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.570; max=152.588)Mibits/s
+rngtest: Program run time: 331974277 microseconds
+rngtest: bits received from input: 46800000032
+rngtest: FIPS 140-2 successes: 2338211
+rngtest: FIPS 140-2 failures: 1789
+rngtest: FIPS 140-2(2001-10-10) Monobit: 228
+rngtest: FIPS 140-2(2001-10-10) Poker: 214
+rngtest: FIPS 140-2(2001-10-10) Runs: 680
+rngtest: FIPS 140-2(2001-10-10) Long run: 677
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3673067.064; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.600; max=152.588)Mibits/s
+rngtest: Program run time: 334767734 microseconds
+rngtest: bits received from input: 47200000032
+rngtest: FIPS 140-2 successes: 2358191
+rngtest: FIPS 140-2 failures: 1809
+rngtest: FIPS 140-2(2001-10-10) Monobit: 232
+rngtest: FIPS 140-2(2001-10-10) Poker: 216
+rngtest: FIPS 140-2(2001-10-10) Runs: 686
+rngtest: FIPS 140-2(2001-10-10) Long run: 685
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3673930.558; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.565; max=152.588)Mibits/s
+rngtest: Program run time: 337708792 microseconds
+rngtest: bits received from input: 47600000032
+rngtest: FIPS 140-2 successes: 2378174
+rngtest: FIPS 140-2 failures: 1826
+rngtest: FIPS 140-2(2001-10-10) Monobit: 234
+rngtest: FIPS 140-2(2001-10-10) Poker: 220
+rngtest: FIPS 140-2(2001-10-10) Runs: 690
+rngtest: FIPS 140-2(2001-10-10) Long run: 692
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3667655.162; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.541; max=152.588)Mibits/s
+rngtest: Program run time: 340650811 microseconds
 rngtest: bits received from input: 48000000032
-rngtest: FIPS 140-2 successes: 2398110
-rngtest: FIPS 140-2 failures: 1890
-rngtest: FIPS 140-2(2001-10-10) Monobit: 247
-rngtest: FIPS 140-2(2001-10-10) Poker: 245
-rngtest: FIPS 140-2(2001-10-10) Runs: 679
-rngtest: FIPS 140-2(2001-10-10) Long run: 732
+rngtest: FIPS 140-2 successes: 2398164
+rngtest: FIPS 140-2 failures: 1836
+rngtest: FIPS 140-2(2001-10-10) Monobit: 235
+rngtest: FIPS 140-2(2001-10-10) Poker: 222
+rngtest: FIPS 140-2(2001-10-10) Runs: 695
+rngtest: FIPS 140-2(2001-10-10) Long run: 694
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=88436746.361; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.329; max=151.377)Mibits/s
-rngtest: Program run time: 860199439 microseconds
+rngtest: input channel speed: (min=259470.680; avg=3755430117.235; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.518; max=152.588)Mibits/s
+rngtest: Program run time: 343567150 microseconds
+rngtest: bits received from input: 48400000032
+rngtest: FIPS 140-2 successes: 2418154
+rngtest: FIPS 140-2 failures: 1846
+rngtest: FIPS 140-2(2001-10-10) Monobit: 237
+rngtest: FIPS 140-2(2001-10-10) Poker: 225
+rngtest: FIPS 140-2(2001-10-10) Runs: 699
+rngtest: FIPS 140-2(2001-10-10) Long run: 696
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=259470.680; avg=3729854067.918; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.479; max=152.588)Mibits/s
+rngtest: Program run time: 346612791 microseconds
+rngtest: bits received from input: 48800000032
+rngtest: FIPS 140-2 successes: 2438132
+rngtest: FIPS 140-2 failures: 1868
+rngtest: FIPS 140-2(2001-10-10) Monobit: 241
+rngtest: FIPS 140-2(2001-10-10) Poker: 226
+rngtest: FIPS 140-2(2001-10-10) Runs: 708
+rngtest: FIPS 140-2(2001-10-10) Long run: 704
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3641779.774; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.492; max=152.588)Mibits/s
+rngtest: Program run time: 349448899 microseconds
+rngtest: bits received from input: 49200000032
+rngtest: FIPS 140-2 successes: 2458121
+rngtest: FIPS 140-2 failures: 1879
+rngtest: FIPS 140-2(2001-10-10) Monobit: 243
+rngtest: FIPS 140-2(2001-10-10) Poker: 227
+rngtest: FIPS 140-2(2001-10-10) Runs: 711
+rngtest: FIPS 140-2(2001-10-10) Long run: 710
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3633981.197; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.461; max=152.588)Mibits/s
+rngtest: Program run time: 352418350 microseconds
+rngtest: bits received from input: 49600000032
+rngtest: FIPS 140-2 successes: 2478106
+rngtest: FIPS 140-2 failures: 1894
+rngtest: FIPS 140-2(2001-10-10) Monobit: 246
+rngtest: FIPS 140-2(2001-10-10) Poker: 229
+rngtest: FIPS 140-2(2001-10-10) Runs: 718
+rngtest: FIPS 140-2(2001-10-10) Long run: 713
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3633179.360; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.430; max=152.588)Mibits/s
+rngtest: Program run time: 355362646 microseconds
 rngtest: bits received from input: 50000000032
-rngtest: FIPS 140-2 successes: 2498027
-rngtest: FIPS 140-2 failures: 1973
+rngtest: FIPS 140-2 successes: 2498091
+rngtest: FIPS 140-2 failures: 1909
+rngtest: FIPS 140-2(2001-10-10) Monobit: 248
+rngtest: FIPS 140-2(2001-10-10) Poker: 230
+rngtest: FIPS 140-2(2001-10-10) Runs: 722
+rngtest: FIPS 140-2(2001-10-10) Long run: 721
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=259470.680; avg=3728284698.978; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.407; max=152.588)Mibits/s
+rngtest: Program run time: 358256123 microseconds
+rngtest: bits received from input: 50400000032
+rngtest: FIPS 140-2 successes: 2518074
+rngtest: FIPS 140-2 failures: 1926
+rngtest: FIPS 140-2(2001-10-10) Monobit: 252
+rngtest: FIPS 140-2(2001-10-10) Poker: 233
+rngtest: FIPS 140-2(2001-10-10) Runs: 728
+rngtest: FIPS 140-2(2001-10-10) Long run: 725
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=259470.680; avg=3720527003.792; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.412; max=152.588)Mibits/s
+rngtest: Program run time: 361138494 microseconds
+rngtest: bits received from input: 50800000032
+rngtest: FIPS 140-2 successes: 2538054
+rngtest: FIPS 140-2 failures: 1946
+rngtest: FIPS 140-2(2001-10-10) Monobit: 255
+rngtest: FIPS 140-2(2001-10-10) Poker: 238
+rngtest: FIPS 140-2(2001-10-10) Runs: 735
+rngtest: FIPS 140-2(2001-10-10) Long run: 731
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3645271.789; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.457; max=152.588)Mibits/s
+rngtest: Program run time: 363846487 microseconds
+rngtest: bits received from input: 51200000032
+rngtest: FIPS 140-2 successes: 2558034
+rngtest: FIPS 140-2 failures: 1966
+rngtest: FIPS 140-2(2001-10-10) Monobit: 257
+rngtest: FIPS 140-2(2001-10-10) Poker: 241
+rngtest: FIPS 140-2(2001-10-10) Runs: 741
+rngtest: FIPS 140-2(2001-10-10) Long run: 740
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3622738.451; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.443; max=152.588)Mibits/s
+rngtest: Program run time: 366831240 microseconds
+rngtest: bits received from input: 51600000032
+rngtest: FIPS 140-2 successes: 2578019
+rngtest: FIPS 140-2 failures: 1981
 rngtest: FIPS 140-2(2001-10-10) Monobit: 259
-rngtest: FIPS 140-2(2001-10-10) Poker: 246
-rngtest: FIPS 140-2(2001-10-10) Runs: 721
-rngtest: FIPS 140-2(2001-10-10) Long run: 760
+rngtest: FIPS 140-2(2001-10-10) Poker: 244
+rngtest: FIPS 140-2(2001-10-10) Runs: 745
+rngtest: FIPS 140-2(2001-10-10) Long run: 746
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=87535.497; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.331; max=151.377)Mibits/s
-rngtest: Program run time: 888470133 microseconds
+rngtest: input channel speed: (min=253.389; avg=3619091.891; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.444; max=152.588)Mibits/s
+rngtest: Program run time: 369709114 microseconds
 rngtest: bits received from input: 52000000032
-rngtest: FIPS 140-2 successes: 2597940
-rngtest: FIPS 140-2 failures: 2060
-rngtest: FIPS 140-2(2001-10-10) Monobit: 278
-rngtest: FIPS 140-2(2001-10-10) Poker: 256
-rngtest: FIPS 140-2(2001-10-10) Runs: 754
-rngtest: FIPS 140-2(2001-10-10) Long run: 785
+rngtest: FIPS 140-2 successes: 2598005
+rngtest: FIPS 140-2 failures: 1995
+rngtest: FIPS 140-2(2001-10-10) Monobit: 260
+rngtest: FIPS 140-2(2001-10-10) Poker: 245
+rngtest: FIPS 140-2(2001-10-10) Runs: 751
+rngtest: FIPS 140-2(2001-10-10) Long run: 752
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=84317387.237; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.391; max=151.377)Mibits/s
-rngtest: Program run time: 960461270 microseconds
+rngtest: input channel speed: (min=253.389; avg=3617343.360; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.413; max=152.588)Mibits/s
+rngtest: Program run time: 372663380 microseconds
+rngtest: bits received from input: 52400000032
+rngtest: FIPS 140-2 successes: 2617990
+rngtest: FIPS 140-2 failures: 2010
+rngtest: FIPS 140-2(2001-10-10) Monobit: 262
+rngtest: FIPS 140-2(2001-10-10) Poker: 248
+rngtest: FIPS 140-2(2001-10-10) Runs: 755
+rngtest: FIPS 140-2(2001-10-10) Long run: 758
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3528590.604; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.372; max=152.588)Mibits/s
+rngtest: Program run time: 375992227 microseconds
+rngtest: bits received from input: 52800000032
+rngtest: FIPS 140-2 successes: 2637973
+rngtest: FIPS 140-2 failures: 2027
+rngtest: FIPS 140-2(2001-10-10) Monobit: 266
+rngtest: FIPS 140-2(2001-10-10) Poker: 251
+rngtest: FIPS 140-2(2001-10-10) Runs: 761
+rngtest: FIPS 140-2(2001-10-10) Long run: 762
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3522163.897; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.340; max=152.588)Mibits/s
+rngtest: Program run time: 378974640 microseconds
+rngtest: bits received from input: 53200000032
+rngtest: FIPS 140-2 successes: 2657956
+rngtest: FIPS 140-2 failures: 2044
+rngtest: FIPS 140-2(2001-10-10) Monobit: 268
+rngtest: FIPS 140-2(2001-10-10) Poker: 255
+rngtest: FIPS 140-2(2001-10-10) Runs: 766
+rngtest: FIPS 140-2(2001-10-10) Long run: 768
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3486043.847; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.304; max=152.588)Mibits/s
+rngtest: Program run time: 382091983 microseconds
+rngtest: bits received from input: 53600000032
+rngtest: FIPS 140-2 successes: 2677941
+rngtest: FIPS 140-2 failures: 2059
+rngtest: FIPS 140-2(2001-10-10) Monobit: 269
+rngtest: FIPS 140-2(2001-10-10) Poker: 257
+rngtest: FIPS 140-2(2001-10-10) Runs: 770
+rngtest: FIPS 140-2(2001-10-10) Long run: 776
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3470237.684; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.268; max=152.588)Mibits/s
+rngtest: Program run time: 385131515 microseconds
 rngtest: bits received from input: 54000000032
-rngtest: FIPS 140-2 successes: 2697857
-rngtest: FIPS 140-2 failures: 2143
-rngtest: FIPS 140-2(2001-10-10) Monobit: 294
+rngtest: FIPS 140-2 successes: 2697924
+rngtest: FIPS 140-2 failures: 2076
+rngtest: FIPS 140-2(2001-10-10) Monobit: 272
+rngtest: FIPS 140-2(2001-10-10) Poker: 257
+rngtest: FIPS 140-2(2001-10-10) Runs: 778
+rngtest: FIPS 140-2(2001-10-10) Long run: 782
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3461256.733; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.237; max=152.588)Mibits/s
+rngtest: Program run time: 388127295 microseconds
+rngtest: bits received from input: 54400000032
+rngtest: FIPS 140-2 successes: 2717903
+rngtest: FIPS 140-2 failures: 2097
+rngtest: FIPS 140-2(2001-10-10) Monobit: 275
+rngtest: FIPS 140-2(2001-10-10) Poker: 258
+rngtest: FIPS 140-2(2001-10-10) Runs: 787
+rngtest: FIPS 140-2(2001-10-10) Long run: 791
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=253.389; avg=3424854.912; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.201; max=152.588)Mibits/s
+rngtest: Program run time: 391263527 microseconds
+rngtest: bits received from input: 54800000032
+rngtest: FIPS 140-2 successes: 2737884
+rngtest: FIPS 140-2 failures: 2116
+rngtest: FIPS 140-2(2001-10-10) Monobit: 277
 rngtest: FIPS 140-2(2001-10-10) Poker: 263
-rngtest: FIPS 140-2(2001-10-10) Runs: 789
-rngtest: FIPS 140-2(2001-10-10) Long run: 811
+rngtest: FIPS 140-2(2001-10-10) Runs: 792
+rngtest: FIPS 140-2(2001-10-10) Long run: 798
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=77533.011; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.445; max=151.377)Mibits/s
-rngtest: Program run time: 1036983188 microseconds
+rngtest: input channel speed: (min=253.389; avg=3422092.590; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.174; max=152.588)Mibits/s
+rngtest: Program run time: 394228696 microseconds
+rngtest: bits received from input: 55200000032
+rngtest: FIPS 140-2 successes: 2757868
+rngtest: FIPS 140-2 failures: 2132
+rngtest: FIPS 140-2(2001-10-10) Monobit: 279
+rngtest: FIPS 140-2(2001-10-10) Poker: 264
+rngtest: FIPS 140-2(2001-10-10) Runs: 800
+rngtest: FIPS 140-2(2001-10-10) Long run: 803
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3386611.093; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.145; max=152.588)Mibits/s
+rngtest: Program run time: 397350452 microseconds
+rngtest: bits received from input: 55600000032
+rngtest: FIPS 140-2 successes: 2777851
+rngtest: FIPS 140-2 failures: 2149
+rngtest: FIPS 140-2(2001-10-10) Monobit: 282
+rngtest: FIPS 140-2(2001-10-10) Poker: 265
+rngtest: FIPS 140-2(2001-10-10) Runs: 806
+rngtest: FIPS 140-2(2001-10-10) Long run: 810
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3385408.126; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.120; max=152.588)Mibits/s
+rngtest: Program run time: 400305991 microseconds
 rngtest: bits received from input: 56000000032
-rngtest: FIPS 140-2 successes: 2797772
-rngtest: FIPS 140-2 failures: 2228
-rngtest: FIPS 140-2(2001-10-10) Monobit: 301
-rngtest: FIPS 140-2(2001-10-10) Poker: 276
+rngtest: FIPS 140-2 successes: 2797843
+rngtest: FIPS 140-2 failures: 2157
+rngtest: FIPS 140-2(2001-10-10) Monobit: 283
+rngtest: FIPS 140-2(2001-10-10) Poker: 266
+rngtest: FIPS 140-2(2001-10-10) Runs: 810
+rngtest: FIPS 140-2(2001-10-10) Long run: 812
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3385958.743; max=1627604.167)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.120; max=152.588)Mibits/s
+rngtest: Program run time: 403183101 microseconds
+rngtest: bits received from input: 56400000032
+rngtest: FIPS 140-2 successes: 2817828
+rngtest: FIPS 140-2 failures: 2172
+rngtest: FIPS 140-2(2001-10-10) Monobit: 284
+rngtest: FIPS 140-2(2001-10-10) Poker: 268
+rngtest: FIPS 140-2(2001-10-10) Runs: 815
+rngtest: FIPS 140-2(2001-10-10) Long run: 819
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3376569.464; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.164; max=152.588)Mibits/s
+rngtest: Program run time: 405982143 microseconds
+rngtest: bits received from input: 56800000032
+rngtest: FIPS 140-2 successes: 2837817
+rngtest: FIPS 140-2 failures: 2183
+rngtest: FIPS 140-2(2001-10-10) Monobit: 286
+rngtest: FIPS 140-2(2001-10-10) Poker: 269
+rngtest: FIPS 140-2(2001-10-10) Runs: 817
+rngtest: FIPS 140-2(2001-10-10) Long run: 825
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3372277.214; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.450; avg=138.137; max=152.588)Mibits/s
+rngtest: Program run time: 408958480 microseconds
+rngtest: bits received from input: 57200000032
+rngtest: FIPS 140-2 successes: 2857801
+rngtest: FIPS 140-2 failures: 2199
+rngtest: FIPS 140-2(2001-10-10) Monobit: 288
+rngtest: FIPS 140-2(2001-10-10) Poker: 269
+rngtest: FIPS 140-2(2001-10-10) Runs: 822
+rngtest: FIPS 140-2(2001-10-10) Long run: 834
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3369683.106; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.113; max=152.588)Mibits/s
+rngtest: Program run time: 411920053 microseconds
+rngtest: bits received from input: 57600000032
+rngtest: FIPS 140-2 successes: 2877786
+rngtest: FIPS 140-2 failures: 2214
+rngtest: FIPS 140-2(2001-10-10) Monobit: 290
+rngtest: FIPS 140-2(2001-10-10) Poker: 270
 rngtest: FIPS 140-2(2001-10-10) Runs: 829
-rngtest: FIPS 140-2(2001-10-10) Long run: 837
+rngtest: FIPS 140-2(2001-10-10) Long run: 839
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=80765464.381; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.477; max=151.377)Mibits/s
-rngtest: Program run time: 1063329530 microseconds
+rngtest: input channel speed: (min=206.881; avg=3371437.672; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.095; max=152.588)Mibits/s
+rngtest: Program run time: 414844008 microseconds
 rngtest: bits received from input: 58000000032
-rngtest: FIPS 140-2 successes: 2897677
-rngtest: FIPS 140-2 failures: 2323
-rngtest: FIPS 140-2(2001-10-10) Monobit: 308
-rngtest: FIPS 140-2(2001-10-10) Poker: 290
-rngtest: FIPS 140-2(2001-10-10) Runs: 868
-rngtest: FIPS 140-2(2001-10-10) Long run: 872
+rngtest: FIPS 140-2 successes: 2897764
+rngtest: FIPS 140-2 failures: 2236
+rngtest: FIPS 140-2(2001-10-10) Monobit: 295
+rngtest: FIPS 140-2(2001-10-10) Poker: 273
+rngtest: FIPS 140-2(2001-10-10) Runs: 835
+rngtest: FIPS 140-2(2001-10-10) Long run: 847
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=83568827.528; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.554; max=151.377)Mibits/s
-rngtest: Program run time: 1077012195 microseconds
+rngtest: input channel speed: (min=206.881; avg=3371473.801; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.101; max=152.588)Mibits/s
+rngtest: Program run time: 417709406 microseconds
+rngtest: bits received from input: 58400000032
+rngtest: FIPS 140-2 successes: 2917751
+rngtest: FIPS 140-2 failures: 2249
+rngtest: FIPS 140-2(2001-10-10) Monobit: 295
+rngtest: FIPS 140-2(2001-10-10) Poker: 274
+rngtest: FIPS 140-2(2001-10-10) Runs: 839
+rngtest: FIPS 140-2(2001-10-10) Long run: 856
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3375365.568; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.103; max=152.588)Mibits/s
+rngtest: Program run time: 420564017 microseconds
+rngtest: bits received from input: 58800000032
+rngtest: FIPS 140-2 successes: 2937735
+rngtest: FIPS 140-2 failures: 2265
+rngtest: FIPS 140-2(2001-10-10) Monobit: 296
+rngtest: FIPS 140-2(2001-10-10) Poker: 277
+rngtest: FIPS 140-2(2001-10-10) Runs: 846
+rngtest: FIPS 140-2(2001-10-10) Long run: 861
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3373034.113; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.090; max=152.588)Mibits/s
+rngtest: Program run time: 423493336 microseconds
+rngtest: bits received from input: 59200000032
+rngtest: FIPS 140-2 successes: 2957719
+rngtest: FIPS 140-2 failures: 2281
+rngtest: FIPS 140-2(2001-10-10) Monobit: 300
+rngtest: FIPS 140-2(2001-10-10) Poker: 281
+rngtest: FIPS 140-2(2001-10-10) Runs: 849
+rngtest: FIPS 140-2(2001-10-10) Long run: 866
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3456111701.530; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.148; max=152.588)Mibits/s
+rngtest: Program run time: 426192972 microseconds
+rngtest: bits received from input: 59600000032
+rngtest: FIPS 140-2 successes: 2977704
+rngtest: FIPS 140-2 failures: 2296
+rngtest: FIPS 140-2(2001-10-10) Monobit: 301
+rngtest: FIPS 140-2(2001-10-10) Poker: 283
+rngtest: FIPS 140-2(2001-10-10) Runs: 854
+rngtest: FIPS 140-2(2001-10-10) Long run: 874
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3459047460.743; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.125; max=152.588)Mibits/s
+rngtest: Program run time: 429127969 microseconds
 rngtest: bits received from input: 60000000032
-rngtest: FIPS 140-2 successes: 2997593
-rngtest: FIPS 140-2 failures: 2407
-rngtest: FIPS 140-2(2001-10-10) Monobit: 321
-rngtest: FIPS 140-2(2001-10-10) Poker: 295
-rngtest: FIPS 140-2(2001-10-10) Runs: 909
-rngtest: FIPS 140-2(2001-10-10) Long run: 897
+rngtest: FIPS 140-2 successes: 2997689
+rngtest: FIPS 140-2 failures: 2311
+rngtest: FIPS 140-2(2001-10-10) Monobit: 303
+rngtest: FIPS 140-2(2001-10-10) Poker: 285
+rngtest: FIPS 140-2(2001-10-10) Runs: 863
+rngtest: FIPS 140-2(2001-10-10) Long run: 876
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=86412337.539; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.629; max=151.377)Mibits/s
-rngtest: Program run time: 1090318608 microseconds
+rngtest: input channel speed: (min=206.881; avg=3378479.087; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.116; max=152.588)Mibits/s
+rngtest: Program run time: 432032239 microseconds
+rngtest: bits received from input: 60400000032
+rngtest: FIPS 140-2 successes: 3017671
+rngtest: FIPS 140-2 failures: 2329
+rngtest: FIPS 140-2(2001-10-10) Monobit: 306
+rngtest: FIPS 140-2(2001-10-10) Poker: 286
+rngtest: FIPS 140-2(2001-10-10) Runs: 867
+rngtest: FIPS 140-2(2001-10-10) Long run: 886
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3375638.909; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.091; max=152.588)Mibits/s
+rngtest: Program run time: 435001269 microseconds
+rngtest: bits received from input: 60800000032
+rngtest: FIPS 140-2 successes: 3037658
+rngtest: FIPS 140-2 failures: 2342
+rngtest: FIPS 140-2(2001-10-10) Monobit: 309
+rngtest: FIPS 140-2(2001-10-10) Poker: 288
+rngtest: FIPS 140-2(2001-10-10) Runs: 871
+rngtest: FIPS 140-2(2001-10-10) Long run: 891
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3377097.867; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.104; max=152.588)Mibits/s
+rngtest: Program run time: 437833981 microseconds
+rngtest: bits received from input: 61200000032
+rngtest: FIPS 140-2 successes: 3057642
+rngtest: FIPS 140-2 failures: 2358
+rngtest: FIPS 140-2(2001-10-10) Monobit: 312
+rngtest: FIPS 140-2(2001-10-10) Poker: 291
+rngtest: FIPS 140-2(2001-10-10) Runs: 878
+rngtest: FIPS 140-2(2001-10-10) Long run: 894
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3467790684.154; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.099; max=152.588)Mibits/s
+rngtest: Program run time: 440681939 microseconds
+rngtest: bits received from input: 61600000032
+rngtest: FIPS 140-2 successes: 3077627
+rngtest: FIPS 140-2 failures: 2373
+rngtest: FIPS 140-2(2001-10-10) Monobit: 313
+rngtest: FIPS 140-2(2001-10-10) Poker: 293
+rngtest: FIPS 140-2(2001-10-10) Runs: 886
+rngtest: FIPS 140-2(2001-10-10) Long run: 898
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3467463177.483; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.076; max=152.588)Mibits/s
+rngtest: Program run time: 443634581 microseconds
 rngtest: bits received from input: 62000000032
-rngtest: FIPS 140-2 successes: 3097514
-rngtest: FIPS 140-2 failures: 2486
-rngtest: FIPS 140-2(2001-10-10) Monobit: 328
-rngtest: FIPS 140-2(2001-10-10) Poker: 304
-rngtest: FIPS 140-2(2001-10-10) Runs: 943
-rngtest: FIPS 140-2(2001-10-10) Long run: 927
+rngtest: FIPS 140-2 successes: 3097610
+rngtest: FIPS 140-2 failures: 2390
+rngtest: FIPS 140-2(2001-10-10) Monobit: 316
+rngtest: FIPS 140-2(2001-10-10) Poker: 296
+rngtest: FIPS 140-2(2001-10-10) Runs: 892
+rngtest: FIPS 140-2(2001-10-10) Long run: 903
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=87166.975; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.702; max=151.377)Mibits/s
-rngtest: Program run time: 1103572029 microseconds
+rngtest: input channel speed: (min=211846.454; avg=3476290938.863; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.078; max=152.588)Mibits/s
+rngtest: Program run time: 446462579 microseconds
+rngtest: bits received from input: 62400000032
+rngtest: FIPS 140-2 successes: 3117598
+rngtest: FIPS 140-2 failures: 2402
+rngtest: FIPS 140-2(2001-10-10) Monobit: 317
+rngtest: FIPS 140-2(2001-10-10) Poker: 297
+rngtest: FIPS 140-2(2001-10-10) Runs: 895
+rngtest: FIPS 140-2(2001-10-10) Long run: 910
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3466590401.678; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.064; max=152.588)Mibits/s
+rngtest: Program run time: 449439395 microseconds
+rngtest: bits received from input: 62800000032
+rngtest: FIPS 140-2 successes: 3137589
+rngtest: FIPS 140-2 failures: 2411
+rngtest: FIPS 140-2(2001-10-10) Monobit: 318
+rngtest: FIPS 140-2(2001-10-10) Poker: 297
+rngtest: FIPS 140-2(2001-10-10) Runs: 900
+rngtest: FIPS 140-2(2001-10-10) Long run: 913
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3468376716.301; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.060; max=152.588)Mibits/s
+rngtest: Program run time: 452321709 microseconds
+rngtest: bits received from input: 63200000032
+rngtest: FIPS 140-2 successes: 3157576
+rngtest: FIPS 140-2 failures: 2424
+rngtest: FIPS 140-2(2001-10-10) Monobit: 320
+rngtest: FIPS 140-2(2001-10-10) Poker: 298
+rngtest: FIPS 140-2(2001-10-10) Runs: 905
+rngtest: FIPS 140-2(2001-10-10) Long run: 918
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3470206438.298; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.040; max=152.588)Mibits/s
+rngtest: Program run time: 455257932 microseconds
+rngtest: bits received from input: 63600000032
+rngtest: FIPS 140-2 successes: 3177564
+rngtest: FIPS 140-2 failures: 2436
+rngtest: FIPS 140-2(2001-10-10) Monobit: 322
+rngtest: FIPS 140-2(2001-10-10) Poker: 299
+rngtest: FIPS 140-2(2001-10-10) Runs: 909
+rngtest: FIPS 140-2(2001-10-10) Long run: 924
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3389133.644; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.050; max=152.588)Mibits/s
+rngtest: Program run time: 458103728 microseconds
 rngtest: bits received from input: 64000000032
-rngtest: FIPS 140-2 successes: 3197450
-rngtest: FIPS 140-2 failures: 2550
-rngtest: FIPS 140-2(2001-10-10) Monobit: 340
+rngtest: FIPS 140-2 successes: 3197551
+rngtest: FIPS 140-2 failures: 2449
+rngtest: FIPS 140-2(2001-10-10) Monobit: 322
+rngtest: FIPS 140-2(2001-10-10) Poker: 302
+rngtest: FIPS 140-2(2001-10-10) Runs: 917
+rngtest: FIPS 140-2(2001-10-10) Long run: 926
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3395035.155; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.053; max=152.588)Mibits/s
+rngtest: Program run time: 460944067 microseconds
+rngtest: bits received from input: 64400000032
+rngtest: FIPS 140-2 successes: 3217528
+rngtest: FIPS 140-2 failures: 2472
+rngtest: FIPS 140-2(2001-10-10) Monobit: 323
+rngtest: FIPS 140-2(2001-10-10) Poker: 306
+rngtest: FIPS 140-2(2001-10-10) Runs: 928
+rngtest: FIPS 140-2(2001-10-10) Long run: 933
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3393495.744; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.032; max=152.588)Mibits/s
+rngtest: Program run time: 463902087 microseconds
+rngtest: bits received from input: 64800000032
+rngtest: FIPS 140-2 successes: 3237512
+rngtest: FIPS 140-2 failures: 2488
+rngtest: FIPS 140-2(2001-10-10) Monobit: 325
+rngtest: FIPS 140-2(2001-10-10) Poker: 311
+rngtest: FIPS 140-2(2001-10-10) Runs: 933
+rngtest: FIPS 140-2(2001-10-10) Long run: 938
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3403881.801; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.065; max=152.588)Mibits/s
+rngtest: Program run time: 466617460 microseconds
+rngtest: bits received from input: 65200000032
+rngtest: FIPS 140-2 successes: 3257496
+rngtest: FIPS 140-2 failures: 2504
+rngtest: FIPS 140-2(2001-10-10) Monobit: 326
 rngtest: FIPS 140-2(2001-10-10) Poker: 312
-rngtest: FIPS 140-2(2001-10-10) Runs: 973
-rngtest: FIPS 140-2(2001-10-10) Long run: 943
+rngtest: FIPS 140-2(2001-10-10) Runs: 938
+rngtest: FIPS 140-2(2001-10-10) Long run: 947
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=91626140.162; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.766; max=151.377)Mibits/s
-rngtest: Program run time: 1120461732 microseconds
+rngtest: input channel speed: (min=206.881; avg=3397868.793; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=14.245; avg=138.063; max=152.588)Mibits/s
+rngtest: Program run time: 469539094 microseconds
+rngtest: bits received from input: 65600000032
+rngtest: FIPS 140-2 successes: 3277484
+rngtest: FIPS 140-2 failures: 2516
+rngtest: FIPS 140-2(2001-10-10) Monobit: 327
+rngtest: FIPS 140-2(2001-10-10) Poker: 315
+rngtest: FIPS 140-2(2001-10-10) Runs: 941
+rngtest: FIPS 140-2(2001-10-10) Long run: 952
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3407015.093; max=4882812.500)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.064; max=152.588)Mibits/s
+rngtest: Program run time: 472366318 microseconds
 rngtest: bits received from input: 66000000032
-rngtest: FIPS 140-2 successes: 3297351
-rngtest: FIPS 140-2 failures: 2649
-rngtest: FIPS 140-2(2001-10-10) Monobit: 355
-rngtest: FIPS 140-2(2001-10-10) Poker: 321
-rngtest: FIPS 140-2(2001-10-10) Runs: 1014
-rngtest: FIPS 140-2(2001-10-10) Long run: 977
+rngtest: FIPS 140-2 successes: 3297469
+rngtest: FIPS 140-2 failures: 2531
+rngtest: FIPS 140-2(2001-10-10) Monobit: 330
+rngtest: FIPS 140-2(2001-10-10) Poker: 317
+rngtest: FIPS 140-2(2001-10-10) Runs: 944
+rngtest: FIPS 140-2(2001-10-10) Long run: 959
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=94446023.188; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.832; max=151.377)Mibits/s
-rngtest: Program run time: 1133772476 microseconds
+rngtest: input channel speed: (min=206.881; avg=3401849.704; max=3255208.333)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.041; max=152.588)Mibits/s
+rngtest: Program run time: 475350184 microseconds
+rngtest: bits received from input: 66400000032
+rngtest: FIPS 140-2 successes: 3317452
+rngtest: FIPS 140-2 failures: 2548
+rngtest: FIPS 140-2(2001-10-10) Monobit: 331
+rngtest: FIPS 140-2(2001-10-10) Poker: 322
+rngtest: FIPS 140-2(2001-10-10) Runs: 949
+rngtest: FIPS 140-2(2001-10-10) Long run: 965
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3402478.429; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.050; max=152.588)Mibits/s
+rngtest: Program run time: 478198779 microseconds
+rngtest: bits received from input: 66800000032
+rngtest: FIPS 140-2 successes: 3337430
+rngtest: FIPS 140-2 failures: 2570
+rngtest: FIPS 140-2(2001-10-10) Monobit: 334
+rngtest: FIPS 140-2(2001-10-10) Poker: 323
+rngtest: FIPS 140-2(2001-10-10) Runs: 956
+rngtest: FIPS 140-2(2001-10-10) Long run: 976
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3408851.959; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.045; max=152.588)Mibits/s
+rngtest: Program run time: 481057789 microseconds
+rngtest: bits received from input: 67200000032
+rngtest: FIPS 140-2 successes: 3357420
+rngtest: FIPS 140-2 failures: 2580
+rngtest: FIPS 140-2(2001-10-10) Monobit: 335
+rngtest: FIPS 140-2(2001-10-10) Poker: 324
+rngtest: FIPS 140-2(2001-10-10) Runs: 961
+rngtest: FIPS 140-2(2001-10-10) Long run: 979
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3406049.705; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.025; max=152.588)Mibits/s
+rngtest: Program run time: 484021545 microseconds
+rngtest: bits received from input: 67600000032
+rngtest: FIPS 140-2 successes: 3377405
+rngtest: FIPS 140-2 failures: 2595
+rngtest: FIPS 140-2(2001-10-10) Monobit: 339
+rngtest: FIPS 140-2(2001-10-10) Poker: 328
+rngtest: FIPS 140-2(2001-10-10) Runs: 965
+rngtest: FIPS 140-2(2001-10-10) Long run: 982
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3410589.088; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.009; max=152.588)Mibits/s
+rngtest: Program run time: 486931166 microseconds
 rngtest: bits received from input: 68000000032
-rngtest: FIPS 140-2 successes: 3397268
-rngtest: FIPS 140-2 failures: 2732
-rngtest: FIPS 140-2(2001-10-10) Monobit: 373
-rngtest: FIPS 140-2(2001-10-10) Poker: 332
-rngtest: FIPS 140-2(2001-10-10) Runs: 1039
-rngtest: FIPS 140-2(2001-10-10) Long run: 1006
+rngtest: FIPS 140-2 successes: 3397390
+rngtest: FIPS 140-2 failures: 2610
+rngtest: FIPS 140-2(2001-10-10) Monobit: 341
+rngtest: FIPS 140-2(2001-10-10) Poker: 329
+rngtest: FIPS 140-2(2001-10-10) Runs: 971
+rngtest: FIPS 140-2(2001-10-10) Long run: 988
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=94993.869; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.904; max=151.377)Mibits/s
-rngtest: Program run time: 1146977468 microseconds
+rngtest: input channel speed: (min=206.881; avg=3411864.248; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.019; max=152.588)Mibits/s
+rngtest: Program run time: 489772839 microseconds
+rngtest: bits received from input: 68400000032
+rngtest: FIPS 140-2 successes: 3417372
+rngtest: FIPS 140-2 failures: 2628
+rngtest: FIPS 140-2(2001-10-10) Monobit: 342
+rngtest: FIPS 140-2(2001-10-10) Poker: 331
+rngtest: FIPS 140-2(2001-10-10) Runs: 980
+rngtest: FIPS 140-2(2001-10-10) Long run: 994
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3414344.578; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.013; max=152.588)Mibits/s
+rngtest: Program run time: 492659622 microseconds
+rngtest: bits received from input: 68800000032
+rngtest: FIPS 140-2 successes: 3437347
+rngtest: FIPS 140-2 failures: 2653
+rngtest: FIPS 140-2(2001-10-10) Monobit: 346
+rngtest: FIPS 140-2(2001-10-10) Poker: 333
+rngtest: FIPS 140-2(2001-10-10) Runs: 994
+rngtest: FIPS 140-2(2001-10-10) Long run: 1000
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3412234.955; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.007; max=152.588)Mibits/s
+rngtest: Program run time: 495574627 microseconds
+rngtest: bits received from input: 69200000032
+rngtest: FIPS 140-2 successes: 3457329
+rngtest: FIPS 140-2 failures: 2671
+rngtest: FIPS 140-2(2001-10-10) Monobit: 347
+rngtest: FIPS 140-2(2001-10-10) Poker: 337
+rngtest: FIPS 140-2(2001-10-10) Runs: 1004
+rngtest: FIPS 140-2(2001-10-10) Long run: 1003
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3412650.711; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.017; max=152.588)Mibits/s
+rngtest: Program run time: 498417612 microseconds
+rngtest: bits received from input: 69600000032
+rngtest: FIPS 140-2 successes: 3477308
+rngtest: FIPS 140-2 failures: 2692
+rngtest: FIPS 140-2(2001-10-10) Monobit: 350
+rngtest: FIPS 140-2(2001-10-10) Poker: 340
+rngtest: FIPS 140-2(2001-10-10) Runs: 1009
+rngtest: FIPS 140-2(2001-10-10) Long run: 1013
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3418808.642; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.998; max=152.588)Mibits/s
+rngtest: Program run time: 501330435 microseconds
 rngtest: bits received from input: 70000000032
-rngtest: FIPS 140-2 successes: 3497208
-rngtest: FIPS 140-2 failures: 2792
-rngtest: FIPS 140-2(2001-10-10) Monobit: 379
+rngtest: FIPS 140-2 successes: 3497292
+rngtest: FIPS 140-2 failures: 2708
+rngtest: FIPS 140-2(2001-10-10) Monobit: 352
 rngtest: FIPS 140-2(2001-10-10) Poker: 342
-rngtest: FIPS 140-2(2001-10-10) Runs: 1065
-rngtest: FIPS 140-2(2001-10-10) Long run: 1024
+rngtest: FIPS 140-2(2001-10-10) Runs: 1013
+rngtest: FIPS 140-2(2001-10-10) Long run: 1021
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=97744.371; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=144.959; max=151.377)Mibits/s
-rngtest: Program run time: 1160286065 microseconds
+rngtest: input channel speed: (min=206.881; avg=3418888.089; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.012; max=152.588)Mibits/s
+rngtest: Program run time: 504162098 microseconds
+rngtest: bits received from input: 70400000032
+rngtest: FIPS 140-2 successes: 3517274
+rngtest: FIPS 140-2 failures: 2726
+rngtest: FIPS 140-2(2001-10-10) Monobit: 353
+rngtest: FIPS 140-2(2001-10-10) Poker: 346
+rngtest: FIPS 140-2(2001-10-10) Runs: 1020
+rngtest: FIPS 140-2(2001-10-10) Long run: 1027
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3419281.215; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.994; max=152.588)Mibits/s
+rngtest: Program run time: 507102958 microseconds
+rngtest: bits received from input: 70800000032
+rngtest: FIPS 140-2 successes: 3537261
+rngtest: FIPS 140-2 failures: 2739
+rngtest: FIPS 140-2(2001-10-10) Monobit: 355
+rngtest: FIPS 140-2(2001-10-10) Poker: 346
+rngtest: FIPS 140-2(2001-10-10) Runs: 1025
+rngtest: FIPS 140-2(2001-10-10) Long run: 1033
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3418236.826; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.998; max=152.588)Mibits/s
+rngtest: Program run time: 509976184 microseconds
+rngtest: bits received from input: 71200000032
+rngtest: FIPS 140-2 successes: 3557252
+rngtest: FIPS 140-2 failures: 2748
+rngtest: FIPS 140-2(2001-10-10) Monobit: 358
+rngtest: FIPS 140-2(2001-10-10) Poker: 346
+rngtest: FIPS 140-2(2001-10-10) Runs: 1026
+rngtest: FIPS 140-2(2001-10-10) Long run: 1038
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3419996.779; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.982; max=152.588)Mibits/s
+rngtest: Program run time: 512903686 microseconds
+rngtest: bits received from input: 71600000032
+rngtest: FIPS 140-2 successes: 3577235
+rngtest: FIPS 140-2 failures: 2765
+rngtest: FIPS 140-2(2001-10-10) Monobit: 361
+rngtest: FIPS 140-2(2001-10-10) Poker: 348
+rngtest: FIPS 140-2(2001-10-10) Runs: 1035
+rngtest: FIPS 140-2(2001-10-10) Long run: 1041
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3417655.481; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.986; max=152.588)Mibits/s
+rngtest: Program run time: 515785713 microseconds
 rngtest: bits received from input: 72000000032
-rngtest: FIPS 140-2 successes: 3597118
-rngtest: FIPS 140-2 failures: 2882
-rngtest: FIPS 140-2(2001-10-10) Monobit: 396
-rngtest: FIPS 140-2(2001-10-10) Poker: 355
-rngtest: FIPS 140-2(2001-10-10) Runs: 1094
+rngtest: FIPS 140-2 successes: 3597226
+rngtest: FIPS 140-2 failures: 2774
+rngtest: FIPS 140-2(2001-10-10) Monobit: 361
+rngtest: FIPS 140-2(2001-10-10) Poker: 349
+rngtest: FIPS 140-2(2001-10-10) Runs: 1039
+rngtest: FIPS 140-2(2001-10-10) Long run: 1045
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3426863.078; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.027; max=152.588)Mibits/s
+rngtest: Program run time: 518462489 microseconds
+rngtest: bits received from input: 72400000032
+rngtest: FIPS 140-2 successes: 3617212
+rngtest: FIPS 140-2 failures: 2788
+rngtest: FIPS 140-2(2001-10-10) Monobit: 364
+rngtest: FIPS 140-2(2001-10-10) Poker: 350
+rngtest: FIPS 140-2(2001-10-10) Runs: 1045
+rngtest: FIPS 140-2(2001-10-10) Long run: 1049
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3418480.106; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.022; max=152.588)Mibits/s
+rngtest: Program run time: 521411661 microseconds
+rngtest: bits received from input: 72800000032
+rngtest: FIPS 140-2 successes: 3637199
+rngtest: FIPS 140-2 failures: 2801
+rngtest: FIPS 140-2(2001-10-10) Monobit: 366
+rngtest: FIPS 140-2(2001-10-10) Poker: 350
+rngtest: FIPS 140-2(2001-10-10) Runs: 1048
 rngtest: FIPS 140-2(2001-10-10) Long run: 1057
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=100473.609; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.005; max=151.377)Mibits/s
-rngtest: Program run time: 1173745292 microseconds
+rngtest: input channel speed: (min=206.881; avg=3418687.989; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.023; max=152.588)Mibits/s
+rngtest: Program run time: 524288466 microseconds
+rngtest: bits received from input: 73200000032
+rngtest: FIPS 140-2 successes: 3657186
+rngtest: FIPS 140-2 failures: 2814
+rngtest: FIPS 140-2(2001-10-10) Monobit: 369
+rngtest: FIPS 140-2(2001-10-10) Poker: 352
+rngtest: FIPS 140-2(2001-10-10) Runs: 1056
+rngtest: FIPS 140-2(2001-10-10) Long run: 1057
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3502100446.939; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.010; max=152.588)Mibits/s
+rngtest: Program run time: 527210095 microseconds
+rngtest: bits received from input: 73600000032
+rngtest: FIPS 140-2 successes: 3677169
+rngtest: FIPS 140-2 failures: 2831
+rngtest: FIPS 140-2(2001-10-10) Monobit: 370
+rngtest: FIPS 140-2(2001-10-10) Poker: 353
+rngtest: FIPS 140-2(2001-10-10) Runs: 1065
+rngtest: FIPS 140-2(2001-10-10) Long run: 1063
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3420222.449; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.013; max=152.588)Mibits/s
+rngtest: Program run time: 530078117 microseconds
 rngtest: bits received from input: 74000000032
-rngtest: FIPS 140-2 successes: 3697036
-rngtest: FIPS 140-2 failures: 2964
-rngtest: FIPS 140-2(2001-10-10) Monobit: 405
-rngtest: FIPS 140-2(2001-10-10) Poker: 371
-rngtest: FIPS 140-2(2001-10-10) Runs: 1116
-rngtest: FIPS 140-2(2001-10-10) Long run: 1093
+rngtest: FIPS 140-2 successes: 3697159
+rngtest: FIPS 140-2 failures: 2841
+rngtest: FIPS 140-2(2001-10-10) Monobit: 371
+rngtest: FIPS 140-2(2001-10-10) Poker: 355
+rngtest: FIPS 140-2(2001-10-10) Runs: 1067
+rngtest: FIPS 140-2(2001-10-10) Long run: 1068
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=105463683.662; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.046; max=151.377)Mibits/s
-rngtest: Program run time: 1188625541 microseconds
+rngtest: input channel speed: (min=211846.454; avg=3510632448.501; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.033; max=152.588)Mibits/s
+rngtest: Program run time: 532833398 microseconds
+rngtest: bits received from input: 74400000032
+rngtest: FIPS 140-2 successes: 3717145
+rngtest: FIPS 140-2 failures: 2855
+rngtest: FIPS 140-2(2001-10-10) Monobit: 373
+rngtest: FIPS 140-2(2001-10-10) Poker: 358
+rngtest: FIPS 140-2(2001-10-10) Runs: 1072
+rngtest: FIPS 140-2(2001-10-10) Long run: 1072
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3426875.933; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.052; max=152.588)Mibits/s
+rngtest: Program run time: 535650794 microseconds
+rngtest: bits received from input: 74800000032
+rngtest: FIPS 140-2 successes: 3737131
+rngtest: FIPS 140-2 failures: 2869
+rngtest: FIPS 140-2(2001-10-10) Monobit: 374
+rngtest: FIPS 140-2(2001-10-10) Poker: 361
+rngtest: FIPS 140-2(2001-10-10) Runs: 1077
+rngtest: FIPS 140-2(2001-10-10) Long run: 1077
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3429494.833; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.041; max=152.588)Mibits/s
+rngtest: Program run time: 538558282 microseconds
+rngtest: bits received from input: 75200000032
+rngtest: FIPS 140-2 successes: 3757116
+rngtest: FIPS 140-2 failures: 2884
+rngtest: FIPS 140-2(2001-10-10) Monobit: 375
+rngtest: FIPS 140-2(2001-10-10) Poker: 363
+rngtest: FIPS 140-2(2001-10-10) Runs: 1084
+rngtest: FIPS 140-2(2001-10-10) Long run: 1082
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3482880761.076; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.016; max=152.588)Mibits/s
+rngtest: Program run time: 541707708 microseconds
+rngtest: bits received from input: 75600000032
+rngtest: FIPS 140-2 successes: 3777104
+rngtest: FIPS 140-2 failures: 2896
+rngtest: FIPS 140-2(2001-10-10) Monobit: 376
+rngtest: FIPS 140-2(2001-10-10) Poker: 365
+rngtest: FIPS 140-2(2001-10-10) Runs: 1092
+rngtest: FIPS 140-2(2001-10-10) Long run: 1083
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3404312.257; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.000; max=152.588)Mibits/s
+rngtest: Program run time: 544630161 microseconds
 rngtest: bits received from input: 76000000032
-rngtest: FIPS 140-2 successes: 3796965
-rngtest: FIPS 140-2 failures: 3035
-rngtest: FIPS 140-2(2001-10-10) Monobit: 410
-rngtest: FIPS 140-2(2001-10-10) Poker: 380
-rngtest: FIPS 140-2(2001-10-10) Runs: 1144
-rngtest: FIPS 140-2(2001-10-10) Long run: 1123
+rngtest: FIPS 140-2 successes: 3797088
+rngtest: FIPS 140-2 failures: 2912
+rngtest: FIPS 140-2(2001-10-10) Monobit: 378
+rngtest: FIPS 140-2(2001-10-10) Poker: 369
+rngtest: FIPS 140-2(2001-10-10) Runs: 1098
+rngtest: FIPS 140-2(2001-10-10) Long run: 1087
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=108268092.773; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.090; max=151.377)Mibits/s
-rngtest: Program run time: 1201932151 microseconds
+rngtest: input channel speed: (min=206.881; avg=3397176.488; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.988; max=152.588)Mibits/s
+rngtest: Program run time: 547604423 microseconds
+rngtest: bits received from input: 76400000032
+rngtest: FIPS 140-2 successes: 3817072
+rngtest: FIPS 140-2 failures: 2928
+rngtest: FIPS 140-2(2001-10-10) Monobit: 379
+rngtest: FIPS 140-2(2001-10-10) Poker: 371
+rngtest: FIPS 140-2(2001-10-10) Runs: 1108
+rngtest: FIPS 140-2(2001-10-10) Long run: 1091
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=211846.454; avg=3478047262.201; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.990; max=152.588)Mibits/s
+rngtest: Program run time: 550484595 microseconds
+rngtest: bits received from input: 76800000032
+rngtest: FIPS 140-2 successes: 3837056
+rngtest: FIPS 140-2 failures: 2944
+rngtest: FIPS 140-2(2001-10-10) Monobit: 382
+rngtest: FIPS 140-2(2001-10-10) Poker: 372
+rngtest: FIPS 140-2(2001-10-10) Runs: 1114
+rngtest: FIPS 140-2(2001-10-10) Long run: 1098
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3404575.513; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=138.006; max=152.588)Mibits/s
+rngtest: Program run time: 553252357 microseconds
+rngtest: bits received from input: 77200000032
+rngtest: FIPS 140-2 successes: 3857041
+rngtest: FIPS 140-2 failures: 2959
+rngtest: FIPS 140-2(2001-10-10) Monobit: 384
+rngtest: FIPS 140-2(2001-10-10) Poker: 374
+rngtest: FIPS 140-2(2001-10-10) Runs: 1118
+rngtest: FIPS 140-2(2001-10-10) Long run: 1105
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3403819.597; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.990; max=152.588)Mibits/s
+rngtest: Program run time: 556201213 microseconds
+rngtest: bits received from input: 77600000032
+rngtest: FIPS 140-2 successes: 3877027
+rngtest: FIPS 140-2 failures: 2973
+rngtest: FIPS 140-2(2001-10-10) Monobit: 386
+rngtest: FIPS 140-2(2001-10-10) Poker: 377
+rngtest: FIPS 140-2(2001-10-10) Runs: 1122
+rngtest: FIPS 140-2(2001-10-10) Long run: 1111
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3407077.342; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.974; max=152.588)Mibits/s
+rngtest: Program run time: 559123447 microseconds
 rngtest: bits received from input: 78000000032
-rngtest: FIPS 140-2 successes: 3896897
-rngtest: FIPS 140-2 failures: 3103
-rngtest: FIPS 140-2(2001-10-10) Monobit: 415
-rngtest: FIPS 140-2(2001-10-10) Poker: 389
-rngtest: FIPS 140-2(2001-10-10) Runs: 1168
-rngtest: FIPS 140-2(2001-10-10) Long run: 1154
+rngtest: FIPS 140-2 successes: 3897013
+rngtest: FIPS 140-2 failures: 2987
+rngtest: FIPS 140-2(2001-10-10) Monobit: 386
+rngtest: FIPS 140-2(2001-10-10) Poker: 377
+rngtest: FIPS 140-2(2001-10-10) Runs: 1126
+rngtest: FIPS 140-2(2001-10-10) Long run: 1121
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=102938.695; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.124; max=151.377)Mibits/s
-rngtest: Program run time: 1252981132 microseconds
+rngtest: input channel speed: (min=206.881; avg=3407685.970; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.979; max=152.588)Mibits/s
+rngtest: Program run time: 561980707 microseconds
+rngtest: bits received from input: 78400000032
+rngtest: FIPS 140-2 successes: 3916994
+rngtest: FIPS 140-2 failures: 3006
+rngtest: FIPS 140-2(2001-10-10) Monobit: 389
+rngtest: FIPS 140-2(2001-10-10) Poker: 383
+rngtest: FIPS 140-2(2001-10-10) Runs: 1132
+rngtest: FIPS 140-2(2001-10-10) Long run: 1125
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3376925.388; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.963; max=152.588)Mibits/s
+rngtest: Program run time: 565128877 microseconds
+rngtest: bits received from input: 78800000032
+rngtest: FIPS 140-2 successes: 3936974
+rngtest: FIPS 140-2 failures: 3026
+rngtest: FIPS 140-2(2001-10-10) Monobit: 391
+rngtest: FIPS 140-2(2001-10-10) Poker: 386
+rngtest: FIPS 140-2(2001-10-10) Runs: 1139
+rngtest: FIPS 140-2(2001-10-10) Long run: 1133
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3355734.148; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.944; max=152.588)Mibits/s
+rngtest: Program run time: 568232346 microseconds
+rngtest: bits received from input: 79200000032
+rngtest: FIPS 140-2 successes: 3956958
+rngtest: FIPS 140-2 failures: 3042
+rngtest: FIPS 140-2(2001-10-10) Monobit: 392
+rngtest: FIPS 140-2(2001-10-10) Poker: 388
+rngtest: FIPS 140-2(2001-10-10) Runs: 1147
+rngtest: FIPS 140-2(2001-10-10) Long run: 1138
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3349585.006; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.927; max=152.588)Mibits/s
+rngtest: Program run time: 571227879 microseconds
+rngtest: bits received from input: 79600000032
+rngtest: FIPS 140-2 successes: 3976937
+rngtest: FIPS 140-2 failures: 3063
+rngtest: FIPS 140-2(2001-10-10) Monobit: 396
+rngtest: FIPS 140-2(2001-10-10) Poker: 392
+rngtest: FIPS 140-2(2001-10-10) Runs: 1156
+rngtest: FIPS 140-2(2001-10-10) Long run: 1142
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3341669.555; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.911; max=152.588)Mibits/s
+rngtest: Program run time: 574231212 microseconds
 rngtest: bits received from input: 80000000032
-rngtest: FIPS 140-2 successes: 3996823
-rngtest: FIPS 140-2 failures: 3177
-rngtest: FIPS 140-2(2001-10-10) Monobit: 420
-rngtest: FIPS 140-2(2001-10-10) Poker: 402
-rngtest: FIPS 140-2(2001-10-10) Runs: 1195
-rngtest: FIPS 140-2(2001-10-10) Long run: 1183
+rngtest: FIPS 140-2 successes: 3996915
+rngtest: FIPS 140-2 failures: 3085
+rngtest: FIPS 140-2(2001-10-10) Monobit: 399
+rngtest: FIPS 140-2(2001-10-10) Poker: 393
+rngtest: FIPS 140-2(2001-10-10) Runs: 1165
+rngtest: FIPS 140-2(2001-10-10) Long run: 1151
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=97464.571; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.153; max=151.377)Mibits/s
-rngtest: Program run time: 1327632888 microseconds
+rngtest: input channel speed: (min=206.881; avg=3334185.178; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.893; max=152.588)Mibits/s
+rngtest: Program run time: 577240005 microseconds
+rngtest: bits received from input: 80400000032
+rngtest: FIPS 140-2 successes: 4016902
+rngtest: FIPS 140-2 failures: 3098
+rngtest: FIPS 140-2(2001-10-10) Monobit: 401
+rngtest: FIPS 140-2(2001-10-10) Poker: 393
+rngtest: FIPS 140-2(2001-10-10) Runs: 1169
+rngtest: FIPS 140-2(2001-10-10) Long run: 1158
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3335453.226; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.877; max=152.588)Mibits/s
+rngtest: Program run time: 580181267 microseconds
+rngtest: bits received from input: 80800000032
+rngtest: FIPS 140-2 successes: 4036889
+rngtest: FIPS 140-2 failures: 3111
+rngtest: FIPS 140-2(2001-10-10) Monobit: 404
+rngtest: FIPS 140-2(2001-10-10) Poker: 393
+rngtest: FIPS 140-2(2001-10-10) Runs: 1175
+rngtest: FIPS 140-2(2001-10-10) Long run: 1163
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=206.881; avg=3298789.783; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.848; max=152.588)Mibits/s
+rngtest: Program run time: 583449851 microseconds
+rngtest: bits received from input: 81200000032
+rngtest: FIPS 140-2 successes: 4056871
+rngtest: FIPS 140-2 failures: 3129
+rngtest: FIPS 140-2(2001-10-10) Monobit: 406
+rngtest: FIPS 140-2(2001-10-10) Poker: 396
+rngtest: FIPS 140-2(2001-10-10) Runs: 1181
+rngtest: FIPS 140-2(2001-10-10) Long run: 1170
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3276443.751; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.831; max=152.588)Mibits/s
+rngtest: Program run time: 586571522 microseconds
+rngtest: bits received from input: 81600000032
+rngtest: FIPS 140-2 successes: 4076858
+rngtest: FIPS 140-2 failures: 3142
+rngtest: FIPS 140-2(2001-10-10) Monobit: 409
+rngtest: FIPS 140-2(2001-10-10) Poker: 398
+rngtest: FIPS 140-2(2001-10-10) Runs: 1189
+rngtest: FIPS 140-2(2001-10-10) Long run: 1171
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3274302.681; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.816; max=152.588)Mibits/s
+rngtest: Program run time: 589536753 microseconds
 rngtest: bits received from input: 82000000032
-rngtest: FIPS 140-2 successes: 4096743
-rngtest: FIPS 140-2 failures: 3257
-rngtest: FIPS 140-2(2001-10-10) Monobit: 434
-rngtest: FIPS 140-2(2001-10-10) Poker: 412
-rngtest: FIPS 140-2(2001-10-10) Runs: 1225
-rngtest: FIPS 140-2(2001-10-10) Long run: 1211
+rngtest: FIPS 140-2 successes: 4096842
+rngtest: FIPS 140-2 failures: 3158
+rngtest: FIPS 140-2(2001-10-10) Monobit: 409
+rngtest: FIPS 140-2(2001-10-10) Poker: 400
+rngtest: FIPS 140-2(2001-10-10) Runs: 1195
+rngtest: FIPS 140-2(2001-10-10) Long run: 1179
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=99743.236; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.193; max=151.377)Mibits/s
-rngtest: Program run time: 1341901492 microseconds
+rngtest: input channel speed: (min=163.842; avg=3273398.181; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.813; max=152.588)Mibits/s
+rngtest: Program run time: 592447139 microseconds
+rngtest: bits received from input: 82400000032
+rngtest: FIPS 140-2 successes: 4116824
+rngtest: FIPS 140-2 failures: 3176
+rngtest: FIPS 140-2(2001-10-10) Monobit: 412
+rngtest: FIPS 140-2(2001-10-10) Poker: 402
+rngtest: FIPS 140-2(2001-10-10) Runs: 1202
+rngtest: FIPS 140-2(2001-10-10) Long run: 1185
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3271515.488; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.798; max=152.588)Mibits/s
+rngtest: Program run time: 595414909 microseconds
+rngtest: bits received from input: 82800000032
+rngtest: FIPS 140-2 successes: 4136810
+rngtest: FIPS 140-2 failures: 3190
+rngtest: FIPS 140-2(2001-10-10) Monobit: 413
+rngtest: FIPS 140-2(2001-10-10) Poker: 404
+rngtest: FIPS 140-2(2001-10-10) Runs: 1206
+rngtest: FIPS 140-2(2001-10-10) Long run: 1192
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3270751.513; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.785; max=152.588)Mibits/s
+rngtest: Program run time: 598362792 microseconds
+rngtest: bits received from input: 83200000032
+rngtest: FIPS 140-2 successes: 4156791
+rngtest: FIPS 140-2 failures: 3209
+rngtest: FIPS 140-2(2001-10-10) Monobit: 415
+rngtest: FIPS 140-2(2001-10-10) Poker: 407
+rngtest: FIPS 140-2(2001-10-10) Runs: 1214
+rngtest: FIPS 140-2(2001-10-10) Long run: 1198
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3277217.951; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.826; max=152.588)Mibits/s
+rngtest: Program run time: 601035433 microseconds
+rngtest: bits received from input: 83600000032
+rngtest: FIPS 140-2 successes: 4176775
+rngtest: FIPS 140-2 failures: 3225
+rngtest: FIPS 140-2(2001-10-10) Monobit: 415
+rngtest: FIPS 140-2(2001-10-10) Poker: 408
+rngtest: FIPS 140-2(2001-10-10) Runs: 1219
+rngtest: FIPS 140-2(2001-10-10) Long run: 1208
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3272318.855; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.809; max=152.588)Mibits/s
+rngtest: Program run time: 604032949 microseconds
 rngtest: bits received from input: 84000000032
-rngtest: FIPS 140-2 successes: 4196660
-rngtest: FIPS 140-2 failures: 3340
-rngtest: FIPS 140-2(2001-10-10) Monobit: 443
-rngtest: FIPS 140-2(2001-10-10) Poker: 423
-rngtest: FIPS 140-2(2001-10-10) Runs: 1262
+rngtest: FIPS 140-2 successes: 4196767
+rngtest: FIPS 140-2 failures: 3233
+rngtest: FIPS 140-2(2001-10-10) Monobit: 415
+rngtest: FIPS 140-2(2001-10-10) Poker: 408
+rngtest: FIPS 140-2(2001-10-10) Runs: 1223
+rngtest: FIPS 140-2(2001-10-10) Long run: 1212
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3252526.548; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.805; max=152.588)Mibits/s
+rngtest: Program run time: 607093357 microseconds
+rngtest: bits received from input: 84400000032
+rngtest: FIPS 140-2 successes: 4216754
+rngtest: FIPS 140-2 failures: 3246
+rngtest: FIPS 140-2(2001-10-10) Monobit: 417
+rngtest: FIPS 140-2(2001-10-10) Poker: 410
+rngtest: FIPS 140-2(2001-10-10) Runs: 1227
+rngtest: FIPS 140-2(2001-10-10) Long run: 1217
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3257423.047; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.790; max=152.588)Mibits/s
+rngtest: Program run time: 610008678 microseconds
+rngtest: bits received from input: 84800000032
+rngtest: FIPS 140-2 successes: 4236742
+rngtest: FIPS 140-2 failures: 3258
+rngtest: FIPS 140-2(2001-10-10) Monobit: 418
+rngtest: FIPS 140-2(2001-10-10) Poker: 411
+rngtest: FIPS 140-2(2001-10-10) Runs: 1232
+rngtest: FIPS 140-2(2001-10-10) Long run: 1223
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3256180.196; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.776; max=152.588)Mibits/s
+rngtest: Program run time: 612968897 microseconds
+rngtest: bits received from input: 85200000032
+rngtest: FIPS 140-2 successes: 4256727
+rngtest: FIPS 140-2 failures: 3273
+rngtest: FIPS 140-2(2001-10-10) Monobit: 421
+rngtest: FIPS 140-2(2001-10-10) Poker: 412
+rngtest: FIPS 140-2(2001-10-10) Runs: 1237
+rngtest: FIPS 140-2(2001-10-10) Long run: 1229
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=167773.975; avg=3336556321.423; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.763; max=152.588)Mibits/s
+rngtest: Program run time: 615900851 microseconds
+rngtest: bits received from input: 85600000032
+rngtest: FIPS 140-2 successes: 4276713
+rngtest: FIPS 140-2 failures: 3287
+rngtest: FIPS 140-2(2001-10-10) Monobit: 421
+rngtest: FIPS 140-2(2001-10-10) Poker: 415
+rngtest: FIPS 140-2(2001-10-10) Runs: 1240
 rngtest: FIPS 140-2(2001-10-10) Long run: 1237
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=100393.367; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.231; max=151.377)Mibits/s
-rngtest: Program run time: 1369160846 microseconds
+rngtest: input channel speed: (min=167773.975; avg=3329848273.674; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.747; max=152.588)Mibits/s
+rngtest: Program run time: 618913899 microseconds
 rngtest: bits received from input: 86000000032
-rngtest: FIPS 140-2 successes: 4296584
-rngtest: FIPS 140-2 failures: 3416
-rngtest: FIPS 140-2(2001-10-10) Monobit: 453
-rngtest: FIPS 140-2(2001-10-10) Poker: 434
-rngtest: FIPS 140-2(2001-10-10) Runs: 1284
-rngtest: FIPS 140-2(2001-10-10) Long run: 1271
+rngtest: FIPS 140-2 successes: 4296701
+rngtest: FIPS 140-2 failures: 3299
+rngtest: FIPS 140-2(2001-10-10) Monobit: 422
+rngtest: FIPS 140-2(2001-10-10) Poker: 416
+rngtest: FIPS 140-2(2001-10-10) Runs: 1243
+rngtest: FIPS 140-2(2001-10-10) Long run: 1244
 rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=101559399.228; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.261; max=151.377)Mibits/s
-rngtest: Program run time: 1411887355 microseconds
+rngtest: input channel speed: (min=163.842; avg=3252003.723; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.732; max=152.588)Mibits/s
+rngtest: Program run time: 621867045 microseconds
+rngtest: bits received from input: 86400000032
+rngtest: FIPS 140-2 successes: 4316691
+rngtest: FIPS 140-2 failures: 3309
+rngtest: FIPS 140-2(2001-10-10) Monobit: 423
+rngtest: FIPS 140-2(2001-10-10) Poker: 416
+rngtest: FIPS 140-2(2001-10-10) Runs: 1247
+rngtest: FIPS 140-2(2001-10-10) Long run: 1249
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=163.842; avg=3246229.353; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.719; max=152.588)Mibits/s
+rngtest: Program run time: 624861853 microseconds
+rngtest: bits received from input: 86800000032
+rngtest: FIPS 140-2 successes: 4336670
+rngtest: FIPS 140-2 failures: 3330
+rngtest: FIPS 140-2(2001-10-10) Monobit: 425
+rngtest: FIPS 140-2(2001-10-10) Poker: 418
+rngtest: FIPS 140-2(2001-10-10) Runs: 1258
+rngtest: FIPS 140-2(2001-10-10) Long run: 1256
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=167773.975; avg=3326019411.538; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.706; max=152.588)Mibits/s
+rngtest: Program run time: 627796793 microseconds
+rngtest: bits received from input: 87200000032
+rngtest: FIPS 140-2 successes: 4356655
+rngtest: FIPS 140-2 failures: 3345
+rngtest: FIPS 140-2(2001-10-10) Monobit: 430
+rngtest: FIPS 140-2(2001-10-10) Poker: 421
+rngtest: FIPS 140-2(2001-10-10) Runs: 1260
+rngtest: FIPS 140-2(2001-10-10) Long run: 1260
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3325494902.859; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.691; max=152.588)Mibits/s
+rngtest: Program run time: 630759826 microseconds
+rngtest: bits received from input: 87600000032
+rngtest: FIPS 140-2 successes: 4376638
+rngtest: FIPS 140-2 failures: 3362
+rngtest: FIPS 140-2(2001-10-10) Monobit: 430
+rngtest: FIPS 140-2(2001-10-10) Poker: 424
+rngtest: FIPS 140-2(2001-10-10) Runs: 1266
+rngtest: FIPS 140-2(2001-10-10) Long run: 1268
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3247308.280; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.679; max=152.588)Mibits/s
+rngtest: Program run time: 633709135 microseconds
 rngtest: bits received from input: 88000000032
-rngtest: FIPS 140-2 successes: 4396500
-rngtest: FIPS 140-2 failures: 3500
-rngtest: FIPS 140-2(2001-10-10) Monobit: 459
-rngtest: FIPS 140-2(2001-10-10) Poker: 443
-rngtest: FIPS 140-2(2001-10-10) Runs: 1316
-rngtest: FIPS 140-2(2001-10-10) Long run: 1308
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=101439.463; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.294; max=151.377)Mibits/s
-rngtest: Program run time: 1425279549 microseconds
+rngtest: FIPS 140-2 successes: 4396618
+rngtest: FIPS 140-2 failures: 3382
+rngtest: FIPS 140-2(2001-10-10) Monobit: 433
+rngtest: FIPS 140-2(2001-10-10) Poker: 427
+rngtest: FIPS 140-2(2001-10-10) Runs: 1273
+rngtest: FIPS 140-2(2001-10-10) Long run: 1275
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3331049419.487; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.667; max=152.588)Mibits/s
+rngtest: Program run time: 636610325 microseconds
+rngtest: bits received from input: 88400000032
+rngtest: FIPS 140-2 successes: 4416607
+rngtest: FIPS 140-2 failures: 3393
+rngtest: FIPS 140-2(2001-10-10) Monobit: 433
+rngtest: FIPS 140-2(2001-10-10) Poker: 430
+rngtest: FIPS 140-2(2001-10-10) Runs: 1277
+rngtest: FIPS 140-2(2001-10-10) Long run: 1279
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3330978788.523; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.661; max=152.588)Mibits/s
+rngtest: Program run time: 639530042 microseconds
+rngtest: bits received from input: 88800000032
+rngtest: FIPS 140-2 successes: 4436595
+rngtest: FIPS 140-2 failures: 3405
+rngtest: FIPS 140-2(2001-10-10) Monobit: 435
+rngtest: FIPS 140-2(2001-10-10) Poker: 431
+rngtest: FIPS 140-2(2001-10-10) Runs: 1279
+rngtest: FIPS 140-2(2001-10-10) Long run: 1286
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3255112.171; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.700; max=152.588)Mibits/s
+rngtest: Program run time: 642231512 microseconds
+rngtest: bits received from input: 89200000032
+rngtest: FIPS 140-2 successes: 4456577
+rngtest: FIPS 140-2 failures: 3423
+rngtest: FIPS 140-2(2001-10-10) Monobit: 437
+rngtest: FIPS 140-2(2001-10-10) Poker: 433
+rngtest: FIPS 140-2(2001-10-10) Runs: 1284
+rngtest: FIPS 140-2(2001-10-10) Long run: 1295
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3256786.341; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.741; max=152.588)Mibits/s
+rngtest: Program run time: 644928096 microseconds
+rngtest: bits received from input: 89600000032
+rngtest: FIPS 140-2 successes: 4476560
+rngtest: FIPS 140-2 failures: 3440
+rngtest: FIPS 140-2(2001-10-10) Monobit: 439
+rngtest: FIPS 140-2(2001-10-10) Poker: 433
+rngtest: FIPS 140-2(2001-10-10) Runs: 1291
+rngtest: FIPS 140-2(2001-10-10) Long run: 1303
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241822.309; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.762; max=152.588)Mibits/s
+rngtest: Program run time: 647846732 microseconds
 rngtest: bits received from input: 90000000032
-rngtest: FIPS 140-2 successes: 4496421
-rngtest: FIPS 140-2 failures: 3579
-rngtest: FIPS 140-2(2001-10-10) Monobit: 466
-rngtest: FIPS 140-2(2001-10-10) Poker: 456
-rngtest: FIPS 140-2(2001-10-10) Runs: 1345
-rngtest: FIPS 140-2(2001-10-10) Long run: 1339
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=103718.186; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.321; max=151.377)Mibits/s
-rngtest: Program run time: 1438526890 microseconds
+rngtest: FIPS 140-2 successes: 4496547
+rngtest: FIPS 140-2 failures: 3453
+rngtest: FIPS 140-2(2001-10-10) Monobit: 442
+rngtest: FIPS 140-2(2001-10-10) Poker: 436
+rngtest: FIPS 140-2(2001-10-10) Runs: 1295
+rngtest: FIPS 140-2(2001-10-10) Long run: 1306
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3245423.022; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.762; max=152.588)Mibits/s
+rngtest: Program run time: 650709661 microseconds
+rngtest: bits received from input: 90400000032
+rngtest: FIPS 140-2 successes: 4516525
+rngtest: FIPS 140-2 failures: 3475
+rngtest: FIPS 140-2(2001-10-10) Monobit: 443
+rngtest: FIPS 140-2(2001-10-10) Poker: 442
+rngtest: FIPS 140-2(2001-10-10) Runs: 1303
+rngtest: FIPS 140-2(2001-10-10) Long run: 1313
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3245406.416; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.749; max=152.588)Mibits/s
+rngtest: Program run time: 653662384 microseconds
+rngtest: bits received from input: 90800000032
+rngtest: FIPS 140-2 successes: 4536512
+rngtest: FIPS 140-2 failures: 3488
+rngtest: FIPS 140-2(2001-10-10) Monobit: 445
+rngtest: FIPS 140-2(2001-10-10) Poker: 444
+rngtest: FIPS 140-2(2001-10-10) Runs: 1308
+rngtest: FIPS 140-2(2001-10-10) Long run: 1318
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3246556.213; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.750; max=152.588)Mibits/s
+rngtest: Program run time: 656541674 microseconds
+rngtest: bits received from input: 91200000032
+rngtest: FIPS 140-2 successes: 4556494
+rngtest: FIPS 140-2 failures: 3506
+rngtest: FIPS 140-2(2001-10-10) Monobit: 450
+rngtest: FIPS 140-2(2001-10-10) Poker: 446
+rngtest: FIPS 140-2(2001-10-10) Runs: 1313
+rngtest: FIPS 140-2(2001-10-10) Long run: 1324
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3248004.435; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.737; max=152.588)Mibits/s
+rngtest: Program run time: 659478059 microseconds
+rngtest: bits received from input: 91600000032
+rngtest: FIPS 140-2 successes: 4576482
+rngtest: FIPS 140-2 failures: 3518
+rngtest: FIPS 140-2(2001-10-10) Monobit: 453
+rngtest: FIPS 140-2(2001-10-10) Poker: 449
+rngtest: FIPS 140-2(2001-10-10) Runs: 1316
+rngtest: FIPS 140-2(2001-10-10) Long run: 1327
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3250165.845; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.738; max=152.588)Mibits/s
+rngtest: Program run time: 662349535 microseconds
 rngtest: bits received from input: 92000000032
-rngtest: FIPS 140-2 successes: 4596343
-rngtest: FIPS 140-2 failures: 3657
-rngtest: FIPS 140-2(2001-10-10) Monobit: 477
-rngtest: FIPS 140-2(2001-10-10) Poker: 459
-rngtest: FIPS 140-2(2001-10-10) Runs: 1368
-rngtest: FIPS 140-2(2001-10-10) Long run: 1380
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=105969.871; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.353; max=151.377)Mibits/s
-rngtest: Program run time: 1451955829 microseconds
+rngtest: FIPS 140-2 successes: 4596470
+rngtest: FIPS 140-2 failures: 3530
+rngtest: FIPS 140-2(2001-10-10) Monobit: 453
+rngtest: FIPS 140-2(2001-10-10) Poker: 450
+rngtest: FIPS 140-2(2001-10-10) Runs: 1321
+rngtest: FIPS 140-2(2001-10-10) Long run: 1333
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3250876.658; max=4882812.500)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.733; max=152.588)Mibits/s
+rngtest: Program run time: 665256384 microseconds
+rngtest: bits received from input: 92400000032
+rngtest: FIPS 140-2 successes: 4616455
+rngtest: FIPS 140-2 failures: 3545
+rngtest: FIPS 140-2(2001-10-10) Monobit: 456
+rngtest: FIPS 140-2(2001-10-10) Poker: 453
+rngtest: FIPS 140-2(2001-10-10) Runs: 1325
+rngtest: FIPS 140-2(2001-10-10) Long run: 1338
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3257774.124; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.756; max=152.588)Mibits/s
+rngtest: Program run time: 667986515 microseconds
+rngtest: bits received from input: 92800000032
+rngtest: FIPS 140-2 successes: 4636439
+rngtest: FIPS 140-2 failures: 3561
+rngtest: FIPS 140-2(2001-10-10) Monobit: 459
+rngtest: FIPS 140-2(2001-10-10) Poker: 455
+rngtest: FIPS 140-2(2001-10-10) Runs: 1332
+rngtest: FIPS 140-2(2001-10-10) Long run: 1343
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3258424.975; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.778; max=152.588)Mibits/s
+rngtest: Program run time: 670767825 microseconds
+rngtest: bits received from input: 93200000032
+rngtest: FIPS 140-2 successes: 4656428
+rngtest: FIPS 140-2 failures: 3572
+rngtest: FIPS 140-2(2001-10-10) Monobit: 461
+rngtest: FIPS 140-2(2001-10-10) Poker: 457
+rngtest: FIPS 140-2(2001-10-10) Runs: 1335
+rngtest: FIPS 140-2(2001-10-10) Long run: 1347
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3254476.774; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.770; max=152.588)Mibits/s
+rngtest: Program run time: 673730507 microseconds
+rngtest: bits received from input: 93600000032
+rngtest: FIPS 140-2 successes: 4676410
+rngtest: FIPS 140-2 failures: 3590
+rngtest: FIPS 140-2(2001-10-10) Monobit: 464
+rngtest: FIPS 140-2(2001-10-10) Poker: 460
+rngtest: FIPS 140-2(2001-10-10) Runs: 1341
+rngtest: FIPS 140-2(2001-10-10) Long run: 1353
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3255059.259; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.759; max=152.588)Mibits/s
+rngtest: Program run time: 676668939 microseconds
 rngtest: bits received from input: 94000000032
-rngtest: FIPS 140-2 successes: 4696270
-rngtest: FIPS 140-2 failures: 3730
-rngtest: FIPS 140-2(2001-10-10) Monobit: 488
+rngtest: FIPS 140-2 successes: 4696396
+rngtest: FIPS 140-2 failures: 3604
+rngtest: FIPS 140-2(2001-10-10) Monobit: 466
+rngtest: FIPS 140-2(2001-10-10) Poker: 463
+rngtest: FIPS 140-2(2001-10-10) Runs: 1346
+rngtest: FIPS 140-2(2001-10-10) Long run: 1357
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3249383.525; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.745; max=152.588)Mibits/s
+rngtest: Program run time: 679675992 microseconds
+rngtest: bits received from input: 94400000032
+rngtest: FIPS 140-2 successes: 4716384
+rngtest: FIPS 140-2 failures: 3616
+rngtest: FIPS 140-2(2001-10-10) Monobit: 466
+rngtest: FIPS 140-2(2001-10-10) Poker: 464
+rngtest: FIPS 140-2(2001-10-10) Runs: 1351
+rngtest: FIPS 140-2(2001-10-10) Long run: 1363
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3238439.802; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.731; max=152.588)Mibits/s
+rngtest: Program run time: 682731905 microseconds
+rngtest: bits received from input: 94800000032
+rngtest: FIPS 140-2 successes: 4736363
+rngtest: FIPS 140-2 failures: 3637
+rngtest: FIPS 140-2(2001-10-10) Monobit: 470
+rngtest: FIPS 140-2(2001-10-10) Poker: 469
+rngtest: FIPS 140-2(2001-10-10) Runs: 1357
+rngtest: FIPS 140-2(2001-10-10) Long run: 1369
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3237093.245; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.721; max=152.588)Mibits/s
+rngtest: Program run time: 685683407 microseconds
+rngtest: bits received from input: 95200000032
+rngtest: FIPS 140-2 successes: 4756350
+rngtest: FIPS 140-2 failures: 3650
+rngtest: FIPS 140-2(2001-10-10) Monobit: 470
+rngtest: FIPS 140-2(2001-10-10) Poker: 471
+rngtest: FIPS 140-2(2001-10-10) Runs: 1363
+rngtest: FIPS 140-2(2001-10-10) Long run: 1375
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3244137.940; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.760; max=152.588)Mibits/s
+rngtest: Program run time: 688328224 microseconds
+rngtest: bits received from input: 95600000032
+rngtest: FIPS 140-2 successes: 4776330
+rngtest: FIPS 140-2 failures: 3670
+rngtest: FIPS 140-2(2001-10-10) Monobit: 471
 rngtest: FIPS 140-2(2001-10-10) Poker: 473
-rngtest: FIPS 140-2(2001-10-10) Runs: 1394
-rngtest: FIPS 140-2(2001-10-10) Long run: 1403
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=110764456.332; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.383; max=151.377)Mibits/s
-rngtest: Program run time: 1465783402 microseconds
+rngtest: FIPS 140-2(2001-10-10) Runs: 1370
+rngtest: FIPS 140-2(2001-10-10) Long run: 1386
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3243741.008; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.762; max=152.588)Mibits/s
+rngtest: Program run time: 691215096 microseconds
 rngtest: bits received from input: 96000000032
-rngtest: FIPS 140-2 successes: 4796200
-rngtest: FIPS 140-2 failures: 3800
-rngtest: FIPS 140-2(2001-10-10) Monobit: 498
-rngtest: FIPS 140-2(2001-10-10) Poker: 483
-rngtest: FIPS 140-2(2001-10-10) Runs: 1425
-rngtest: FIPS 140-2(2001-10-10) Long run: 1422
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=113078397.638; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=66.691; avg=145.408; max=151.377)Mibits/s
-rngtest: Program run time: 1479129805 microseconds
+rngtest: FIPS 140-2 successes: 4796310
+rngtest: FIPS 140-2 failures: 3690
+rngtest: FIPS 140-2(2001-10-10) Monobit: 475
+rngtest: FIPS 140-2(2001-10-10) Poker: 475
+rngtest: FIPS 140-2(2001-10-10) Runs: 1375
+rngtest: FIPS 140-2(2001-10-10) Long run: 1395
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3238108.087; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.757; max=152.588)Mibits/s
+rngtest: Program run time: 694178896 microseconds
+rngtest: bits received from input: 96400000032
+rngtest: FIPS 140-2 successes: 4816297
+rngtest: FIPS 140-2 failures: 3703
+rngtest: FIPS 140-2(2001-10-10) Monobit: 478
+rngtest: FIPS 140-2(2001-10-10) Poker: 475
+rngtest: FIPS 140-2(2001-10-10) Runs: 1380
+rngtest: FIPS 140-2(2001-10-10) Long run: 1400
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3239255.783; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.748; max=152.588)Mibits/s
+rngtest: Program run time: 697105013 microseconds
+rngtest: bits received from input: 96800000032
+rngtest: FIPS 140-2 successes: 4836277
+rngtest: FIPS 140-2 failures: 3723
+rngtest: FIPS 140-2(2001-10-10) Monobit: 479
+rngtest: FIPS 140-2(2001-10-10) Poker: 476
+rngtest: FIPS 140-2(2001-10-10) Runs: 1388
+rngtest: FIPS 140-2(2001-10-10) Long run: 1410
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3232271.449; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.733; max=152.588)Mibits/s
+rngtest: Program run time: 700134165 microseconds
+rngtest: bits received from input: 97200000032
+rngtest: FIPS 140-2 successes: 4856256
+rngtest: FIPS 140-2 failures: 3744
+rngtest: FIPS 140-2(2001-10-10) Monobit: 485
+rngtest: FIPS 140-2(2001-10-10) Poker: 479
+rngtest: FIPS 140-2(2001-10-10) Runs: 1394
+rngtest: FIPS 140-2(2001-10-10) Long run: 1417
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3238495.321; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.746; max=152.588)Mibits/s
+rngtest: Program run time: 702907637 microseconds
+rngtest: bits received from input: 97600000032
+rngtest: FIPS 140-2 successes: 4876247
+rngtest: FIPS 140-2 failures: 3753
+rngtest: FIPS 140-2(2001-10-10) Monobit: 485
+rngtest: FIPS 140-2(2001-10-10) Poker: 479
+rngtest: FIPS 140-2(2001-10-10) Runs: 1400
+rngtest: FIPS 140-2(2001-10-10) Long run: 1420
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3237834.608; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.756; max=152.588)Mibits/s
+rngtest: Program run time: 705757246 microseconds
 rngtest: bits received from input: 98000000032
-rngtest: FIPS 140-2 successes: 4896109
-rngtest: FIPS 140-2 failures: 3891
-rngtest: FIPS 140-2(2001-10-10) Monobit: 509
-rngtest: FIPS 140-2(2001-10-10) Poker: 498
-rngtest: FIPS 140-2(2001-10-10) Runs: 1451
-rngtest: FIPS 140-2(2001-10-10) Long run: 1461
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=112691.522; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.436; max=151.377)Mibits/s
-rngtest: Program run time: 1492411973 microseconds
+rngtest: FIPS 140-2 successes: 4896222
+rngtest: FIPS 140-2 failures: 3778
+rngtest: FIPS 140-2(2001-10-10) Monobit: 487
+rngtest: FIPS 140-2(2001-10-10) Poker: 483
+rngtest: FIPS 140-2(2001-10-10) Runs: 1411
+rngtest: FIPS 140-2(2001-10-10) Long run: 1428
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3240931.150; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.743; max=152.588)Mibits/s
+rngtest: Program run time: 708687275 microseconds
+rngtest: bits received from input: 98400000032
+rngtest: FIPS 140-2 successes: 4916204
+rngtest: FIPS 140-2 failures: 3796
+rngtest: FIPS 140-2(2001-10-10) Monobit: 492
+rngtest: FIPS 140-2(2001-10-10) Poker: 486
+rngtest: FIPS 140-2(2001-10-10) Runs: 1414
+rngtest: FIPS 140-2(2001-10-10) Long run: 1435
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241880.711; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.737; max=152.588)Mibits/s
+rngtest: Program run time: 711599368 microseconds
+rngtest: bits received from input: 98800000032
+rngtest: FIPS 140-2 successes: 4936187
+rngtest: FIPS 140-2 failures: 3813
+rngtest: FIPS 140-2(2001-10-10) Monobit: 496
+rngtest: FIPS 140-2(2001-10-10) Poker: 488
+rngtest: FIPS 140-2(2001-10-10) Runs: 1422
+rngtest: FIPS 140-2(2001-10-10) Long run: 1438
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3235732.151; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.727; max=152.588)Mibits/s
+rngtest: Program run time: 714598343 microseconds
+rngtest: bits received from input: 99200000032
+rngtest: FIPS 140-2 successes: 4956179
+rngtest: FIPS 140-2 failures: 3821
+rngtest: FIPS 140-2(2001-10-10) Monobit: 497
+rngtest: FIPS 140-2(2001-10-10) Poker: 488
+rngtest: FIPS 140-2(2001-10-10) Runs: 1425
+rngtest: FIPS 140-2(2001-10-10) Long run: 1442
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241850.949; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.733; max=152.588)Mibits/s
+rngtest: Program run time: 717402831 microseconds
+rngtest: bits received from input: 99600000032
+rngtest: FIPS 140-2 successes: 4976159
+rngtest: FIPS 140-2 failures: 3841
+rngtest: FIPS 140-2(2001-10-10) Monobit: 503
+rngtest: FIPS 140-2(2001-10-10) Poker: 490
+rngtest: FIPS 140-2(2001-10-10) Runs: 1429
+rngtest: FIPS 140-2(2001-10-10) Long run: 1450
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3313539702.094; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.721; max=152.588)Mibits/s
+rngtest: Program run time: 720412551 microseconds
 rngtest: bits received from input: 100000000032
-rngtest: FIPS 140-2 successes: 4996039
-rngtest: FIPS 140-2 failures: 3961
-rngtest: FIPS 140-2(2001-10-10) Monobit: 523
-rngtest: FIPS 140-2(2001-10-10) Poker: 507
-rngtest: FIPS 140-2(2001-10-10) Runs: 1477
-rngtest: FIPS 140-2(2001-10-10) Long run: 1483
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=37.386; avg=114944.435; max=19531250.000)Kibits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.464; max=151.377)Mibits/s
-rngtest: Program run time: 1505759072 microseconds
+rngtest: FIPS 140-2 successes: 4996145
+rngtest: FIPS 140-2 failures: 3855
+rngtest: FIPS 140-2(2001-10-10) Monobit: 503
+rngtest: FIPS 140-2(2001-10-10) Poker: 490
+rngtest: FIPS 140-2(2001-10-10) Runs: 1437
+rngtest: FIPS 140-2(2001-10-10) Long run: 1456
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241367.908; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.737; max=152.588)Mibits/s
+rngtest: Program run time: 723177160 microseconds
+rngtest: bits received from input: 100400000032
+rngtest: FIPS 140-2 successes: 5016121
+rngtest: FIPS 140-2 failures: 3879
+rngtest: FIPS 140-2(2001-10-10) Monobit: 504
+rngtest: FIPS 140-2(2001-10-10) Poker: 494
+rngtest: FIPS 140-2(2001-10-10) Runs: 1445
+rngtest: FIPS 140-2(2001-10-10) Long run: 1467
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3317551393.299; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.724; max=152.588)Mibits/s
+rngtest: Program run time: 726145367 microseconds
+rngtest: bits received from input: 100800000032
+rngtest: FIPS 140-2 successes: 5036108
+rngtest: FIPS 140-2 failures: 3892
+rngtest: FIPS 140-2(2001-10-10) Monobit: 506
+rngtest: FIPS 140-2(2001-10-10) Poker: 494
+rngtest: FIPS 140-2(2001-10-10) Runs: 1451
+rngtest: FIPS 140-2(2001-10-10) Long run: 1472
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3322909024.882; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.721; max=152.588)Mibits/s
+rngtest: Program run time: 729005286 microseconds
+rngtest: bits received from input: 101200000032
+rngtest: FIPS 140-2 successes: 5056093
+rngtest: FIPS 140-2 failures: 3907
+rngtest: FIPS 140-2(2001-10-10) Monobit: 508
+rngtest: FIPS 140-2(2001-10-10) Poker: 497
+rngtest: FIPS 140-2(2001-10-10) Runs: 1455
+rngtest: FIPS 140-2(2001-10-10) Long run: 1478
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3244460.364; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.722; max=152.588)Mibits/s
+rngtest: Program run time: 731898030 microseconds
+rngtest: bits received from input: 101600000032
+rngtest: FIPS 140-2 successes: 5076075
+rngtest: FIPS 140-2 failures: 3925
+rngtest: FIPS 140-2(2001-10-10) Monobit: 511
+rngtest: FIPS 140-2(2001-10-10) Poker: 499
+rngtest: FIPS 140-2(2001-10-10) Runs: 1463
+rngtest: FIPS 140-2(2001-10-10) Long run: 1484
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3246466.413; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.710; max=152.588)Mibits/s
+rngtest: Program run time: 734835939 microseconds
 rngtest: bits received from input: 102000000032
-rngtest: FIPS 140-2 successes: 5095965
-rngtest: FIPS 140-2 failures: 4035
-rngtest: FIPS 140-2(2001-10-10) Monobit: 531
-rngtest: FIPS 140-2(2001-10-10) Poker: 516
-rngtest: FIPS 140-2(2001-10-10) Runs: 1504
-rngtest: FIPS 140-2(2001-10-10) Long run: 1514
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=119999696.471; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.485; max=151.377)Mibits/s
-rngtest: Program run time: 1519192699 microseconds
+rngtest: FIPS 140-2 successes: 5096060
+rngtest: FIPS 140-2 failures: 3940
+rngtest: FIPS 140-2(2001-10-10) Monobit: 512
+rngtest: FIPS 140-2(2001-10-10) Poker: 502
+rngtest: FIPS 140-2(2001-10-10) Runs: 1468
+rngtest: FIPS 140-2(2001-10-10) Long run: 1490
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3246009.186; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.698; max=152.588)Mibits/s
+rngtest: Program run time: 737794004 microseconds
+rngtest: bits received from input: 102400000032
+rngtest: FIPS 140-2 successes: 5116043
+rngtest: FIPS 140-2 failures: 3957
+rngtest: FIPS 140-2(2001-10-10) Monobit: 514
+rngtest: FIPS 140-2(2001-10-10) Poker: 503
+rngtest: FIPS 140-2(2001-10-10) Runs: 1473
+rngtest: FIPS 140-2(2001-10-10) Long run: 1499
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241100.893; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.685; max=152.588)Mibits/s
+rngtest: Program run time: 740799539 microseconds
+rngtest: bits received from input: 102800000032
+rngtest: FIPS 140-2 successes: 5136028
+rngtest: FIPS 140-2 failures: 3972
+rngtest: FIPS 140-2(2001-10-10) Monobit: 518
+rngtest: FIPS 140-2(2001-10-10) Poker: 505
+rngtest: FIPS 140-2(2001-10-10) Runs: 1477
+rngtest: FIPS 140-2(2001-10-10) Long run: 1504
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3246617.115; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.685; max=152.588)Mibits/s
+rngtest: Program run time: 743642230 microseconds
+rngtest: bits received from input: 103200000032
+rngtest: FIPS 140-2 successes: 5156010
+rngtest: FIPS 140-2 failures: 3990
+rngtest: FIPS 140-2(2001-10-10) Monobit: 520
+rngtest: FIPS 140-2(2001-10-10) Poker: 510
+rngtest: FIPS 140-2(2001-10-10) Runs: 1481
+rngtest: FIPS 140-2(2001-10-10) Long run: 1511
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242524.574; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.673; max=152.588)Mibits/s
+rngtest: Program run time: 746637422 microseconds
+rngtest: bits received from input: 103600000032
+rngtest: FIPS 140-2 successes: 5175994
+rngtest: FIPS 140-2 failures: 4006
+rngtest: FIPS 140-2(2001-10-10) Monobit: 524
+rngtest: FIPS 140-2(2001-10-10) Poker: 512
+rngtest: FIPS 140-2(2001-10-10) Runs: 1489
+rngtest: FIPS 140-2(2001-10-10) Long run: 1513
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3247609.783; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.663; max=152.588)Mibits/s
+rngtest: Program run time: 749537514 microseconds
 rngtest: bits received from input: 104000000032
-rngtest: FIPS 140-2 successes: 5195885
-rngtest: FIPS 140-2 failures: 4115
-rngtest: FIPS 140-2(2001-10-10) Monobit: 541
+rngtest: FIPS 140-2 successes: 5195981
+rngtest: FIPS 140-2 failures: 4019
+rngtest: FIPS 140-2(2001-10-10) Monobit: 527
+rngtest: FIPS 140-2(2001-10-10) Poker: 513
+rngtest: FIPS 140-2(2001-10-10) Runs: 1494
+rngtest: FIPS 140-2(2001-10-10) Long run: 1517
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3247142.826; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.652; max=152.588)Mibits/s
+rngtest: Program run time: 752493066 microseconds
+rngtest: bits received from input: 104400000032
+rngtest: FIPS 140-2 successes: 5215964
+rngtest: FIPS 140-2 failures: 4036
+rngtest: FIPS 140-2(2001-10-10) Monobit: 529
+rngtest: FIPS 140-2(2001-10-10) Poker: 516
+rngtest: FIPS 140-2(2001-10-10) Runs: 1498
+rngtest: FIPS 140-2(2001-10-10) Long run: 1525
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3248391.896; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.645; max=152.588)Mibits/s
+rngtest: Program run time: 755411090 microseconds
+rngtest: bits received from input: 104800000032
+rngtest: FIPS 140-2 successes: 5235948
+rngtest: FIPS 140-2 failures: 4052
+rngtest: FIPS 140-2(2001-10-10) Monobit: 532
+rngtest: FIPS 140-2(2001-10-10) Poker: 518
+rngtest: FIPS 140-2(2001-10-10) Runs: 1503
+rngtest: FIPS 140-2(2001-10-10) Long run: 1532
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3248611.193; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.645; max=152.588)Mibits/s
+rngtest: Program run time: 758304156 microseconds
+rngtest: bits received from input: 105200000032
+rngtest: FIPS 140-2 successes: 5255932
+rngtest: FIPS 140-2 failures: 4068
+rngtest: FIPS 140-2(2001-10-10) Monobit: 535
+rngtest: FIPS 140-2(2001-10-10) Poker: 519
+rngtest: FIPS 140-2(2001-10-10) Runs: 1510
+rngtest: FIPS 140-2(2001-10-10) Long run: 1537
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241814.892; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.639; max=152.588)Mibits/s
+rngtest: Program run time: 761292428 microseconds
+rngtest: bits received from input: 105600000032
+rngtest: FIPS 140-2 successes: 5275927
+rngtest: FIPS 140-2 failures: 4073
+rngtest: FIPS 140-2(2001-10-10) Monobit: 535
+rngtest: FIPS 140-2(2001-10-10) Poker: 520
+rngtest: FIPS 140-2(2001-10-10) Runs: 1511
+rngtest: FIPS 140-2(2001-10-10) Long run: 1540
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242881.494; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.627; max=152.588)Mibits/s
+rngtest: Program run time: 764245059 microseconds
+rngtest: bits received from input: 106000000032
+rngtest: FIPS 140-2 successes: 5295907
+rngtest: FIPS 140-2 failures: 4093
+rngtest: FIPS 140-2(2001-10-10) Monobit: 536
+rngtest: FIPS 140-2(2001-10-10) Poker: 524
+rngtest: FIPS 140-2(2001-10-10) Runs: 1521
+rngtest: FIPS 140-2(2001-10-10) Long run: 1545
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242564.981; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.615; max=152.588)Mibits/s
+rngtest: Program run time: 767206224 microseconds
+rngtest: bits received from input: 106400000032
+rngtest: FIPS 140-2 successes: 5315892
+rngtest: FIPS 140-2 failures: 4108
+rngtest: FIPS 140-2(2001-10-10) Monobit: 536
 rngtest: FIPS 140-2(2001-10-10) Poker: 525
-rngtest: FIPS 140-2(2001-10-10) Runs: 1539
-rngtest: FIPS 140-2(2001-10-10) Long run: 1541
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=122302373.318; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.510; max=151.377)Mibits/s
-rngtest: Program run time: 1532546566 microseconds
-asfrngtest: bits received from input: 106000000032
-rngtest: FIPS 140-2 successes: 5295801
-rngtest: FIPS 140-2 failures: 4199
-rngtest: FIPS 140-2(2001-10-10) Monobit: 553
-rngtest: FIPS 140-2(2001-10-10) Poker: 532
-rngtest: FIPS 140-2(2001-10-10) Runs: 1573
-rngtest: FIPS 140-2(2001-10-10) Long run: 1572
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=124612262.480; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.535; max=151.377)Mibits/s
-rngtest: Program run time: 1545833960 microseconds
+rngtest: FIPS 140-2(2001-10-10) Runs: 1529
+rngtest: FIPS 140-2(2001-10-10) Long run: 1551
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3248759.464; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.638; max=152.588)Mibits/s
+rngtest: Program run time: 769917142 microseconds
+rngtest: bits received from input: 106800000032
+rngtest: FIPS 140-2 successes: 5335872
+rngtest: FIPS 140-2 failures: 4128
+rngtest: FIPS 140-2(2001-10-10) Monobit: 539
+rngtest: FIPS 140-2(2001-10-10) Poker: 527
+rngtest: FIPS 140-2(2001-10-10) Runs: 1540
+rngtest: FIPS 140-2(2001-10-10) Long run: 1555
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3237294.897; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.645; max=152.588)Mibits/s
+rngtest: Program run time: 772886145 microseconds
+rngtest: bits received from input: 107200000032
+rngtest: FIPS 140-2 successes: 5355864
+rngtest: FIPS 140-2 failures: 4136
+rngtest: FIPS 140-2(2001-10-10) Monobit: 541
+rngtest: FIPS 140-2(2001-10-10) Poker: 527
+rngtest: FIPS 140-2(2001-10-10) Runs: 1543
+rngtest: FIPS 140-2(2001-10-10) Long run: 1558
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242105.830; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.641; max=152.588)Mibits/s
+rngtest: Program run time: 775753293 microseconds
+rngtest: bits received from input: 107600000032
+rngtest: FIPS 140-2 successes: 5375848
+rngtest: FIPS 140-2 failures: 4152
+rngtest: FIPS 140-2(2001-10-10) Monobit: 542
+rngtest: FIPS 140-2(2001-10-10) Poker: 528
+rngtest: FIPS 140-2(2001-10-10) Runs: 1551
+rngtest: FIPS 140-2(2001-10-10) Long run: 1564
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242895.577; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.635; max=152.588)Mibits/s
+rngtest: Program run time: 778672291 microseconds
 rngtest: bits received from input: 108000000032
-rngtest: FIPS 140-2 successes: 5395699
-rngtest: FIPS 140-2 failures: 4301
-rngtest: FIPS 140-2(2001-10-10) Monobit: 573
-rngtest: FIPS 140-2(2001-10-10) Poker: 547
-rngtest: FIPS 140-2(2001-10-10) Runs: 1602
-rngtest: FIPS 140-2(2001-10-10) Long run: 1612
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=126910380.638; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.555; max=151.377)Mibits/s
-rngtest: Program run time: 1559208356 microseconds
+rngtest: FIPS 140-2 successes: 5395833
+rngtest: FIPS 140-2 failures: 4167
+rngtest: FIPS 140-2(2001-10-10) Monobit: 546
+rngtest: FIPS 140-2(2001-10-10) Poker: 529
+rngtest: FIPS 140-2(2001-10-10) Runs: 1559
+rngtest: FIPS 140-2(2001-10-10) Long run: 1567
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3236198.166; max=6510416.667)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.638; max=152.588)Mibits/s
+rngtest: Program run time: 781617105 microseconds
+rngtest: bits received from input: 108400000032
+rngtest: FIPS 140-2 successes: 5415821
+rngtest: FIPS 140-2 failures: 4179
+rngtest: FIPS 140-2(2001-10-10) Monobit: 549
+rngtest: FIPS 140-2(2001-10-10) Poker: 530
+rngtest: FIPS 140-2(2001-10-10) Runs: 1564
+rngtest: FIPS 140-2(2001-10-10) Long run: 1570
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3242220.806; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.646; max=152.588)Mibits/s
+rngtest: Program run time: 784407689 microseconds
+rngtest: bits received from input: 108800000032
+rngtest: FIPS 140-2 successes: 5435805
+rngtest: FIPS 140-2 failures: 4195
+rngtest: FIPS 140-2(2001-10-10) Monobit: 550
+rngtest: FIPS 140-2(2001-10-10) Poker: 531
+rngtest: FIPS 140-2(2001-10-10) Runs: 1570
+rngtest: FIPS 140-2(2001-10-10) Long run: 1578
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3235883.940; max=1395089.286)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.641; max=152.588)Mibits/s
+rngtest: Program run time: 787396799 microseconds
+rngtest: bits received from input: 109200000032
+rngtest: FIPS 140-2 successes: 5455793
+rngtest: FIPS 140-2 failures: 4207
+rngtest: FIPS 140-2(2001-10-10) Monobit: 552
+rngtest: FIPS 140-2(2001-10-10) Poker: 533
+rngtest: FIPS 140-2(2001-10-10) Runs: 1574
+rngtest: FIPS 140-2(2001-10-10) Long run: 1582
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3241196.293; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.657; max=152.588)Mibits/s
+rngtest: Program run time: 790150908 microseconds
+rngtest: bits received from input: 109600000032
+rngtest: FIPS 140-2 successes: 5475772
+rngtest: FIPS 140-2 failures: 4228
+rngtest: FIPS 140-2(2001-10-10) Monobit: 556
+rngtest: FIPS 140-2(2001-10-10) Poker: 537
+rngtest: FIPS 140-2(2001-10-10) Runs: 1580
+rngtest: FIPS 140-2(2001-10-10) Long run: 1589
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3237416.328; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.665; max=152.588)Mibits/s
+rngtest: Program run time: 793035899 microseconds
 rngtest: bits received from input: 110000000032
-rngtest: FIPS 140-2 successes: 5495620
-rngtest: FIPS 140-2 failures: 4380
-rngtest: FIPS 140-2(2001-10-10) Monobit: 584
-rngtest: FIPS 140-2(2001-10-10) Poker: 552
-rngtest: FIPS 140-2(2001-10-10) Runs: 1631
-rngtest: FIPS 140-2(2001-10-10) Long run: 1646
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=129226585.290; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.576; max=151.377)Mibits/s
-rngtest: Program run time: 1572441771 microseconds
+rngtest: FIPS 140-2 successes: 5495760
+rngtest: FIPS 140-2 failures: 4240
+rngtest: FIPS 140-2(2001-10-10) Monobit: 559
+rngtest: FIPS 140-2(2001-10-10) Poker: 538
+rngtest: FIPS 140-2(2001-10-10) Runs: 1584
+rngtest: FIPS 140-2(2001-10-10) Long run: 1593
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3239288.409; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.677; max=152.588)Mibits/s
+rngtest: Program run time: 795844306 microseconds
+rngtest: bits received from input: 110400000032
+rngtest: FIPS 140-2 successes: 5515743
+rngtest: FIPS 140-2 failures: 4257
+rngtest: FIPS 140-2(2001-10-10) Monobit: 563
+rngtest: FIPS 140-2(2001-10-10) Poker: 540
+rngtest: FIPS 140-2(2001-10-10) Runs: 1591
+rngtest: FIPS 140-2(2001-10-10) Long run: 1597
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=167773.975; avg=3314919316.846; max=0.000)bits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.666; max=152.588)Mibits/s
+rngtest: Program run time: 798819971 microseconds
+rngtest: bits received from input: 110800000032
+rngtest: FIPS 140-2 successes: 5535728
+rngtest: FIPS 140-2 failures: 4272
+rngtest: FIPS 140-2(2001-10-10) Monobit: 564
+rngtest: FIPS 140-2(2001-10-10) Poker: 540
+rngtest: FIPS 140-2(2001-10-10) Runs: 1597
+rngtest: FIPS 140-2(2001-10-10) Long run: 1605
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3234941.773; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.662; max=152.588)Mibits/s
+rngtest: Program run time: 801765116 microseconds
+rngtest: bits received from input: 111200000032
+rngtest: FIPS 140-2 successes: 5555715
+rngtest: FIPS 140-2 failures: 4285
+rngtest: FIPS 140-2(2001-10-10) Monobit: 568
+rngtest: FIPS 140-2(2001-10-10) Poker: 541
+rngtest: FIPS 140-2(2001-10-10) Runs: 1599
+rngtest: FIPS 140-2(2001-10-10) Long run: 1611
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3234929.418; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.660; max=152.588)Mibits/s
+rngtest: Program run time: 804668538 microseconds
+rngtest: bits received from input: 111600000032
+rngtest: FIPS 140-2 successes: 5575695
+rngtest: FIPS 140-2 failures: 4305
+rngtest: FIPS 140-2(2001-10-10) Monobit: 571
+rngtest: FIPS 140-2(2001-10-10) Poker: 545
+rngtest: FIPS 140-2(2001-10-10) Runs: 1605
+rngtest: FIPS 140-2(2001-10-10) Long run: 1618
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3234723.490; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.682; max=152.588)Mibits/s
+rngtest: Program run time: 807440896 microseconds
 rngtest: entropy source exhausted!
 rngtest: bits received from input: 111669149696
-rngtest: FIPS 140-2 successes: 5579014
-rngtest: FIPS 140-2 failures: 4443
-rngtest: FIPS 140-2(2001-10-10) Monobit: 587
-rngtest: FIPS 140-2(2001-10-10) Poker: 561
-rngtest: FIPS 140-2(2001-10-10) Runs: 1651
-rngtest: FIPS 140-2(2001-10-10) Long run: 1677
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=38283.593; avg=131157971.903; max=0.000)bits/s
-rngtest: FIPS tests speed: (min=65.998; avg=145.593; max=151.377)Mibits/s
-rngtest: Program run time: 1583488776 microseconds
+rngtest: FIPS 140-2 successes: 5579151
+rngtest: FIPS 140-2 failures: 4306
+rngtest: FIPS 140-2(2001-10-10) Monobit: 571
+rngtest: FIPS 140-2(2001-10-10) Poker: 545
+rngtest: FIPS 140-2(2001-10-10) Runs: 1605
+rngtest: FIPS 140-2(2001-10-10) Long run: 1619
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 1
+rngtest: input channel speed: (min=163.842; avg=3235529.986; max=19531250.000)Kibits/s
+rngtest: FIPS tests speed: (min=13.663; avg=137.680; max=152.588)Mibits/s
+rngtest: Program run time: 807943393 microseconds
 
-Script done on Sat 22 Oct 2011 04:19:05 PM JST
+Script done on Mon 27 Aug 2012 04:00:44 PM JST
