@@ -1,3 +1,7 @@
+2012-08-30  Niibe Yutaka  <gniibe@fsij.org>
+
+	* Version 0.02.
+
 2012-08-27  Niibe Yutaka  <gniibe@fsij.org>
 
 	Use WELL random number generator to whiten noise input.

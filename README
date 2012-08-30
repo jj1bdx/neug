@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
 							   Version 0.02
-							     2012-09-XX
+							     2012-08-30
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -25,10 +25,10 @@ too.
 Release notes
 =============
 
-This is the second release of NeuG, which is experimental.  You can
-enjoy NeuG device, but I don't know how it is good yet.  Note that you
-need the snapshot of ChibiOS/RT (from trunk).  This means that it is
-covered by GNU GPL.  No "linking exception" option is available for
+This is the third release of NeuG, which is still experimental.  You
+can enjoy NeuG device, but I'm not sure how it is good yet.  Note that
+you need the snapshot of ChibiOS/RT (from trunk).  This means that it
+is covered by GNU GPL.  No "linking exception" option is available for
 the snapshot.
 
 
@@ -36,19 +36,28 @@ FAQ
 ===
 
 Q0: How NeuG device is good?
-A0: I believe it's good enough.  I evaluated it with rngtest of
-    RNG-tools, NIST STS test and Dieharder.
+A0: I believe it's good enough if we compare to other hardware RNGs.
+    If its usage is as an entropy source for RNG-tools, or use for
+    computer simulations, I think that it's good enough.  I evaluated
+    it with rngtest of RNG-tools, NIST STS test suite and Dieharder.
     See the directory neug/test-results/.
-A0-dash: For better entropy device, you can get EntropyKey.
-         See http://www.entropykey.co.uk/
-A0-double-dash: STM32F2xx has built-in TRNG, it would be better for you.
+    For important cryptographic usage, such as generating keys or use
+    for ECC, I think that we need more evaluations under severe
+    condition (e.g., lower ALPHA (say, 0.001) in NIST STS test suite
+    and more number of streams (say, 10000)).
+A0-dash: For better entropy device with embedded test, you could get
+         EntropyKey.  See http://www.entropykey.co.uk/
+A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
+                be better for you (although the quality of randomness
+                looks not that good).
 
 Q1: How fast is NeuG device?
 A1: It's something around 30 Ki-byte/second.
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  It's not implemented yet, and I don't have an
-    good idea how to implement.  Please let me know your idea.
+    good idea how to implement such a feature with limited resource
+    of STM32F103.  Please let me know your idea.
 
 
 Targets
@@ -187,7 +196,12 @@ Since the noise source is not "white", signal is whiten by this WELL
 more than 6 bit/byte entropy.  So, we put 6-byte (36-bit) to get
 4-byte (32-bit) output.
 
-I don't know how stable the noise source is.
+I don't know how stable the noise source is.  My experience with
+STM32F103 and NeuG shows that it's stable at least for a year.
+
+For WELL Random Number Generator, please visit:
+
+   http://www.iro.umontreal.ca/~panneton/WELLRNG.html
 
 
 Test results
