@@ -7,3 +7,5 @@ neug.map
 config.h
 Makefile
 .dep
+usb-strings.c.inc
+usb-vid-pid-ver.c.inc

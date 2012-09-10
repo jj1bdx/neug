@@ -1,3 +1,11 @@
+2012-09-10  Niibe Yutaka  <gniibe@fsij.org>
+
+	* NEUG_USB_DEVICE_ID: New file.
+
+	* src/main.c: Include usb-vid-pid-ver.c.inc and usb-strings.c.inc.
+
+	* src/configure (vidpid): New.
+
 2012-08-30  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.02.

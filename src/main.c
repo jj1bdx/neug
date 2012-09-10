@@ -59,9 +59,7 @@ static const uint8_t vcom_device_desc[18] = {
   0x00,				/* bDeviceSubClass.                 */
   0x00,				/* bDeviceProtocol.                 */
   0x40,				/* bMaxPacketSize.                  */
-  0x4b, 0x23,			/* idVendor (FSIJ).                 */
-  0x01, 0x00,			/* idProduct (NeoG).                */
-  0x00, 0x01,			/* bcdDevice.                       */
+#include "usb-vid-pid-ver.c.inc"
   1,				/* iManufacturer.                   */
   2,				/* iProduct.                        */
   3,				/* iSerialNumber.                   */
@@ -161,29 +159,8 @@ static const uint8_t vcom_string0[4] = {
   0x09, 0x04			/* LangID = 0x0409: US-English */
 };
 
-/*
- * Vendor string.
- */
-static const uint8_t vcom_string1[68] = {
-  68,                    /* bLength.                         */
-  USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType.                 */
-  /* Manufacturer: "Free Software Initiative of Japan" */
-  'F', 0, 'r', 0, 'e', 0, 'e', 0, ' ', 0, 'S', 0, 'o', 0, 'f', 0,
-  't', 0, 'w', 0, 'a', 0, 'r', 0, 'e', 0, ' ', 0, 'I', 0, 'n', 0,
-  'i', 0, 't', 0, 'i', 0, 'a', 0, 't', 0, 'i', 0, 'v', 0, 'e', 0,
-  ' ', 0, 'o', 0, 'f', 0, ' ', 0, 'J', 0, 'a', 0, 'p', 0, 'a', 0,
-  'n', 0
-};
-
-/*
- * Device Description string.
- */
-static const uint8_t vcom_string2[18] = {
-  18,                    /* bLength.                         */
-  USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType.                 */
-  /* Product name: "NeuG RNG" */
-  'N', 0, 'e', 0, 'u', 0, 'G', 0, ' ', 0, 'R', 0, 'N', 0, 'G', 0,
-};
+#define USB_STRINGS_FOR_NEUG 1
+#include "usb-strings.c.inc"
 
 /*
  * Serial Number string.  NOTE: This does not have CONST qualifier.
@@ -211,9 +188,12 @@ static const struct Descriptor config_desc = {
 
 static const struct Descriptor string_descs[] = {
   {vcom_string0, sizeof vcom_string0},
-  {vcom_string1, sizeof vcom_string1},
-  {vcom_string2, sizeof vcom_string2},
-  {vcom_string3, sizeof vcom_string3}
+  {neug_string_vendor, sizeof (neug_string_vendor)},
+  {neug_string_product, sizeof (neug_string_product)},
+  {vcom_string3, sizeof (vcom_string3)},
+  {neug_revision_detail, sizeof (neug_revision_detail)},
+  {neug_config_options, sizeof (neug_config_options)},
+  {sys_version, sizeof (sys_version)},
 };
 
 #define NUM_STRING_DESC (sizeof (string_descs)/sizeof (struct Descriptor))

@@ -183,4 +183,4 @@ include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
 MCFLAGS= -mcpu=$(MCU) -mfix-cortex-m3-ldrd
 
 distclean: clean
-	-rm -f Makefile neug.ld config.h
+	-rm -f Makefile neug.ld config.h usb-strings.c.inc usb-vid-pid-ver.c.inc
