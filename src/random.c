@@ -146,6 +146,101 @@ static uint32_t ep_output (void)
   return epool[ep_count];
 }
 
+#define REPETITION_COUNT           1
+#define ADAPTIVE_PROPORTION_64     2
+#define ADAPTIVE_PROPORTION_4096   4
+
+uint32_t neug_err_state;
+
+static void noise_source_error_reset (void)
+{
+  neug_err_state = 0;
+}
+
+static void noise_source_error (uint32_t err)
+{
+  neug_err_state |= err;
+}
+
+
+#define REPITITION_COUNT_TEST_CUTOFF 6
+
+static uint8_t rct_a;
+static uint8_t rct_b;
+
+static void repetition_count_test (uint8_t sample)
+{
+  if (rct_a == sample)
+    {
+      rct_b++;
+      if (rct_b >= REPITITION_COUNT_TEST_CUTOFF)
+	noise_source_error (REPETITION_COUNT);
+   }
+  else
+    {
+      rct_a = sample;
+      rct_b = 1;
+    }
+}
+
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 9
+
+static uint8_t ap64t_a;
+static uint8_t ap64t_b;
+static uint8_t ap64t_s;
+
+static void adaptive_proportion_64_test (uint8_t sample)
+{
+  if (ap64t_s >= 64)
+    {
+      ap64t_a = sample;
+      ap64t_s = 0;
+      ap64t_b = 0;
+    }
+  else
+    {
+      ap64t_s++;
+      if (ap64t_a == sample)
+	{
+	  ap64t_b++;
+	  if (ap64t_b > ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
+	    noise_source_error (ADAPTIVE_PROPORTION_64);
+	}
+    }
+}
+
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 117
+
+static uint8_t ap4096t_a;
+static uint16_t ap4096t_b;
+static uint16_t ap4096t_s;
+
+static void adaptive_proportion_4096_test (uint8_t sample)
+{
+  if (ap4096t_s >= 4096)
+    {
+      ap4096t_a = sample;
+      ap4096t_s = 0;
+      ap4096t_b = 0;
+    }
+  else
+    {
+      ap4096t_s++;
+      if (ap4096t_a == sample)
+	{
+	  ap4096t_b++;
+	  if (ap4096t_b > ADAPTIVE_PROPORTION_4096_TEST_CUTOFF)
+	    noise_source_error (ADAPTIVE_PROPORTION_4096);
+	}
+    }
+}
+
+static void noise_source_continuous_test (uint8_t noise)
+{
+  repetition_count_test (noise);
+  adaptive_proportion_64_test (noise);
+  adaptive_proportion_4096_test (noise);
+}
 
 /*
  * Ring buffer, filled by generator, consumed by neug_get routine.
@@ -226,6 +321,7 @@ static int rng_gen (struct rng_rb *rb)
        * Put a random byte to entropy pool.
        */
       ep_add (b, PROBABILITY_50_BY_TICK (), round);
+      noise_source_continuous_test (b);
       round++;
       if ((round % NUM_NOISE_INPUTS) == 0)
 	{		            /* We have enough entropy in the pool.  */

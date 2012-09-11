@@ -1,3 +1,9 @@
+2012-09-11  Niibe Yutaka  <gniibe@fsij.org>
+
+	Health tests (SP 800-90b).
+	* src/random.c (repetition_count_test)
+	(adaptive_proportion_64_test, adaptive_proportion_4096_test): New.
+
 2012-09-10  Niibe Yutaka  <gniibe@fsij.org>
 
 	* NEUG_USB_DEVICE_ID: New file.
