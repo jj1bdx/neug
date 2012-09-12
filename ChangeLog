@@ -1,5 +1,7 @@
 2012-09-12  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/sha256.c, src/sha256.h: New (from Gnuk).
+
 	* boards/STBEE/board.h (GPIOD_USB_ENABLE): Fix.
 
 2012-09-11  Niibe Yutaka  <gniibe@fsij.org>
