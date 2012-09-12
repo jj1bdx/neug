@@ -60,7 +60,7 @@
  * IO pins assignments.
  */
 #define GPIOD_LED1             4
-#define GPIOD_USB_DISC         3
+#define GPIOD_USB_ENABLE       3
 #define GPIOA_USER             0
 
 /*
