@@ -22,6 +22,7 @@
  *
  */
 
+#include <string.h>		/* for memcpy */
 #include "config.h"
 
 #include "ch.h"
@@ -83,67 +84,49 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err)
 }
 
 
-#define EPOOL_SIZE (64 / sizeof (uint32_t))
-#define EP_INDEX(cnt, i)  ((cnt + i) & (EPOOL_SIZE - 1))
-#define EP_INCREMENT(cnt) ((cnt + 15) & (EPOOL_SIZE - 1))
+#include "sha256.h"
 
-static uint8_t ep_count;
-static uint32_t epool[EPOOL_SIZE];
-
+static sha256_context sha256_ctx_data;
+static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
 /*
  * We did an experiment of measuring entropy of ADC output with MUST.
  * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
- * So, it is considered OK to get 4-byte from 6-byte (6x6 = 36 > 32).
+ * So, it is considered OK to get 32-byte from 86-byte.  That is, to be a
+ * full entropy source, it is needed to have N samples to output 256-bit
+ * where:
+ *      N = (256 * 2) / <min-entropy of a sample>
  */
-#define NUM_NOISE_INPUTS 6
+#define NUM_NOISE_INPUTS 86
 
-static void well512a_step (void)
+static const uint8_t hash_df_initial_string[5] = {
+  1,          /* counter = 1 */
+  0, 0, 0, 32 /* no_of_bits_returned (big endian) */
+};
+
+static void ep_init (void)
 {
-  uint32_t v = epool[ep_count];	/* V0 */
-  uint32_t z1, z2;
-
-  z1  = (v ^ (v << 16));
-  v = epool[EP_INDEX (ep_count, 13)]; /* VM1 */
-  z1 ^= (v ^ (v << 15));
-  v = epool[EP_INDEX (ep_count, 9)]; /* VM2 */
-  z2 = v ^ (v >> 11);
-  v = z1 ^ z2;
-  
-  /* newV1 */
-  epool[ep_count] = v;
-
-  v = (v ^ ((v<<5) & 0xda442d24U));
-  z1 = (z1 ^ (z1 << 18));
-  z2 = (z2 << 28);
-  ep_count = EP_INCREMENT (ep_count);
-
-  /* newV0 */
-  epool[ep_count] ^= (epool[ep_count] << 2) ^ z1 ^ z2 ^ v;
+  sha256_start (&sha256_ctx_data);
+  sha256_update (&sha256_ctx_data, hash_df_initial_string, 5);
 }
 
-#define FNV_INIT	2166136261U
-#define FNV_PRIME	16777619
-
-static void ep_add (uint8_t entropy_bits, uint8_t another_random_bit,
-		    uint32_t round)
+static void ep_add (uint8_t entropy_bits)
 {
-  uint32_t v = FNV_INIT;
-
-  v ^= entropy_bits;
-  v *= FNV_PRIME;
-  v ^= ((round >> 19) & 0xff) ^ another_random_bit ^ (epool[ep_count] & 1);
-  v *= FNV_PRIME;
-
-  epool[ep_count] ^= v;
-  if ((round % 5) == 0 && another_random_bit)
-    well512a_step ();
+  sha256_update (&sha256_ctx_data, &entropy_bits, 1);
 }
 
-static uint32_t ep_output (void)
+#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
+
+static const uint32_t *ep_output (void)
 {
-  well512a_step ();
-  return epool[ep_count];
+
+  sha256_update (&sha256_ctx_data, (uint8_t *)sha256_output,
+		 SHA256_DIGEST_SIZE);
+  if (PROBABILITY_50_BY_TICK ()) /* Add something by timing */
+    sha256_update (&sha256_ctx_data, hash_df_initial_string, 3);
+  sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
+  ep_init ();
+  return sha256_output;
 }
 
 #define REPETITION_COUNT           1
@@ -291,8 +274,6 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
-#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
-
 /**
  * @brief  Random number generation from ADC sampling.
  * @param  RB: Pointer to ring buffer structure
@@ -302,7 +283,7 @@ static uint32_t rb_del (struct rng_rb *rb)
  */
 static int rng_gen (struct rng_rb *rb)
 {
-  static uint32_t round = 0;
+  uint8_t round = 0;
   uint8_t b;
 
   while (1)
@@ -320,18 +301,27 @@ static int rng_gen (struct rng_rb *rb)
       /*
        * Put a random byte to entropy pool.
        */
-      ep_add (b, PROBABILITY_50_BY_TICK (), round);
+      ep_add (b);
       noise_source_continuous_test (b);
       round++;
-      if ((round % NUM_NOISE_INPUTS) == 0)
-	{		            /* We have enough entropy in the pool.  */
-	  uint32_t v = ep_output (); /* Get the random bits from the pool.  */
+      if (round >= NUM_NOISE_INPUTS)
+	{
+	  /*
+	   * We have enough entropy in the pool.
+	   * Thus, we pull the random bits from the pool.
+	   */
+	  int i;
+	  const uint32_t *vp = ep_output ();
 
-	  /* We got the final random bits, add it to the ring buffer.  */
-	  rb_add (rb, v);
-	  if (rb->full)
-	    /* fully generated */
-	    break;
+	  /* We get the random bits, add it to the ring buffer.  */
+	  for (i = 0; i < SHA256_DIGEST_SIZE / 4; i++)
+	    {
+	      rb_add (rb, *vp);
+	      vp++;
+	      if (rb->full)
+		/* fully generated */
+		return 0;	/* success */
+	    }
 	}
     }
 
@@ -364,7 +354,7 @@ static msg_t rng (void *arg)
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 128);
+static WORKING_AREA(wa_rng, 256);
 
 /**
  * @brief Initialize NeuG.
@@ -374,6 +364,7 @@ neug_init (uint32_t *buf, uint8_t size)
 {
   struct rng_rb *rb = &the_ring_buffer;
 
+  ep_init ();
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
 }
