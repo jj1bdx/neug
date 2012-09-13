@@ -283,6 +283,8 @@ reset (void)
 typedef void (*handler)(void);
 extern uint8_t __ram_end__;
 
+extern const unsigned long *FT0, *FT1, *FT2;
+
 handler vector[] __attribute__ ((section(".vectors"))) = {
   (handler)&__ram_end__,
   reset,
@@ -297,6 +299,9 @@ handler vector[] __attribute__ ((section(".vectors"))) = {
   usb_lld_sys_init,
   usb_lld_sys_shutdown,
   nvic_system_reset,
+  (handler)&FT0,
+  (handler)&FT1,
+  (handler)&FT2,
 };
 
 const uint8_t sys_version[8] __attribute__((section(".sys.version"))) = {

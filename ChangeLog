@@ -1,3 +1,7 @@
+2012-09-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/aes-constant-ft.c: New (from Gnuk).
+
 2012-09-12  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/sha256.c, src/sha256.h: New (from Gnuk).
