@@ -1,3 +1,10 @@
+2012-09-18  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (NUM_NOISE_INPUTS, REPITITION_COUNT_TEST_CUTOFF)
+	(ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
+	(ADAPTIVE_PROPORTION_4096_TEST_CUTOFF): Change for draft SP 800-90b,
+	the section 6.2 "Full Entropy Source Requirements".
+
 2012-09-13  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/aes-constant-ft.c: New (from Gnuk).

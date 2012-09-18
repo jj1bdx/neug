@@ -93,13 +93,32 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  * We did an experiment of measuring entropy of ADC output with MUST.
  * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
  *
- * Further test will be required, but for now we assume min-entropy >= 5.0.
+ * More tests will be required, but for now we assume min-entropy >= 5.0.
  * 
- * To be a full entropy source, it is needed to have N samples to
- * output 256-bit where:
+ * To be a full entropy source, the requirement is to have N samples for
+ * output of 256-bit, where:
+ *
  *      N = (256 * 2) / <min-entropy of a sample>
+ *
+ * For min-entropy = 5.0, N should be more than 103.
+ *
+ * On the other hand, in the section 6.2 "Full Entropy Source Requirements",
+ * it says:
+ *
+ *     At least twice the block size of the underlying cryptographic
+ *     primitive shall be provided as input to the conditioning
+ *     function to produce full entropy output.
+ *
+ * For us, cryptographic primitive is SHA-256 and its blocksize is 512-bit
+ * (64-byte), N >= 128.
+ *
+ * We chose N=149, since we love prime number, and we have "additional bits"
+ * of 32-byte for last block (feedback from previous output of SHA-256).
+ *
+ * This corresponds to min-entropy >= 3.44.
+ *
  */
-#define NUM_NOISE_INPUTS 103
+#define NUM_NOISE_INPUTS 149
 
 static const uint8_t hash_df_initial_string[5] = {
   1,          /* counter = 1 */
@@ -154,7 +173,8 @@ static void noise_source_error (uint32_t err)
 }
 
 
-#define REPITITION_COUNT_TEST_CUTOFF 7
+/* Cuttoff = 9, when min-entropy = 4.0, W= 2^-30 */
+#define REPITITION_COUNT_TEST_CUTOFF 9
 
 static uint8_t rct_a;
 static uint8_t rct_b;
@@ -174,7 +194,8 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
-#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 12
+/* Cuttoff = 16, when min-entropy = 4.0, W= 2^-30 */
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 16
 
 static uint8_t ap64t_a;
 static uint8_t ap64t_b;
@@ -200,7 +221,8 @@ static void adaptive_proportion_64_test (uint8_t sample)
     }
 }
 
-#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 200
+/* Cuttoff = 354, when min-entropy = 4.0, W= 2^-30 */
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 354
 
 static uint8_t ap4096t_a;
 static uint16_t ap4096t_b;
