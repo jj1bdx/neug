@@ -173,8 +173,9 @@ static void noise_source_error (uint32_t err)
 }
 
 
-/* Cuttoff = 9, when min-entropy = 4.0, W= 2^-30 */
-#define REPITITION_COUNT_TEST_CUTOFF 9
+/* Cuttoff = 10, when min-entropy = 3.5, W= 2^-30 */
+/* ceiling of (1+30/3.5) */
+#define REPITITION_COUNT_TEST_CUTOFF 10
 
 static uint8_t rct_a;
 static uint8_t rct_b;
@@ -194,8 +195,9 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 16, when min-entropy = 4.0, W= 2^-30 */
-#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 16
+/* Cuttoff = 16, when min-entropy = 3.5, W= 2^-30 */
+/* With R, qbinom(1-2^-30,64,2^-3.5) */
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 23
 
 static uint8_t ap64t_a;
 static uint8_t ap64t_b;
@@ -221,8 +223,9 @@ static void adaptive_proportion_64_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 354, when min-entropy = 4.0, W= 2^-30 */
-#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 354
+/* Cuttoff = 476, when min-entropy = 3.5, W= 2^-30 */
+/* With R, qbinom(1-2^-30,4096,2^-3.5) */
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 476
 
 static uint8_t ap4096t_a;
 static uint16_t ap4096t_b;
