@@ -1,3 +1,13 @@
+2012-09-19  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/neug_upgrade.py: New.
+
+	* src/main.c (main): Support reGNUal.
+	* src/neug.ld.in (__ram_end__): Define.
+	* src/random.c (rng): Finish upon request of termination.
+	(neug_fini): New.
+	* src/neug.h (neug_fini): New.
+
 2012-09-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (NUM_NOISE_INPUTS, REPITITION_COUNT_TEST_CUTOFF)

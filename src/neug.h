@@ -9,3 +9,4 @@ uint32_t neug_get (int kick);
 void neug_kick_filling (void);
 void neug_flush (void);
 void neug_wait_full (void);
+void neug_fini (void);

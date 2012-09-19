@@ -38,6 +38,8 @@
 extern void *memcpy(void *dest, const void *src, size_t n);
 extern void *memset (void *s, int c, size_t n);
 
+static Thread *main_thread = NULL;
+
 
 #define ENDP0_RXADDR        (0x40)
 #define ENDP0_TXADDR        (0x80)
@@ -218,19 +220,24 @@ neug_device_reset (void)
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
 }
 
-#define USB_REGNUAL_MEMINFO	0
-#define USB_REGNUAL_SEND	1
-#define USB_REGNUAL_RESULT	2
-#define USB_REGNUAL_FLASH	3
-#define USB_REGNUAL_PROTECT	4
-#define USB_REGNUAL_FINISH	5
+extern uint8_t _regnual_start, __heap_end__;
 
-static uint8_t mem[256];
-static uint32_t result;
+static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 
-extern uint8_t __flash_start__,  __flash_end__;
-static const uint8_t *const mem_info[] = { &__flash_start__,  &__flash_end__ };
+#define USB_FSIJ_MEMINFO  0
+#define USB_FSIJ_DOWNLOAD 1
+#define USB_FSIJ_EXEC     2
+#define USB_NEUG_EXIT   255	/* exit and receive reGNUal */
 
+enum {
+  FSIJ_DEVICE_RUNNING = 0,
+  FSIJ_DEVICE_EXITED,
+  FSIJ_DEVICE_EXEC_REQUESTED,
+  /**/
+  FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
+}; 
+
+static uint8_t fsij_device_state = FSIJ_DEVICE_RUNNING;
 
 static uint32_t rbit (uint32_t v)
 {
@@ -240,26 +247,23 @@ static uint32_t rbit (uint32_t v)
   return r;
 }
 
-static uint32_t fetch (int i)
+/* After calling this function, CRC module remain enabled.  */
+static int download_check_crc32 (const uint32_t *end_p)
 {
-  uint32_t v;
+  uint32_t crc32 = *end_p;
+  const uint32_t *p;
 
-  v = *(uint32_t *)(&mem[i*4]);
-  return rbit (v);
-}
-
-static uint32_t calc_crc32 (void)
-{
-  int i;
-
+  RCC->AHBENR |= RCC_AHBENR_CRCEN;
   CRC->CR = CRC_CR_RESET;
 
-  for (i = 0; i < 256/4; i++)
-    CRC->DR = fetch (i);
+  for (p = (const uint32_t *)&_regnual_start; p < end_p; p++)
+    CRC->DR = rbit (*p);
 
-  return rbit (CRC->DR);
+  if ((rbit (CRC->DR) ^ crc32) == 0xffffffff)
+    return USB_SUCCESS;
+
+  return USB_UNSUPPORT;
 }
-
 
 static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
 				    uint16_t value, uint16_t index,
@@ -267,22 +271,15 @@ static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
-  if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT) && USB_SETUP_SET (req))
+  if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT)
+      && USB_SETUP_SET (req) && req_no == USB_FSIJ_EXEC && len == 0)
     {
-      if (req_no == USB_REGNUAL_SEND && value == 0)
-	result = calc_crc32 ();
-      else if (req_no == USB_REGNUAL_FLASH && len == 0 && index == 0)
-	{
-	  uint32_t dst_addr = (0x08000000 + value * 0x100);
+      if (fsij_device_state != FSIJ_DEVICE_EXITED)
+	return;
 
-	  result = flash_write (dst_addr, mem, 256);
-	}
-      else if (req_no == USB_REGNUAL_PROTECT && len == 0
-	       && value == 0 && index == 0)
-	result = flash_protect ();
-      else if (req_no == USB_REGNUAL_FINISH && len == 0
-	       && value == 0 && index == 0)
-	nvic_system_reset ();
+      (void)value; (void)index;
+      usb_lld_prepare_shutdown (); /* No further USB communication */
+      fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
     }
 }
 
@@ -350,43 +347,50 @@ neug_setup (uint8_t req, uint8_t req_no,
     {
       if (USB_SETUP_GET (req))
 	{
-	  if (req_no == USB_REGNUAL_MEMINFO)
+	  if (req_no == USB_FSIJ_MEMINFO)
 	    {
 	      usb_lld_set_data_to_send (mem_info, sizeof (mem_info));
-	      return USB_SUCCESS;
-	    }
-	  else if (req_no == USB_REGNUAL_RESULT)
-	    {
-	      usb_lld_set_data_to_send (&result, sizeof (uint32_t));
 	      return USB_SUCCESS;
 	    }
 	}
       else /* SETUP_SET */
 	{
-	  if (req_no == USB_REGNUAL_SEND)
+	  uint8_t *addr = (uint8_t *)(0x20000000 + value * 0x100 + index);
+
+	  if (req_no == USB_FSIJ_DOWNLOAD)
 	    {
-	      if (value != 0 || index + len > 256)
+	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
+		return USB_UNSUPPORT;
+
+	      if (addr < &_regnual_start || addr + len > &__heap_end__)
 		return USB_UNSUPPORT;
 
 	      if (index + len < 256)
-		memset (mem + index + len, 0xff, 256 - (index + len));
+		memset (addr + index + len, 0, 256 - (index + len));
 
-	      usb_lld_set_data_to_recv (mem + index, len);
+	      usb_lld_set_data_to_recv (addr, len);
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_REGNUAL_FLASH && len == 0 && index == 0)
+	  else if (req_no == USB_FSIJ_EXEC && len == 0)
 	    {
-	      uint32_t dst_addr = (0x08000000 + value * 0x100);
+	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
+		return USB_UNSUPPORT;
 
-	      if (dst_addr + 256 <= (uint32_t)&__flash_end__)
-		return USB_SUCCESS;
+	      if (((uint32_t)addr & 0x03))
+		return USB_UNSUPPORT;
+
+	      return download_check_crc32 ((uint32_t *)addr);
 	    }
-	  else if (req_no == USB_REGNUAL_PROTECT && len == 0
-		   && value == 0 && index == 0)
-	    return USB_SUCCESS;
-	  else if (req_no == USB_REGNUAL_FINISH && len == 0
-		   && value == 0 && index == 0)
-	    return USB_SUCCESS;
+	  else if (req_no == USB_NEUG_EXIT && len == 0)
+	    {
+	      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+		return USB_UNSUPPORT;
+
+	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
+	      chEvtSignalFlagsI (main_thread, 1);
+	      chSchReadyI (main_thread);
+	      return USB_SUCCESS;
+	    }
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT))
@@ -556,8 +560,6 @@ static void fill_serial_no_by_unique_id (void)
     }
 }
 
-static Thread *main_thread = NULL;
-
 CH_IRQ_HANDLER (Vector90)
 {
   CH_IRQ_PROLOGUE();
@@ -613,6 +615,9 @@ static msg_t led_blinker (void *arg)
       eventmask_t m;
 
       m = chEvtWaitOne (ALL_EVENTS);
+      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	break;
+
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
 	chThdSleep (MS2ST (100));
@@ -655,22 +660,31 @@ main (int argc, char **argv)
     {
       unsigned int count = 0;
 
+      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	break;
+
       connected = 0;
       while (count < NEUG_PRE_LOOP || bDeviceState != CONFIGURED)
 	{
+	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	    break;
+
 	  (void)neug_get (NEUG_KICK_FILLING);
 	  if ((count & 0x000f) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
-	  chThdSleep (MS2ST (25));
+	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (25));
 	  count++;
 	}
 
     waiting_connection:
       while ((connected & 1) == 0)
 	{
+	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	    break;
+
 	  neug_flush ();
 	  chEvtSignalFlags (led_thread, LED_ONESHOT_LONG);
-	  chThdSleep (MS2ST (2500));
+	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (2500));
 	}
 
       /* The connection opened.  */
@@ -678,6 +692,9 @@ main (int argc, char **argv)
 
       while (1)
 	{
+	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	    break;
+
 	  if ((connected & 1) == 0)
 	    goto waiting_connection;
 
@@ -701,5 +718,54 @@ main (int argc, char **argv)
 	}
     }
 
+  /*
+   * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED.
+   */
+  neug_fini ();
+
+  chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
+  chThdWait (led_thread);
+
+  fsij_device_state = FSIJ_DEVICE_EXITED;
+
+  while (fsij_device_state == FSIJ_DEVICE_EXITED)
+    chThdSleep (MS2ST (500));
+
+  flash_unlock ();		/* Flash unlock should be done here */
+  set_led (1);
+  usb_lld_shutdown ();
+  /* Disable SysTick */
+  SysTick->CTRL = 0;
+  /* Disable all interrupts */
+  port_disable ();
+  /* Set vector */
+  SCB->VTOR = (uint32_t)&_regnual_start;
+#ifdef DFU_SUPPORT
+#define FLASH_SYS_START_ADDR 0x08000000
+#define FLASH_SYS_END_ADDR (0x08000000+0x1000)
+  {
+    extern uint8_t _sys;
+    uint32_t addr;
+    handler *new_vector = (handler *)FLASH_SYS_START_ADDR;
+    void (*func) (void (*)(void)) = (void (*)(void (*)(void)))new_vector[10];
+
+    /* Kill DFU */
+    for (addr = FLASH_SYS_START_ADDR; addr < FLASH_SYS_END_ADDR;
+	 addr += FLASH_PAGE_SIZE)
+      flash_erase_page (addr);
+
+    /* copy system service routines */
+    flash_write (FLASH_SYS_START_ADDR, &_sys, 0x1000);
+
+    /* Leave NeuG to exec reGNUal */
+    (*func) (*((void (**)(void))(&_regnual_start+4)));
+    for (;;);
+  }
+#else
+  /* Leave NeuG to exec reGNUal */
+  flash_erase_all_and_exec (*((void (**)(void))(&_regnual_start+4)));
+#endif
+
+  /* Never reached */
   return 0;
 }

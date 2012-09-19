@@ -157,14 +157,17 @@ SECTIONS
         PROVIDE(_bss_end = .);
     } > ram
 
+    PROVIDE(end = .);
+    _end            = .;
+    . = ALIGN(512);
+    /* it is at offset 0x1400 from ram start */
+    _regnual_start = __ram_start__ + 0x1400;
+
     .fill_ffff :
     {
         . = ALIGN (@FLASH_PAGE_SIZE@);
     } > flash =0xffffffff
 }
-
-PROVIDE(end = .);
-_end            = .;
 
 __heap_base__   = _end;
 __heap_end__    = __ram_end__;

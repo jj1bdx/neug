@@ -370,7 +370,7 @@ static msg_t rng (void *arg)
   adcStart (&ADCD1, NULL);
   adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
-  while (1)
+  while (!chThdShouldTerminate ())
     {
       chMtxLock (&rb->m);
       while (rb->full)
@@ -461,4 +461,16 @@ neug_wait_full (void)
   while (!rb->full)
     chCondWait (&rb->data_available);
   chMtxUnlock ();
+}
+
+void
+neug_fini (void)
+{
+  if (rng_thread)
+    {
+      chThdTerminate (rng_thread);
+      neug_get (1);
+      chThdWait (rng_thread);
+      rng_thread = NULL;
+    }
 }
