@@ -112,13 +112,13 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  * For us, cryptographic primitive is SHA-256 and its blocksize is 512-bit
  * (64-byte), N >= 128.
  *
- * We chose N=149, since we love prime number, and we have "additional bits"
+ * We chose N=131, since we love prime number, and we have "additional bits"
  * of 32-byte for last block (feedback from previous output of SHA-256).
  *
- * This corresponds to min-entropy >= 3.44.
+ * This corresponds to min-entropy >= 3.91.
  *
  */
-#define NUM_NOISE_INPUTS 149
+#define NUM_NOISE_INPUTS 131
 
 static const uint8_t hash_df_initial_string[5] = {
   1,          /* counter = 1 */
@@ -173,9 +173,9 @@ static void noise_source_error (uint32_t err)
 }
 
 
-/* Cuttoff = 10, when min-entropy = 3.5, W= 2^-30 */
-/* ceiling of (1+30/3.5) */
-#define REPITITION_COUNT_TEST_CUTOFF 10
+/* Cuttoff = 9, when min-entropy = 4.0, W= 2^-30 */
+/* ceiling of (1+30/4.0) */
+#define REPITITION_COUNT_TEST_CUTOFF 9
 
 static uint8_t rct_a;
 static uint8_t rct_b;
@@ -195,9 +195,9 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 16, when min-entropy = 3.5, W= 2^-30 */
-/* With R, qbinom(1-2^-30,64,2^-3.5) */
-#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 23
+/* Cuttoff = 20, when min-entropy = 4.0, W= 2^-30 */
+/* With R, qbinom(1-2^-30,64,2^-4.0) */
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 20
 
 static uint8_t ap64t_a;
 static uint8_t ap64t_b;
@@ -223,9 +223,9 @@ static void adaptive_proportion_64_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 476, when min-entropy = 3.5, W= 2^-30 */
-/* With R, qbinom(1-2^-30,4096,2^-3.5) */
-#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 476
+/* Cuttoff = 354, when min-entropy = 4.0, W= 2^-30 */
+/* With R, qbinom(1-2^-30,4096,2^-4.0) */
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 354
 
 static uint8_t ap4096t_a;
 static uint16_t ap4096t_b;

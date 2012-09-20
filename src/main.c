@@ -204,6 +204,8 @@ static const struct Descriptor string_descs[] = {
 
 uint32_t bDeviceState = UNCONNECTED; /* USB device status */
 
+#define NEUG_WAIT_FOR_TX_READY 1
+static uint8_t neug_state;
 
 static void
 neug_device_reset (void)
@@ -274,20 +276,29 @@ static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
 
   if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT)
       && USB_SETUP_SET (req) && len == 0)
-    if (req_no == USB_FSIJ_EXEC)
-      {
-	if (fsij_device_state != FSIJ_DEVICE_EXITED)
-	  return;
+    {
+      if (req_no == USB_FSIJ_EXEC)
+	{
+	  if (fsij_device_state != FSIJ_DEVICE_EXITED)
+	    return;
 
-	(void)value; (void)index;
-	usb_lld_prepare_shutdown (); /* No further USB communication */
-	fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
-      }
-    else if (req_no == USB_NEUG_EXIT)
-      {
-	chEvtSignalFlagsI (main_thread, 1);
-	chSchReadyI (main_thread);
-      }
+	  (void)value; (void)index;
+	  usb_lld_prepare_shutdown (); /* No further USB communication */
+	  fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
+	}
+      else if (req_no == USB_NEUG_EXIT)
+	{
+	  if (neug_state == NEUG_WAIT_FOR_TX_READY)
+	    {
+	      chSysLockFromIsr ();
+	      main_thread->p_u.rdymsg = RDY_OK;
+	      chSchReadyI (main_thread);
+	      chSysUnlockFromIsr ();
+	    }
+	  else
+	    chEvtSignalFlagsI (main_thread, 1);
+	}
+    }
 }
 
 struct line_coding
@@ -334,8 +345,20 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
 		connected++;
 	    }
 	  else
-	    /* Close call */
-	    connected++;
+	    {
+	      if (connected)
+		{
+		  /* Close call */
+		  connected = 0;
+		  if (neug_state == NEUG_WAIT_FOR_TX_READY)
+		    {
+		      chSysLockFromIsr ();
+		      main_thread->p_u.rdymsg = RDY_OK;
+		      chSchReadyI (main_thread);
+		      chSysUnlockFromIsr ();
+		    }
+		}
+	    }
 
 	  return USB_SUCCESS;
 	}
@@ -601,8 +624,9 @@ EP3_OUT_Callback (void)
 
 static WORKING_AREA(wa_led, 64);
 
-#define LED_ONESHOT_SHORT ((eventmask_t)1)
-#define LED_ONESHOT_LONG  ((eventmask_t)2)
+#define LED_ONESHOT_SHORT	((eventmask_t)1)
+#define LED_TWOSHOTS		((eventmask_t)2)
+#define LED_ONESHOT_LONG	((eventmask_t)4)
 static Thread *led_thread;
 
 /*
@@ -626,6 +650,14 @@ static msg_t led_blinker (void *arg)
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
 	chThdSleep (MS2ST (100));
+      else if (m == LED_TWOSHOTS)
+	{
+	  chThdSleep (MS2ST (50));
+	  set_led (0);
+	  chThdSleep (MS2ST (50));
+	  set_led (1);
+	  chThdSleep (MS2ST (50));
+	}
       else
 	chThdSleep (MS2ST (250));
       set_led (0);
@@ -664,7 +696,6 @@ main (int argc, char **argv)
   while (1)
     {
       unsigned int count = 0;
-      uint32_t bitrate_saved;
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
@@ -683,29 +714,24 @@ main (int argc, char **argv)
 	}
 
     waiting_connection:
-      bitrate_saved = line_coding.bitrate;
-      while ((connected & 1) == 0)
+      while (connected == 0)
 	{
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;
 
 	  neug_flush ();
-	  chEvtSignalFlags (led_thread, LED_ONESHOT_LONG);
-	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (2500));
+	  chEvtSignalFlags (led_thread, LED_TWOSHOTS);
+	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (5000));
 	}
 
       /* The connection opened.  */
       count = 0;
-      if (bitrate_saved != line_coding.bitrate)
-	neug_select (line_coding.bitrate != 115200);
+      neug_select (line_coding.bitrate != 115200);
 
       while (1)
 	{
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;
-
-	  if ((connected & 1) == 0)
-	    goto waiting_connection;
 
 	  if (bDeviceState != CONFIGURED)
 	    break;
@@ -719,8 +745,18 @@ main (int argc, char **argv)
 	  neug_flush ();
 
 	  chSysLock ();
-	  usb_lld_tx_enable (ENDP1, RANDOM_BYTES_LENGTH);
-	  chSchGoSleepS (THD_STATE_SUSPENDED);
+	  if (connected == 0)
+	    {
+	      chSysUnlock();
+	      goto waiting_connection;
+	    }
+	  else
+	    {
+	      neug_state = NEUG_WAIT_FOR_TX_READY;
+	      usb_lld_tx_enable (ENDP1, RANDOM_BYTES_LENGTH);
+	      chSchGoSleepS (THD_STATE_SUSPENDED);
+	      neug_state = 0;
+	    }
 	  chSysUnlock();
 
 	  count++;
