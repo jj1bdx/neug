@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 """
-neug_upgrade.py - a tool to upgrade firmware of Gnuk Token
+neug_upgrade.py - a tool to upgrade firmware of Gnuk Token / NeuG device
 
 Copyright (C) 2012 Free Software Initiative of Japan
 Author: NIIBE Yutaka <gniibe@fsij.org>
@@ -156,14 +156,9 @@ class neug(object):
         if interface.interfaceSubClass != COM_SUBCLASS:
             raise ValueError, "Wrong interface sub class"
         self.__devhandle = device.open()
-        try:
-            self.__devhandle.setConfiguration(configuration)
-        except:
-            pass
-
-        self.__devhandle.detachKernelDriver(interface)
-        self.__devhandle.claimInterface(interface)
-        self.__devhandle.setAltInterface(interface)
+        # self.__devhandle.detachKernelDriver(interface)
+        # self.__devhandle.claimInterface(interface)
+        # self.__devhandle.setAltInterface(interface)
 
         self.__intf = interface.interfaceNumber
         self.__alt = interface.alternateSetting
@@ -181,8 +176,8 @@ class neug(object):
         self.__devhandle.controlMsg(requestType = 0x40, request = 255,
                                     value = 0, index = 0, buffer = None,
                                     timeout = 10)
-        self.__devhandle.releaseInterface()
-        self.__devhandle.setConfiguration(0)
+        # self.__devhandle.releaseInterface()
+        # self.__devhandle.setConfiguration(0)
         return
 
     def mem_info(self):

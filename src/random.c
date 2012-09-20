@@ -307,6 +307,8 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
+static uint8_t neug_raw;
+
 /**
  * @brief  Random number generation from ADC sampling.
  * @param  RB: Pointer to ring buffer structure
@@ -317,13 +319,15 @@ static uint32_t rb_del (struct rng_rb *rb)
 static int rng_gen (struct rng_rb *rb)
 {
   uint8_t round = 0;
-  uint8_t b;
+  uint32_t v = 0;
 
   while (1)
     {
+      uint8_t b;
+
       chEvtWaitOne (ADC_DATA_AVAILABLE);
 
-      /* Got, ADC sampling data */
+      /* Got an ADC sampling data */
       b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
 	   | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
 	   | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
@@ -331,29 +335,46 @@ static int rng_gen (struct rng_rb *rb)
 
       adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
-      /*
-       * Put a random byte to entropy pool.
-       */
-      ep_add (b);
       noise_source_continuous_test (b);
-      round++;
-      if (round >= NUM_NOISE_INPUTS)
+      if (neug_raw)
+	{
+	  v |= (b << (round * 8));
+	  round++;
+	  if (round >= 4)
+	    {
+	      rb_add (rb, v);
+	      if (rb->full)
+		return 0;
+	      v = 0;
+	      round = 0;
+	    }
+	}
+      else
 	{
 	  /*
-	   * We have enough entropy in the pool.
-	   * Thus, we pull the random bits from the pool.
+	   * Put a random byte to entropy pool.
 	   */
-	  int i;
-	  const uint32_t *vp = ep_output ();
-
-	  /* We get the random bits, add it to the ring buffer.  */
-	  for (i = 0; i < SHA256_DIGEST_SIZE / 4; i++)
+	  ep_add (b);
+	  round++;
+	  if (round >= NUM_NOISE_INPUTS)
 	    {
-	      rb_add (rb, *vp);
-	      vp++;
-	      if (rb->full)
-		/* fully generated */
-		return 0;	/* success */
+	      /*
+	       * We have enough entropy in the pool.
+	       * Thus, we pull the random bits from the pool.
+	       */
+	      int i;
+	      const uint32_t *vp = ep_output ();
+
+	      /* We get the random bits, add it to the ring buffer.  */
+	      for (i = 0; i < SHA256_DIGEST_SIZE / 4; i++)
+		{
+		  rb_add (rb, *vp);
+		  vp++;
+		  if (rb->full)
+		    return 0;
+		}
+
+	      round = 0;
 	    }
 	}
     }
@@ -397,6 +418,7 @@ neug_init (uint32_t *buf, uint8_t size)
 {
   struct rng_rb *rb = &the_ring_buffer;
 
+  neug_raw = 0;
   ep_init ();
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
@@ -476,4 +498,12 @@ neug_fini (void)
       chThdWait (rng_thread);
       rng_thread = NULL;
     }
+}
+
+void
+neug_select (uint8_t raw)
+{
+  neug_wait_full ();
+  neug_raw = raw;
+  neug_flush ();
 }

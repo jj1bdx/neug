@@ -10,3 +10,4 @@ void neug_kick_filling (void);
 void neug_flush (void);
 void neug_wait_full (void);
 void neug_fini (void);
+void neug_select (uint8_t raw);

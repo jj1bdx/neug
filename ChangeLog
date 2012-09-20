@@ -1,5 +1,11 @@
 2012-09-19  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (main): Call neug_select.
+	* src/random.c (neug_select): New.
+	(rng_gen): Implement Raw output.
+
+2012-09-19  Niibe Yutaka  <gniibe@fsij.org>
+
 	* tool/neug_upgrade.py: New.
 
 	* src/main.c (main): Support reGNUal.

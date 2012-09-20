@@ -224,10 +224,11 @@ extern uint8_t _regnual_start, __heap_end__;
 
 static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 
-#define USB_FSIJ_MEMINFO  0
-#define USB_FSIJ_DOWNLOAD 1
-#define USB_FSIJ_EXEC     2
-#define USB_NEUG_EXIT   255	/* exit and receive reGNUal */
+/* USB vendor requests to control pipe */
+#define USB_FSIJ_MEMINFO	  0
+#define USB_FSIJ_DOWNLOAD	  1
+#define USB_FSIJ_EXEC		  2
+#define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
 
 enum {
   FSIJ_DEVICE_RUNNING = 0,
@@ -272,15 +273,21 @@ static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
   if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT)
-      && USB_SETUP_SET (req) && req_no == USB_FSIJ_EXEC && len == 0)
-    {
-      if (fsij_device_state != FSIJ_DEVICE_EXITED)
-	return;
+      && USB_SETUP_SET (req) && len == 0)
+    if (req_no == USB_FSIJ_EXEC)
+      {
+	if (fsij_device_state != FSIJ_DEVICE_EXITED)
+	  return;
 
-      (void)value; (void)index;
-      usb_lld_prepare_shutdown (); /* No further USB communication */
-      fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
-    }
+	(void)value; (void)index;
+	usb_lld_prepare_shutdown (); /* No further USB communication */
+	fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
+      }
+    else if (req_no == USB_NEUG_EXIT)
+      {
+	chEvtSignalFlagsI (main_thread, 1);
+	chSchReadyI (main_thread);
+      }
 }
 
 struct line_coding
@@ -387,8 +394,6 @@ neug_setup (uint8_t req, uint8_t req_no,
 		return USB_UNSUPPORT;
 
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
-	      chEvtSignalFlagsI (main_thread, 1);
-	      chSchReadyI (main_thread);
 	      return USB_SUCCESS;
 	    }
 	}
@@ -659,6 +664,7 @@ main (int argc, char **argv)
   while (1)
     {
       unsigned int count = 0;
+      uint32_t bitrate_saved;
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
@@ -677,6 +683,7 @@ main (int argc, char **argv)
 	}
 
     waiting_connection:
+      bitrate_saved = line_coding.bitrate;
       while ((connected & 1) == 0)
 	{
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -689,6 +696,8 @@ main (int argc, char **argv)
 
       /* The connection opened.  */
       count = 0;
+      if (bitrate_saved != line_coding.bitrate)
+	neug_select (line_coding.bitrate != 115200);
 
       while (1)
 	{
