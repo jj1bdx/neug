@@ -726,7 +726,11 @@ main (int argc, char **argv)
 
       /* The connection opened.  */
       count = 0;
-      neug_select (line_coding.bitrate != 115200);
+      /*
+       * No parity is standard.  It means to provide conditioned output.
+       * When parity enabled, it means to provide raw output.
+       */
+      neug_select (line_coding.paritytype != 0);
 
       while (1)
 	{
