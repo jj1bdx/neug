@@ -122,7 +122,7 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
 static const uint8_t hash_df_initial_string[5] = {
   1,          /* counter = 1 */
-  0, 0, 0, 32 /* no_of_bits_returned (big endian) */
+  0, 0, 1, 0  /* no_of_bits_returned (big endian) */
 };
 
 static void ep_init (void)
@@ -166,10 +166,6 @@ static void noise_source_error_reset (void)
 static void noise_source_error (uint32_t err)
 {
   neug_err_state |= err;
-#include "board.h"
-#if defined(BOARD_STBEE_MINI)
-  palClearPad (GPIOA, GPIOA_LED2);
-#endif
 }
 
 
@@ -399,7 +395,18 @@ static msg_t rng (void *arg)
       chMtxLock (&rb->m);
       while (rb->full)
 	chCondWait (&rb->space_available);
-      rng_gen (rb);
+      while (1)
+	{
+	  rng_gen (rb);
+	  if (neug_err_state != 0)
+	    {
+	      while (!rb->empty)
+		(void)rb_del (rb);
+	      noise_source_error_reset ();
+	    }
+	  else
+	    break;
+	}
       chCondSignal (&rb->data_available);
       chMtxUnlock ();
     }

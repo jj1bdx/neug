@@ -3,6 +3,8 @@
 	* src/main.c (main): Call neug_select.
 	* src/random.c (neug_select): New.
 	(rng_gen): Implement Raw output.
+	(hash_df_initial_string): Fix (was: 32, no of bytes).
+	(rng): Implement error recovery.
 
 2012-09-19  Niibe Yutaka  <gniibe@fsij.org>
 
