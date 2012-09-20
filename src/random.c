@@ -140,8 +140,13 @@ static void ep_add (uint8_t entropy_bits)
 
 static const uint32_t *ep_output (void)
 {
-  int n = (SHA256_BLOCK_SIZE - 9) - 
-    ((5 + NUM_NOISE_INPUTS) % SHA256_BLOCK_SIZE);
+#if ((SHA256_BLOCK_SIZE - 9) - ((5 + NUM_NOISE_INPUTS) % SHA256_BLOCK_SIZE)) \
+    > SHA256_DIGEST_SIZE
+  int n = SHA256_DIGEST_SIZE;
+#else
+  int n = (SHA256_BLOCK_SIZE - 9)
+    - ((5 + NUM_NOISE_INPUTS) % SHA256_BLOCK_SIZE);
+#endif
 
   if (PROBABILITY_50_BY_TICK ())
     n = n - 3;
