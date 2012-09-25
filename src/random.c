@@ -47,9 +47,10 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err);
 
 /*
  * ADC conversion group.
- * Mode:        Linear buffer, 4 samples of 2 channels, SW triggered.
- * Channels:    Vref   (1.5 cycles sample time, violating the spec.)
- *              Sensor (1.5 cycles sample time, violating the spec.)
+ * Mode:     Linear buffer, 4 samples of 2 channels, SW triggered.
+ * Channels:
+ *    IN10 (1.5 cycles sample time, port configured as push pull output 50MHz)
+ *    IN11 (1.5 cycles sample time, port configured as push pull output 50MHz)
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,
@@ -57,12 +58,12 @@ static const ADCConversionGroup adcgrpcfg = {
   adccb,
   adccb_err,
   0,
-  ADC_CR2_TSVREFE,
-  ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5),
+  0,
+  ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_AN11(ADC_SAMPLE_1P5),
   0,
   ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS),
   0,
-  ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR) | ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
+  ADC_SQR3_SQ2_N(ADC_CHANNEL_IN10) | ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11)
 };
 
 /*

@@ -1,3 +1,14 @@
+2012-09-25  Niibe Yutaka  <gniibe@fsij.org>
+
+	* boards/STM8S_DISCOVERY/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
+	12MHz ADC clock gives us more speed.
+
+	* boards/STM8S_DISCOVERY/board.h (VAL_GPIOCCRL): Digital push pull
+	output 50MHz gives us more entropy.
+
+	* src/random.c (adcgrpcfg): To acquire more entropy and more speed,
+	our choise is IN10 and IN11 (which is unconnected).
+
 2012-09-20  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (main): Call neug_select.
