@@ -32,38 +32,66 @@ static Thread *rng_thread;
 #define ADC_DATA_AVAILABLE ((eventmask_t)1)
 
 /* Total number of channels to be sampled by a single ADC operation.*/
-#define ADC_GRP1_NUM_CHANNELS   2
+#define ADC_GRP1_NUM_CHANNELS   1
  
 /* Depth of the conversion buffer, channels are sampled one time each.*/
-#define ADC_GRP1_BUF_DEPTH      4
- 
+#define ADC_GRP1_BUF_DEPTH      16
+
+static void adc2_start (void)
+{
+  rccEnableAPB2(RCC_APB2ENR_ADC2EN, FALSE);
+  ADC2->CR1 = 0;
+  ADC2->CR2 = ADC_CR2_ADON;
+  ADC2->CR2 = ADC_CR2_ADON | ADC_CR2_RSTCAL;
+  while ((ADC2->CR2 & ADC_CR2_RSTCAL) != 0)
+    ;
+  ADC2->CR2 = ADC_CR2_ADON | ADC_CR2_CAL;
+  while ((ADC2->CR2 & ADC_CR2_CAL) != 0)
+    ;
+  ADC2->CR2 = 0;
+
+  ADC2->CR1 = ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0;
+  ADC2->CR2 = ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON;
+  ADC2->SMPR1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_1P5);
+  ADC2->SMPR2 = 0;
+  ADC2->SQR1 = ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS);
+  ADC2->SQR2 = 0;
+  ADC2->SQR3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11);
+
+  ADC2->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_SWSTART;
+}
+
 /*
  * ADC samples buffer.
  */
-static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
+static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH * 2];
  
 static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static void adccb_err (ADCDriver *adcp, adcerror_t err);
 
 /*
  * ADC conversion group.
- * Mode:     Linear buffer, 4 samples of 2 channels, SW triggered.
+ * Mode: Dual fast interleaved mode.
+ *   ADC1: master, 16 samples of 1 channels.
+ *   ADC2: slave,  16 samples of 1 channels.
  * Channels:
- *    IN10 (1.5 cycles sample time, port configured as push pull output 50MHz)
- *    IN11 (1.5 cycles sample time, port configured as push pull output 50MHz)
+ *   ADC1:
+ *     IN10 (1.5 cycles sample time, port configured as push pull output 50MHz)
+ *   ADC2:
+ *     IN11 (1.5 cycles sample time, port configured as push pull output 50MHz)
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,
   ADC_GRP1_NUM_CHANNELS,
   adccb,
   adccb_err,
-  0,
-  0,
-  ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5) | ADC_SMPR1_SMP_AN11(ADC_SAMPLE_1P5),
+  ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0,
+  ADC_CR2_EXTTRIG | ADC_CR2_SWSTART | ADC_CR2_EXTSEL,
+  ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5),
   0,
   ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS),
   0,
-  ADC_SQR3_SQ2_N(ADC_CHANNEL_IN10) | ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11)
+  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10)
 };
 
 /*
@@ -325,23 +353,49 @@ static int rng_gen (struct rng_rb *rb)
 
   while (1)
     {
-      uint8_t b;
+      uint8_t b0, b1, b2, b3;
 
       chEvtWaitOne (ADC_DATA_AVAILABLE);
 
       /* Got an ADC sampling data */
-      b = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
-	   | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
-	   | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
-	   | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
+      b0 = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
+	    | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
+	    | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
+	    | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
+
+      b1 = (((samp[8] & 0x01) << 0) | ((samp[9] & 0x01) << 1)
+	   | ((samp[10] & 0x01) << 2) | ((samp[11] & 0x01) << 3)
+	   | ((samp[12] & 0x01) << 4) | ((samp[13] & 0x01) << 5)
+	   | ((samp[14] & 0x01) << 6) | ((samp[15] & 0x01) << 7));
+
+      b2 = (((samp[16] & 0x01) << 0) | ((samp[17] & 0x01) << 1)
+	    | ((samp[18] & 0x01) << 2) | ((samp[19] & 0x01) << 3)
+	    | ((samp[20] & 0x01) << 4) | ((samp[21] & 0x01) << 5)
+	    | ((samp[22] & 0x01) << 6) | ((samp[23] & 0x01) << 7));
+
+      b3 = (((samp[24] & 0x01) << 0) | ((samp[25] & 0x01) << 1)
+	   | ((samp[26] & 0x01) << 2) | ((samp[27] & 0x01) << 3)
+	   | ((samp[28] & 0x01) << 4) | ((samp[29] & 0x01) << 5)
+	   | ((samp[30] & 0x01) << 6) | ((samp[31] & 0x01) << 7));
 
       adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
-      noise_source_continuous_test (b);
+      noise_source_continuous_test (b0);
+      noise_source_continuous_test (b1);
+      noise_source_continuous_test (b2);
+      noise_source_continuous_test (b3);
+
       if (neug_raw)
 	{
-	  v |= (b << (round * 8));
+	  v |= (b0 << (round * 8));
 	  round++;
+	  v |= (b1 << (round * 8));
+	  round++;
+	  v |= (b2 << (round * 8));
+	  round++;
+	  v |= (b3 << (round * 8));
+	  round++;
+
 	  if (round >= 4)
 	    {
 	      rb_add (rb, v);
@@ -356,7 +410,13 @@ static int rng_gen (struct rng_rb *rb)
 	  /*
 	   * Put a random byte to entropy pool.
 	   */
-	  ep_add (b);
+	  ep_add (b0);
+	  round++;
+	  ep_add (b1);
+	  round++;
+	  ep_add (b2);
+	  round++;
+	  ep_add (b3);
 	  round++;
 	  if (round >= NUM_NOISE_INPUTS)
 	    {
@@ -394,6 +454,12 @@ static msg_t rng (void *arg)
   rng_thread = chThdSelf ();
 
   adcStart (&ADCD1, NULL);
+  /* Override DMA settings. */
+  ADCD1.dmamode = STM32_DMA_CR_PL(STM32_ADC_ADC1_DMA_PRIORITY)
+    | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD | STM32_DMA_CR_MINC
+    | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE       | STM32_DMA_CR_EN;
+  /* Enable ADC2 */
+  adc2_start ();
   adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
 
   while (!chThdShouldTerminate ())

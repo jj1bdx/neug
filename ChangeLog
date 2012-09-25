@@ -1,8 +1,12 @@
 2012-09-25  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/random.c (adc2_start): New function.
+	(adcgrpcfg): Dual fast interleaved mode.
+	(rng_gen): Four-byte at a time.
+	(rng): Override DMA settings for 32-bit, and call adc2_start.
+
 	* boards/STM8S_DISCOVERY/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
 	12MHz ADC clock gives us more speed.
-
 	* boards/STM8S_DISCOVERY/board.h (VAL_GPIOCCRL): Digital push pull
 	output 50MHz gives us more entropy.
 
