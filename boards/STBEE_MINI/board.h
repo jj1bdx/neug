@@ -110,12 +110,14 @@
 
 /*
  * Port C setup.
+ * PC0  - Push Pull output 50MHz.
+ * PC1  - Push Pull output 50MHz.
  * Everything input with pull-up except:
  * PC13 - Normal input.
  * PC14 - Normal input.
  * PC15 - Normal input.
  */
-#define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
+#define VAL_GPIOCCRL            0x88888833      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x44488888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 

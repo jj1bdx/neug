@@ -1,3 +1,26 @@
+2012-09-26  Niibe Yutaka  <gniibe@fsij.org>
+
+	* boards/STM8S_DISCOVERY/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
+	12MHz ADC clock gives us more speed.
+	* boards/STM8S_DISCOVERY/board.h (VAL_GPIOCCRL): Digital push pull
+	output 50MHz gives us more entropy.
+
+	* boards/STBEE/mcuconf.h (STM32_PPRE2, STM32_ADCPRE): Ditto.
+	* boards/STBEE/board.h (VAL_GPIOCCRL): Ditto.
+
+	* boards/STBEE_MINI/mcuconf.h (STM32_PPRE2, STM32_ADCPRE): Ditto.
+	* boards/STBEE_MINI/board.h (VAL_GPIOCCRL): Ditto.
+
+	* boards/OLIMEX_STM32_H103/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
+	Ditto.
+	* boards/OLIMEX_STM32_H103/board.h (VAL_GPIOCCRL): Ditto.
+
+	* boards/FST_01/mcuconf.h (STM32_PPRE2, STM32_ADCPRE): Ditto.
+	* boards/FST_01/board.h (VAL_GPIOCCRL): Ditto.
+
+	* boards/CQ_STARM/mcuconf.h (STM32_PPRE2, STM32_ADCPRE): Ditto.
+	* boards/CQ_STARM/board.h (VAL_GPIOCCRL): Ditto.
+
 2012-09-25  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (adc2_start): New function.
@@ -5,13 +28,8 @@
 	(rng_gen): Four-byte at a time.
 	(rng): Override DMA settings for 32-bit, and call adc2_start.
 
-	* boards/STM8S_DISCOVERY/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
-	12MHz ADC clock gives us more speed.
-	* boards/STM8S_DISCOVERY/board.h (VAL_GPIOCCRL): Digital push pull
-	output 50MHz gives us more entropy.
-
 	* src/random.c (adcgrpcfg): To acquire more entropy and more speed,
-	our choise is IN10 and IN11 (which is unconnected).
+	our choice is IN10 and IN11 (which is unconnected).
 
 2012-09-20  Niibe Yutaka  <gniibe@fsij.org>
 

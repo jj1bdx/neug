@@ -103,6 +103,8 @@
 
 /*
  * Port C setup.
+ * PC0  - Push Pull output 50MHz.
+ * PC1  - Push Pull output 50MHz.
  * Everything input with pull-up except:
  */
 #define VAL_GPIOCCRL            0x88888833      /*  PC7...PC0 */

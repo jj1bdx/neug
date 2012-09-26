@@ -109,6 +109,8 @@
 
 /*
  * Port C setup.
+ * PC0  - Push Pull output 50MHz.
+ * PC1  - Push Pull output 50MHz.
  * Everything input with pull-up except:
  * PC4  - Normal input      (ADC_IN14 : VoutY of LIS344ALH).
  * PC5  - Normal input      (ADC_IN15 : VoutZ of LIS344ALH).
@@ -118,7 +120,7 @@
  * PC14 - Normal input (XTAL).
  * PC15 - Normal input (XTAL).
  */
-#define VAL_GPIOCCRL            0x83448888      /*  PC7...PC0 */
+#define VAL_GPIOCCRL            0x83448833      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x44888888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 
