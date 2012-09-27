@@ -1,0 +1,38 @@
+* Major changes in NeuG 0.02
+
+  Released 2012-08-30, by NIIBE Yutaka
+
+** Change RNG constuct.
+We replace all basic components.  Now, we use WELL 512a structure
+for Physical-based RNG.
+
+** New USB stack.
+Now, we use our own USB stack (taken from Gnuk).
+
+
+* Major changes in NeuG 0.01
+
+  Released 2011-11-14, by NIIBE Yutaka
+
+** Support more boards
+NeuG now supports FST-01, STM8S DISCOVERY, CQ-STARM and STBee, too.
+
+** Change RNG construct.
+Basic technology is basically same (CRC-16, TinyMT), but we add
+FNV32 hash as an output function, and give a seed to TinyMT from
+Physical-based RNG.
+
+** Add Test results.
+Under test-results directory, we put results of RNG test by rng-tools,
+NIST STS 2.1.1, and Dieharder 3.31.1.
+
+
+* Major changes in NeuG 0.00
+
+  Released 2011-07-14, by NIIBE Yutaka
+
+** This is initial release.
+
+Local Variables:
+mode: outline
+End:

@@ -5,7 +5,7 @@
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
  * This file is a part of NeuG, a Random Number Generator
- * implementation (for STM32F103).
+ * implementation based on quantization error of ADC (for STM32F103).
  *
  * NeuG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ static Thread *rng_thread;
 #define ADC_GRP1_NUM_CHANNELS   1
  
 /* Depth of the conversion buffer, channels are sampled one time each.*/
-#define ADC_GRP1_BUF_DEPTH      16
+#define ADC_GRP1_BUF_DEPTH      256
 
 static void adc2_start (void)
 {
-  rccEnableAPB2(RCC_APB2ENR_ADC2EN, FALSE);
+  rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
   ADC2->CR1 = 0;
   ADC2->CR2 = ADC_CR2_ADON;
   ADC2->CR2 = ADC_CR2_ADON | ADC_CR2_RSTCAL;
@@ -59,6 +59,11 @@ static void adc2_start (void)
   ADC2->SQR3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11);
 
   ADC2->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_SWSTART;
+}
+
+static void adc2_stop (void)
+{
+  rccDisableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
 }
 
 /*
@@ -102,7 +107,7 @@ static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
   (void) buffer; (void) n;
 
   chSysLockFromIsr();
-  if (adcp->state == ADC_COMPLETE)
+  if (adcp->state == ADC_COMPLETE && rng_thread)
     chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
   chSysUnlockFromIsr();
 }
@@ -111,7 +116,6 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err)
 {
   (void)adcp;  (void)err;
 }
-
 
 #include "sha256.h"
 
@@ -141,51 +145,158 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  * For us, cryptographic primitive is SHA-256 and its blocksize is 512-bit
  * (64-byte), N >= 128.
  *
- * We chose N=131, since we love prime number, and we have "additional bits"
+ * We chose N=139, since we love prime number, and we have "additional bits"
  * of 32-byte for last block (feedback from previous output of SHA-256).
  *
- * This corresponds to min-entropy >= 3.91.
+ * This corresponds to min-entropy >= 3.68.
  *
  */
-#define NUM_NOISE_INPUTS 131
+#define NUM_NOISE_INPUTS 139
 
-static const uint8_t hash_df_initial_string[5] = {
-  1,          /* counter = 1 */
-  0, 0, 1, 0  /* no_of_bits_returned (big endian) */
-};
+#define EP_ROUND_0 0 /* initial-five-byte and 59-sample-input */
+#define EP_ROUND_1 1 /* 64-sample-input */
+#define EP_ROUND_2 2 /* 8-sample-input */
+#define EP_ROUND_RAW 3 /* 8-sample-input */
 
-static void ep_init (void)
+#define EP_ROUND_0_INPUTS 59
+#define EP_ROUND_1_INPUTS 64
+#define EP_ROUND_2_INPUTS 16
+#define EP_ROUND_RAW_INPUTS 32
+
+static uint8_t ep_round;
+
+/*
+ * Hash_df initial string:
+ *
+ *  1,          : counter = 1
+ *  0, 0, 1, 0  : no_of_bits_returned (in big endian)
+ */
+static void ep_fill_initial_string (void)
 {
-  sha256_start (&sha256_ctx_data);
-  sha256_update (&sha256_ctx_data, hash_df_initial_string, 5);
+  memset (samp, 0, 5 * 8 * sizeof (adcsample_t));
+  samp[0] = 1;
+  samp[3*8] = 1;
 }
 
-static void ep_add (uint8_t entropy_bits)
+static void ep_init (int raw)
 {
-  sha256_update (&sha256_ctx_data, &entropy_bits, 1);
+  chEvtClearFlags (ADC_DATA_AVAILABLE);
+  if (raw)
+    {
+      ep_round = EP_ROUND_RAW;
+      adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_RAW_INPUTS*8/2);
+    }
+  else
+    {
+      ep_round = EP_ROUND_0;
+      ep_fill_initial_string ();
+      /*
+       * We get two samples for a single transaction of DMA.
+       * We take LSBs of each samples.
+       * Thus, we need tansactions of: required_number_of_input_in_byte*8/2 
+       */
+      adcStartConversion (&ADCD1, &adcgrpcfg,
+			  &samp[5*8], EP_ROUND_0_INPUTS*8/2);
+    }
 }
 
-#define PROBABILITY_50_BY_TICK() ((SysTick->VAL & 0x02) != 0)
-
-static const uint32_t *ep_output (void)
+static uint8_t ep_get_byte_from_samples (int i)
 {
-#if ((SHA256_BLOCK_SIZE - 9) - ((5 + NUM_NOISE_INPUTS) % SHA256_BLOCK_SIZE)) \
-    > SHA256_DIGEST_SIZE
-  int n = SHA256_DIGEST_SIZE;
-#else
-  int n = (SHA256_BLOCK_SIZE - 9)
-    - ((5 + NUM_NOISE_INPUTS) % SHA256_BLOCK_SIZE);
-#endif
-
-  if (PROBABILITY_50_BY_TICK ())
-    n = n - 3;
-
-  sha256_update (&sha256_ctx_data, (uint8_t *)sha256_output, n);
-  sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
-  ep_init ();
-  return sha256_output;
+  return (  ((samp[i*8+0] & 1) << 0) | ((samp[i*8+1] & 1) << 1)
+	  | ((samp[i*8+2] & 1) << 2) | ((samp[i*8+3] & 1) << 3)
+	  | ((samp[i*8+4] & 1) << 4) | ((samp[i*8+5] & 1) << 5)
+	  | ((samp[i*8+6] & 1) << 6) | ((samp[i*8+7] & 1) << 7));
 }
 
+static void noise_source_continuous_test (uint8_t noise);
+
+static void ep_fill_wbuf (int i, int flip)
+{
+  uint8_t b0, b1, b2, b3;
+
+  b0 = ep_get_byte_from_samples (i*4 + 0);
+  b1 = ep_get_byte_from_samples (i*4 + 1);
+  b2 = ep_get_byte_from_samples (i*4 + 2);
+  b3 = ep_get_byte_from_samples (i*4 + 3);
+  noise_source_continuous_test (b0);
+  noise_source_continuous_test (b1);
+  noise_source_continuous_test (b2);
+  noise_source_continuous_test (b3);
+
+  if (flip)
+    sha256_ctx_data.wbuf[i] = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
+  else
+    sha256_ctx_data.wbuf[i] = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
+}
+
+/* Here assumes little endian architecture.  */
+static int ep_process (int raw)
+{
+  int i, n, flip;
+
+  if (ep_round == EP_ROUND_0 || ep_round == EP_ROUND_1)
+    {
+      n = 64 / 4;
+      flip = 1;
+    }
+  else if (ep_round == EP_ROUND_2)
+    {
+      n = EP_ROUND_2_INPUTS / 4;
+      flip = 0;
+    }
+  else /* ep_round == EP_ROUND_RAW */
+    {
+      n = EP_ROUND_RAW_INPUTS / 4;
+      flip = 0;
+    }
+
+  for (i = 0; i < n; i++)
+    ep_fill_wbuf (i, flip);
+
+  if (raw)
+    {
+      ep_init (1);
+      return n;
+    }
+  else
+    {
+      if (ep_round == EP_ROUND_0)
+	{
+	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_1_INPUTS*8/2);
+	  sha256_start (&sha256_ctx_data);
+	  sha256_process (&sha256_ctx_data);
+	  ep_round++;
+	  return 0;
+	}
+      else if (ep_round == EP_ROUND_1)
+	{
+	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_2_INPUTS*8/2);
+	  sha256_process (&sha256_ctx_data);
+	  ep_round++;
+	  return 0;
+	}
+      else
+	{
+	  n = SHA256_DIGEST_SIZE;
+	  ep_init (0);
+	  memcpy (((uint8_t *)sha256_ctx_data.wbuf)+EP_ROUND_2_INPUTS,
+		  sha256_output, n);
+	  sha256_ctx_data.total[0] = 5 + NUM_NOISE_INPUTS + n;
+	  sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
+	  return SHA256_DIGEST_SIZE / sizeof (uint32_t);
+	}
+    }
+}
+
+
+static const uint32_t *ep_output (int raw)
+{
+  if (raw)
+    return sha256_ctx_data.wbuf;
+  else
+    return sha256_output;
+}
+
 #define REPETITION_COUNT           1
 #define ADAPTIVE_PROPORTION_64     2
 #define ADAPTIVE_PROPORTION_4096   4
@@ -287,7 +398,7 @@ static void noise_source_continuous_test (uint8_t noise)
   adaptive_proportion_64_test (noise);
   adaptive_proportion_4096_test (noise);
 }
-
+
 /*
  * Ring buffer, filled by generator, consumed by neug_get routine.
  */
@@ -348,95 +459,25 @@ static uint8_t neug_raw;
  */
 static int rng_gen (struct rng_rb *rb)
 {
-  uint8_t round = 0;
-  uint32_t v = 0;
+  int n;
+  int raw = neug_raw;
 
   while (1)
     {
-      uint8_t b0, b1, b2, b3;
+      chEvtWaitOne (ADC_DATA_AVAILABLE); /* Got a series of ADC sampling.  */
 
-      chEvtWaitOne (ADC_DATA_AVAILABLE);
-
-      /* Got an ADC sampling data */
-      b0 = (((samp[0] & 0x01) << 0) | ((samp[1] & 0x01) << 1)
-	    | ((samp[2] & 0x01) << 2) | ((samp[3] & 0x01) << 3)
-	    | ((samp[4] & 0x01) << 4) | ((samp[5] & 0x01) << 5)
-	    | ((samp[6] & 0x01) << 6) | ((samp[7] & 0x01) << 7));
-
-      b1 = (((samp[8] & 0x01) << 0) | ((samp[9] & 0x01) << 1)
-	   | ((samp[10] & 0x01) << 2) | ((samp[11] & 0x01) << 3)
-	   | ((samp[12] & 0x01) << 4) | ((samp[13] & 0x01) << 5)
-	   | ((samp[14] & 0x01) << 6) | ((samp[15] & 0x01) << 7));
-
-      b2 = (((samp[16] & 0x01) << 0) | ((samp[17] & 0x01) << 1)
-	    | ((samp[18] & 0x01) << 2) | ((samp[19] & 0x01) << 3)
-	    | ((samp[20] & 0x01) << 4) | ((samp[21] & 0x01) << 5)
-	    | ((samp[22] & 0x01) << 6) | ((samp[23] & 0x01) << 7));
-
-      b3 = (((samp[24] & 0x01) << 0) | ((samp[25] & 0x01) << 1)
-	   | ((samp[26] & 0x01) << 2) | ((samp[27] & 0x01) << 3)
-	   | ((samp[28] & 0x01) << 4) | ((samp[29] & 0x01) << 5)
-	   | ((samp[30] & 0x01) << 6) | ((samp[31] & 0x01) << 7));
-
-      adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
-
-      noise_source_continuous_test (b0);
-      noise_source_continuous_test (b1);
-      noise_source_continuous_test (b2);
-      noise_source_continuous_test (b3);
-
-      if (neug_raw)
+      if ((n = ep_process (raw)))
 	{
-	  v |= (b0 << (round * 8));
-	  round++;
-	  v |= (b1 << (round * 8));
-	  round++;
-	  v |= (b2 << (round * 8));
-	  round++;
-	  v |= (b3 << (round * 8));
-	  round++;
+	  int i;
+	  const uint32_t *vp;
 
-	  if (round >= 4)
+	  vp = ep_output (raw);
+	  for (i = 0; i < n; i++)
 	    {
-	      rb_add (rb, v);
+	      rb_add (rb, *vp);
+	      vp++;
 	      if (rb->full)
 		return 0;
-	      v = 0;
-	      round = 0;
-	    }
-	}
-      else
-	{
-	  /*
-	   * Put a random byte to entropy pool.
-	   */
-	  ep_add (b0);
-	  round++;
-	  ep_add (b1);
-	  round++;
-	  ep_add (b2);
-	  round++;
-	  ep_add (b3);
-	  round++;
-	  if (round >= NUM_NOISE_INPUTS)
-	    {
-	      /*
-	       * We have enough entropy in the pool.
-	       * Thus, we pull the random bits from the pool.
-	       */
-	      int i;
-	      const uint32_t *vp = ep_output ();
-
-	      /* We get the random bits, add it to the ring buffer.  */
-	      for (i = 0; i < SHA256_DIGEST_SIZE / 4; i++)
-		{
-		  rb_add (rb, *vp);
-		  vp++;
-		  if (rb->full)
-		    return 0;
-		}
-
-	      round = 0;
 	    }
 	}
     }
@@ -460,7 +501,7 @@ static msg_t rng (void *arg)
     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE       | STM32_DMA_CR_EN;
   /* Enable ADC2 */
   adc2_start ();
-  adcStartConversion (&ADCD1, &adcgrpcfg, samp, ADC_GRP1_BUF_DEPTH);
+  ep_init (0);
 
   while (!chThdShouldTerminate ())
     {
@@ -472,8 +513,9 @@ static msg_t rng (void *arg)
 	  rng_gen (rb);
 	  if (neug_err_state != 0)
 	    {
-	      while (!rb->empty)
-		(void)rb_del (rb);
+	      if (!neug_raw)
+		while (!rb->empty)
+		  (void)rb_del (rb);
 	      noise_source_error_reset ();
 	    }
 	  else
@@ -483,11 +525,14 @@ static msg_t rng (void *arg)
       chMtxUnlock ();
     }
 
+  adc2_stop ();
+  adcStop (&ADCD1);
+
   return 0;
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 256);
+static WORKING_AREA(wa_rng, 960);
 
 /**
  * @brief Initialize NeuG.
@@ -498,7 +543,6 @@ neug_init (uint32_t *buf, uint8_t size)
   struct rng_rb *rb = &the_ring_buffer;
 
   neug_raw = 0;
-  ep_init ();
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
 }
@@ -583,6 +627,8 @@ void
 neug_select (uint8_t raw)
 {
   neug_wait_full ();
+  if (neug_raw != raw)
+    ep_init (raw);
   neug_raw = raw;
   neug_flush ();
 }

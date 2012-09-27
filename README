@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
-							   Version 0.02
-							     2012-08-30
+							   Version 0.03
+							     2012-09-27
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -21,12 +21,16 @@ My primary intention was to incorporate NeuG routines into Gnuk for
 random number generation, but the stand alone version could be useful
 too.
 
+Gnuk was named after my son who loved the pacifier when he was baby.
+NeuG was named after my daughter, but I don't say she is noisy.
+
 
 Release notes
 =============
 
-This is the third release of NeuG, which is still experimental.  You
-can enjoy NeuG device, but I'm not sure how it is good yet.  Note that
+This is the fourth release of NeuG, which is still experimental.
+Basic features (generating random numbers) are stable, but newly added
+things like reGNUal support should be considered unstable.  Note that
 you need the snapshot of ChibiOS/RT (from trunk).  This means that it
 is covered by GNU GPL.  No "linking exception" option is available for
 the snapshot.
@@ -41,10 +45,6 @@ A0: I believe it's good enough if we compare to other hardware RNGs.
     computer simulations, I think that it's good enough.  I evaluated
     it with rngtest of RNG-tools, NIST STS test suite and Dieharder.
     See the directory neug/test-results/.
-    For important cryptographic usage, such as generating keys or use
-    for ECC, I think that we need more evaluations under severe
-    condition (e.g., lower ALPHA (say, 0.001) in NIST STS test suite
-    and more number of streams (say, 10000)).
 A0-dash: For better entropy device with embedded test, you could get
          EntropyKey.  See http://www.entropykey.co.uk/
 A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
@@ -55,9 +55,12 @@ Q1: How fast is NeuG device?
 A1: It's something around 30 Ki-byte/second.
 
 Q2: Should we check condition of noise sources?
-A2: Yes, we should.  It's not implemented yet, and I don't have an
-    good idea how to implement such a feature with limited resource
-    of STM32F103.  Please let me know your idea.
+A2: Yes, we should.  Three continuous tests are implemented, following
+    (Draft of) NIST SP 800-90B.  Those are Repetition Count Test,
+    Adaptive Proportion Test (for 64 samples), and another Adaptive
+    Proportion Test (for 4096 samples).  When it detect an error (it
+    is really rare, but it could occur even for normal condition), the
+    generation of random bits restart again.
 
 
 Targets
@@ -157,6 +160,13 @@ Before using /dev/ttyACM0, you need to configure its TTY discipline.
 
 Then, you can use output of /dev/ttyACM0.
 
+When you want to get raw output (not conditioned), you can configure:
+
+  $ stty -F /dev/ttyACM0 parenb
+
+And you can get conditioned output by configuring:
+
+  $ stty -F /dev/ttyACM0 -parenb
 
 
 Structure of the NeuG
@@ -165,43 +175,59 @@ Structure of the NeuG
 Here is a figure of the circuit.
 
 
-             Entropy Pool (64-byte)
-            +----------------+
-            |                |
-            | 16-word        |	      8  ||<-- [ Vref ]
-      +---- | registers      |	  |<--/--||
-      |     |   in           | 32 |      ||<-- [ Temperature Sensor ]
-      |     | WELL512a       |<-/-|
-      |     |  structure     |	  |<----/------ SysTick
-      |     +----------------+          1
-      |     Physical-based RNG
+           Physical-based RNG
+           
+            +--------------+              Noise sources 
+            |              |
+            | Conditioning |   1112 ||<-- LSB of result of [ IN10 ]
+            | Component    |<---/---||
+            |              |        ||<-- LSB of result of [ IN11 ]
+      +-----|  Hash_df     |
+      |     |    by        |
+      |     |  SHA-256     |
+      |     |              |
+      |     |              |   256
+      |     |              |<---/---+
+      |     +--------------+        |
+      |                             |
+      +-----------------------------+
       |
-      / 32
+      / 256
       |
       v
  Random Number Output
 
 
-STM32F103 has built-in Vref (voltage reference) and Temperature Sensor
-which are connected to A/D converter of 12-bit resolution.  NeuG uses
-LSBs of A/D converter's outputs as entropy sources.
+STM32F103 has two built-in A/D converters of 12-bit resolution.  NeuG
+uses LSBs of A/D converters' outputs as entropy sources.  It is
+considered noise of quantization error, plus noise from power supply,
+etc.
 
-By four samplings of two channels, we can get 8-bit, as we can get two
-bits (LSB of Vref and LSB of Temperature Sensor) from one sampling.
-We put this 8-bit noise and SysTick to entropy pool.  Entropy pool
-consist of 16-word buffer, which has WELL 512a structure.
+We chose analog inputs of IN10 and IN11, which is not connected to
+external pin (for the version of 36-pin or 48-pin STM32F103).  The
+input is configured as digital output 50MHz to get maximum noise of
+environment.
 
-Since the noise source is not "white", signal is whiten by this WELL
-512a structure.  An experiment shows that raw noise source of LSBs has
-more than 6 bit/byte entropy.  So, we put 6-byte (36-bit) to get
-4-byte (32-bit) output.
+By 556 samplings of two channels, we can get 1112-bit, as we can get
+two bits (LSB of IN10 and LSB of IN11) from one sampling.  We put this
+1112-bit and previous output of 256-bit to conditioning component.
 
-I don't know how stable the noise source is.  My experience with
-STM32F103 and NeuG shows that it's stable at least for a year.
+Conditioning component is implemented by Hash_df function by SHA-256.
+Since the noise source is not "white", signal is whiten by this
+Conditioning component.
 
-For WELL Random Number Generator, please visit:
+Experiments show that raw noise source of LSBs has more than 6.0
+bit/byte entropy when it is no computation but just to take samples.
+The entropy varies among different boards.  It seems that a board with
+good power supply and capacitor has smaller entropy (6.2 or so), and
+the one with poor power supply and capacitor has bigger entropy (7.3
+or so).  That is considered noise of quantization error.
 
-   http://www.iro.umontreal.ca/~panneton/WELLRNG.html
+When there is some activities of MCU, it's more than 7.0 bit/byte
+entropy for a board even with good power supply and capacitor.
+
+My experience with STM32F103 and NeuG shows that noise source is
+stable at least for a year.
 
 
 Test results

@@ -666,7 +666,7 @@ static msg_t led_blinker (void *arg)
   return 0;
 }
 
-#define RANDOM_BYTES_LENGTH 60
+#define RANDOM_BYTES_LENGTH 32
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
 /*
@@ -724,6 +724,9 @@ main (int argc, char **argv)
 	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (5000));
 	}
 
+      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	break;
+
       /* The connection opened.  */
       count = 0;
       /*
@@ -742,7 +745,7 @@ main (int argc, char **argv)
 
 	  neug_wait_full ();
 
-	  if ((count & 0x00ff) == 0)
+	  if ((count & 0x03ff) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 
 	  usb_lld_txcpy (random_word, ENDP1, 0, RANDOM_BYTES_LENGTH);
@@ -767,13 +770,13 @@ main (int argc, char **argv)
 	}
     }
 
+  chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
+  chThdWait (led_thread);
+
   /*
    * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED.
    */
   neug_fini ();
-
-  chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
-  chThdWait (led_thread);
 
   fsij_device_state = FSIJ_DEVICE_EXITED;
 

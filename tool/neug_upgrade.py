@@ -156,7 +156,7 @@ class neug(object):
         if interface.interfaceSubClass != COM_SUBCLASS:
             raise ValueError, "Wrong interface sub class"
         self.__devhandle = device.open()
-        # self.__devhandle.detachKernelDriver(interface)
+        self.__devhandle.detachKernelDriver(interface)
         # self.__devhandle.claimInterface(interface)
         # self.__devhandle.setAltInterface(interface)
 

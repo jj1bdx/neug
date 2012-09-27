@@ -1,3 +1,11 @@
+2012-09-27  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (RANDOM_BYTES_LENGTH): 32 is best for SHA-256
+	construct.
+
+	* src/random.c (adc2_stop, ep_process): New.
+	(rng_gen): Call ep_process.
+
 2012-09-26  Niibe Yutaka  <gniibe@fsij.org>
 
 	* boards/STM8S_DISCOVERY/mcuconf.h (STM32_PPRE2, STM32_ADCPRE):
