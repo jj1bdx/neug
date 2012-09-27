@@ -52,11 +52,20 @@ static void adc2_start (void)
 
   ADC2->CR1 = ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0;
   ADC2->CR2 = ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON;
+#ifdef NEUG_NON_DEFAULT_ADC_CHANNEL
+  ADC2->SMPR1 = 0;
+  ADC2->SMPR2 = ADC_SMPR2_SMP_ANx_B(ADC_SAMPLE_1P5);
+#else
   ADC2->SMPR1 = ADC_SMPR1_SMP_AN11(ADC_SAMPLE_1P5);
   ADC2->SMPR2 = 0;
+#endif
   ADC2->SQR1 = ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS);
   ADC2->SQR2 = 0;
+#ifdef NEUG_NON_DEFAULT_ADC_CHANNEL
+  ADC2->SQR3 = ADC_SQR3_SQ1_N(NEUG_ADC_CHANNEL_B);
+#else
   ADC2->SQR3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11);
+#endif
 
   ADC2->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_SWSTART;
 }
@@ -92,11 +101,20 @@ static const ADCConversionGroup adcgrpcfg = {
   adccb_err,
   ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0,
   ADC_CR2_EXTTRIG | ADC_CR2_SWSTART | ADC_CR2_EXTSEL,
+#ifdef NEUG_NON_DEFAULT_ADC_CHANNEL
+  0,
+  ADC_SMPR2_SMP_ANx_A(ADC_SAMPLE_1P5),
+#else
   ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5),
   0,
+#endif
   ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS),
   0,
+#if NEUG_NON_DEFAULT_ADC_CHANNEL
+  ADC_SQR3_SQ1_N(NEUG_ADC_CHANNEL_A)
+#else
   ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10)
+#endif
 };
 
 /*
@@ -161,7 +179,7 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 #define EP_ROUND_0_INPUTS 59
 #define EP_ROUND_1_INPUTS 64
 #define EP_ROUND_2_INPUTS 16
-#define EP_ROUND_RAW_INPUTS 32
+#define EP_ROUND_RAW_INPUTS 64
 
 static uint8_t ep_round;
 
@@ -311,12 +329,17 @@ static void noise_source_error_reset (void)
 static void noise_source_error (uint32_t err)
 {
   neug_err_state |= err;
+
+#include "board.h"
+#if defined(BOARD_STBEE_MINI)
+  palClearPad (IOPORT1, GPIOA_LED2);
+#endif
 }
 
 
-/* Cuttoff = 9, when min-entropy = 4.0, W= 2^-30 */
-/* ceiling of (1+30/4.0) */
-#define REPITITION_COUNT_TEST_CUTOFF 9
+/* Cuttoff = 10, when min-entropy = 3.7, W= 2^-30 */
+/* ceiling of (1+30/3.7) */
+#define REPITITION_COUNT_TEST_CUTOFF 10
 
 static uint8_t rct_a;
 static uint8_t rct_b;
@@ -336,9 +359,9 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 20, when min-entropy = 4.0, W= 2^-30 */
-/* With R, qbinom(1-2^-30,64,2^-4.0) */
-#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 20
+/* Cuttoff = 22, when min-entropy = 3.7, W= 2^-30 */
+/* With R, qbinom(1-2^-30,64,2^-3.7) */
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 22
 
 static uint8_t ap64t_a;
 static uint8_t ap64t_b;
@@ -364,9 +387,9 @@ static void adaptive_proportion_64_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 354, when min-entropy = 4.0, W= 2^-30 */
-/* With R, qbinom(1-2^-30,4096,2^-4.0) */
-#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 354
+/* Cuttoff = 422, when min-entropy = 3.7, W= 2^-30 */
+/* With R, qbinom(1-2^-30,4096,2^-3.7) */
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 422
 
 static uint8_t ap4096t_a;
 static uint16_t ap4096t_b;

@@ -1,5 +1,10 @@
 2012-09-27  Niibe Yutaka  <gniibe@fsij.org>
 
+	* boards/STBEE_MINI/board.h (NEUG_NON_DEFAULT_ADC_CHANNEL): New.
+	(VAL_GPIOACRL): Use PA1 and PA2 for NeuG's analog input.
+	(VAL_GPIOCCRL): Revert previous change.
+	* boards/STBEE_MINI/mcuconf.h (STM32_PPRE2, STM32_ADCPRE): Revert.
+
 	* src/main.c (RANDOM_BYTES_LENGTH): 32 is best for SHA-256
 	construct.
 

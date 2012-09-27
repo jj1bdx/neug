@@ -37,6 +37,11 @@
 #define IOPORT_USB	GPIOA
 #define GPIO_LED	GPIOA_LED1
 #define IOPORT_LED	GPIOA
+#define NEUG_NON_DEFAULT_ADC_CHANNEL 1
+#define ADC_SMPR2_SMP_ANx_A ADC_SMPR2_SMP_AN1
+#define ADC_SMPR2_SMP_ANx_B ADC_SMPR2_SMP_AN2
+#define NEUG_ADC_CHANNEL_A ADC_CHANNEL_IN1
+#define NEUG_ADC_CHANNEL_B ADC_CHANNEL_IN2
 
 /*
  * Board identifier.
@@ -91,6 +96,8 @@
 
 /*
  * Port A setup.
+ * PA1  - Push Pull output 50MHz.
+ * PA2  - Push Pull output 50MHz.
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
@@ -98,7 +105,7 @@
  * PA14 - Push pull output  (USB ENABLE 0:DISABLE 1:ENABLE)
  * PA15 - Open Drain output (LED2 0:ON 1:OFF)
  */
-#define VAL_GPIOACRL            0x88888888      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0x88888338      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x63688888      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 
@@ -110,14 +117,12 @@
 
 /*
  * Port C setup.
- * PC0  - Push Pull output 50MHz.
- * PC1  - Push Pull output 50MHz.
  * Everything input with pull-up except:
  * PC13 - Normal input.
  * PC14 - Normal input.
  * PC15 - Normal input.
  */
-#define VAL_GPIOCCRL            0x88888833      /*  PC7...PC0 */
+#define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x44488888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 
