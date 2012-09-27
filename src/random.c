@@ -60,8 +60,10 @@ static void adc2_start (void)
 
   rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
 
-  ADC2->CR1 = ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0;
-  ADC2->CR2 = ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON;
+  ADC2->CR1 = (ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0
+	       | ADC_CR1_SCAN);
+  ADC2->CR2 = (ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL
+	       | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 #ifdef NEUG_NON_DEFAULT_ADC_CHANNEL
   ADC2->SMPR1 = 0;
   ADC2->SMPR2 = ADC_SMPR2_SMP_ANx_B(ADC_SAMPLE_1P5);
@@ -77,7 +79,8 @@ static void adc2_start (void)
   ADC2->SQR3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11);
 #endif
 
-  ADC2->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_SWSTART;
+  ADC2->CR2 = (ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL
+	       | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 
   chSysUnlock ();
 }
@@ -343,6 +346,9 @@ static void noise_source_error (uint32_t err)
   neug_err_state |= err;
 
 #include "board.h"
+#if defined(BOARD_FST_01)
+  palSetPad (IOPORT1, 2);
+#endif
 #if defined(BOARD_STBEE_MINI)
   palClearPad (IOPORT1, GPIOA_LED2);
 #endif

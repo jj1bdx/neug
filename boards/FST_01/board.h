@@ -89,14 +89,15 @@
 
 /*
  * Port A setup.
+ * PA2  - Push pull output   (For error LED)
+ * PA10 - Push pull output   (USB 1:ON 0:OFF)
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
- * PA10 - Push pull output   (USB 1:ON 0:OFF)
  */
-#define VAL_GPIOACRL            0x88888888      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0x88888388      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x88888388      /* PA15...PA8 */
-#define VAL_GPIOAODR            0xFFFFFFFF
+#define VAL_GPIOAODR            0xFFFFFFFB
 
 /*
  * Port B setup.
