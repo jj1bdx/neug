@@ -37,8 +37,9 @@ static Thread *rng_thread;
 /* Depth of the conversion buffer, channels are sampled one time each.*/
 #define ADC_GRP1_BUF_DEPTH      256
 
-static void adc2_start (void)
+void adc2_init (void)
 {
+  chSysLock ();
   rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
   ADC2->CR1 = 0;
   ADC2->CR2 = ADC_CR2_ADON;
@@ -49,6 +50,15 @@ static void adc2_start (void)
   while ((ADC2->CR2 & ADC_CR2_CAL) != 0)
     ;
   ADC2->CR2 = 0;
+  rccDisableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
+  chSysUnlock ();
+}
+
+static void adc2_start (void)
+{
+  chSysLock ();
+
+  rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
 
   ADC2->CR1 = ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0;
   ADC2->CR2 = ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON;
@@ -68,6 +78,8 @@ static void adc2_start (void)
 #endif
 
   ADC2->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_SWSTART;
+
+  chSysUnlock ();
 }
 
 static void adc2_stop (void)
@@ -295,7 +307,7 @@ static int ep_process (int raw)
 	}
       else
 	{
-	  n = SHA256_DIGEST_SIZE;
+	  n = SHA256_DIGEST_SIZE / 2;
 	  ep_init (0);
 	  memcpy (((uint8_t *)sha256_ctx_data.wbuf)+EP_ROUND_2_INPUTS,
 		  sha256_output, n);

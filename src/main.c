@@ -340,7 +340,7 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
 	{
 	  if (value != 0)
 	    {
-	      if ((connected & 1) == 0)
+	      if (connected == 0)
 		/* It's Open call */
 		connected++;
 	    }
@@ -669,6 +669,8 @@ static msg_t led_blinker (void *arg)
 #define RANDOM_BYTES_LENGTH 32
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
+extern void adc2_init (void);
+
 /*
  * Entry point.
  *
@@ -682,16 +684,17 @@ main (int argc, char **argv)
 
   fill_serial_no_by_unique_id ();
 
-  halInit();
-  chSysInit();
+  halInit ();
+  adc2_init ();
+  chSysInit ();
 
   main_thread = chThdSelf ();
-
-  usb_lld_init (config_desc.Descriptor[7]);
 
   chThdCreateStatic (wa_led, sizeof (wa_led), NORMALPRIO, led_blinker, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
+
+  usb_lld_init (config_desc.Descriptor[7]);
 
   while (1)
     {
@@ -700,14 +703,15 @@ main (int argc, char **argv)
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
 
-      connected = 0;
       while (count < NEUG_PRE_LOOP || bDeviceState != CONFIGURED)
 	{
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;
 
-	  (void)neug_get (NEUG_KICK_FILLING);
-	  if ((count & 0x000f) == 0)
+	  neug_wait_full ();
+	  neug_flush ();
+
+	  if ((count & 0x0007) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 	  chEvtWaitOneTimeout (ALL_EVENTS, MS2ST (25));
 	  count++;

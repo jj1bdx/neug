@@ -186,7 +186,7 @@ Here is a figure of the circuit.
       |     |    by        |
       |     |  SHA-256     |
       |     |              |
-      |     |              |   256
+      |     |              |   128
       |     |              |<---/---+
       |     +--------------+        |
       |                             |
@@ -210,7 +210,7 @@ environment.
 
 By 556 samplings of two channels, we can get 1112-bit, as we can get
 two bits (LSB of IN10 and LSB of IN11) from one sampling.  We put this
-1112-bit and previous output of 256-bit to conditioning component.
+1112-bit and half of previous output to conditioning component.
 
 Conditioning component is implemented by Hash_df function by SHA-256.
 Since the noise source is not "white", signal is whiten by this

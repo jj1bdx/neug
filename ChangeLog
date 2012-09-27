@@ -1,5 +1,8 @@
 2012-09-27  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/random.c (ep_process): Feedback "additiona input" is now
+	half of previous output.
+
 	* boards/STBEE_MINI/board.h (NEUG_NON_DEFAULT_ADC_CHANNEL): New.
 	(VAL_GPIOACRL): Use PA1 and PA2 for NeuG's analog input.
 	(VAL_GPIOCCRL): Revert previous change.
