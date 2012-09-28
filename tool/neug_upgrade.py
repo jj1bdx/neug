@@ -177,7 +177,7 @@ class neug(object):
     def stop_neug(self):
         self.__devhandle.controlMsg(requestType = 0x40, request = 255,
                                     value = 0, index = 0, buffer = None,
-                                    timeout = 10)
+                                    timeout = 1000)
         # self.__devhandle.releaseInterface()
         # self.__devhandle.setConfiguration(0)
         return
@@ -185,7 +185,7 @@ class neug(object):
     def mem_info(self):
         mem = self.__devhandle.controlMsg(requestType = 0xc0, request = 0,
                                           value = 0, index = 0, buffer = 8,
-                                          timeout = 10)
+                                          timeout = 1000)
         start = ((mem[3]*256 + mem[2])*256 + mem[1])*256 + mem[0]
         end = ((mem[7]*256 + mem[6])*256 + mem[5])*256 + mem[4]
         return (start, end)
