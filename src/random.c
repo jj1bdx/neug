@@ -60,10 +60,8 @@ static void adc2_start (void)
 
   rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
 
-  ADC2->CR1 = (ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0
-	       | ADC_CR1_SCAN);
-  ADC2->CR2 = (ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL
-	       | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
+  ADC2->CR1 = ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0;
+  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL | ADC_CR2_CONT | ADC_CR2_ADON;
 #ifdef NEUG_NON_DEFAULT_ADC_CHANNEL
   ADC2->SMPR1 = 0;
   ADC2->SMPR2 = ADC_SMPR2_SMP_ANx_B(ADC_SAMPLE_1P5);
@@ -79,10 +77,17 @@ static void adc2_start (void)
   ADC2->SQR3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11);
 #endif
 
-  ADC2->CR2 = (ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL
-	       | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
-
   chSysUnlock ();
+}
+
+static void adc2_start_conversion (void)
+{
+  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL | ADC_CR2_CONT | ADC_CR2_ADON;
+}
+
+void adc2_stop_conversion (void)
+{
+  ADC2->CR2 &= ~ADC_CR2_CONT;
 }
 
 static void adc2_stop (void)
@@ -217,6 +222,7 @@ static void ep_init (int raw)
   if (raw)
     {
       ep_round = EP_ROUND_RAW;
+      adc2_start_conversion ();
       adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_RAW_INPUTS*8/2);
     }
   else
@@ -228,6 +234,7 @@ static void ep_init (int raw)
        * We take LSBs of each samples.
        * Thus, we need tansactions of: required_number_of_input_in_byte*8/2 
        */
+      adc2_start_conversion ();
       adcStartConversion (&ADCD1, &adcgrpcfg,
 			  &samp[5*8], EP_ROUND_0_INPUTS*8/2);
     }
@@ -295,6 +302,7 @@ static int ep_process (int raw)
     {
       if (ep_round == EP_ROUND_0)
 	{
+	  adc2_start_conversion ();
 	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_1_INPUTS*8/2);
 	  sha256_start (&sha256_ctx_data);
 	  sha256_process (&sha256_ctx_data);
@@ -303,6 +311,7 @@ static int ep_process (int raw)
 	}
       else if (ep_round == EP_ROUND_1)
 	{
+	  adc2_start_conversion ();
 	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_2_INPUTS*8/2);
 	  sha256_process (&sha256_ctx_data);
 	  ep_round++;
@@ -334,7 +343,8 @@ static const uint32_t *ep_output (int raw)
 #define ADAPTIVE_PROPORTION_64     2
 #define ADAPTIVE_PROPORTION_4096   4
 
-uint32_t neug_err_state;
+uint8_t neug_err_state;
+uint16_t neug_err_count;
 
 static void noise_source_error_reset (void)
 {
@@ -344,6 +354,7 @@ static void noise_source_error_reset (void)
 static void noise_source_error (uint32_t err)
 {
   neug_err_state |= err;
+  neug_err_count++;
 
 #include "board.h"
 #if defined(BOARD_FST_01)
@@ -542,6 +553,7 @@ static msg_t rng (void *arg)
     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE       | STM32_DMA_CR_EN;
   /* Enable ADC2 */
   adc2_start ();
+
   ep_init (0);
 
   while (!chThdShouldTerminate ())
@@ -573,7 +585,7 @@ static msg_t rng (void *arg)
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 960);
+static WORKING_AREA(wa_rng, 128);
 
 /**
  * @brief Initialize NeuG.

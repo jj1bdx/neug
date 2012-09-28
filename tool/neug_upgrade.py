@@ -156,7 +156,6 @@ class neug(object):
         if interface.interfaceSubClass != COM_SUBCLASS:
             raise ValueError, "Wrong interface sub class"
         self.__devhandle = device.open()
-        self.__devhandle.detachKernelDriver(interface)
         # self.__devhandle.claimInterface(interface)
         # self.__devhandle.setAltInterface(interface)
 
@@ -165,6 +164,9 @@ class neug(object):
         self.__conf = configuration
 
         self.__timeout = 10000
+
+    def detach_driver(self):
+        self.__devhandle.detachKernelDriver(self.__intf)
 
     def reset_device(self):
         try:
@@ -286,7 +288,8 @@ def main(data_regnual, data_upgrade):
     if not com:
         raise ValueError, "No NeuG Device Present"
     com.stop_neug()
-    time.sleep(0.500)
+    com.detach_driver()
+    time.sleep(1.500)
     mem_info = com.mem_info()
     print "%08x:%08x" % mem_info
     print "Downloading flash upgrade program..."

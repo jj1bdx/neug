@@ -89,7 +89,7 @@
 
 /*
  * Port A setup.
- * PA2  - Push pull output   (For error LED)
+ * PA2  - Push pull output   (For Error LED)
  * PA10 - Push pull output   (USB 1:ON 0:OFF)
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
