@@ -27,6 +27,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "neug.h"
 
 static Thread *rng_thread;
 #define ADC_DATA_AVAILABLE ((eventmask_t)1)
@@ -191,15 +192,17 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  */
 #define NUM_NOISE_INPUTS 139
 
-#define EP_ROUND_0 0 /* initial-five-byte and 59-sample-input */
-#define EP_ROUND_1 1 /* 64-sample-input */
-#define EP_ROUND_2 2 /* 8-sample-input */
-#define EP_ROUND_RAW 3 /* 8-sample-input */
+#define EP_ROUND_0 0 /* initial-five-byte and 59*8-sample-input */
+#define EP_ROUND_1 1 /* 64*8-sample-input */
+#define EP_ROUND_2 2 /* 16*8-sample-input */
+#define EP_ROUND_RAW_LSB  3 /* 64*8-sample-input */
+#define EP_ROUND_RAW_DATA 4 /* 16-sample-input */
 
 #define EP_ROUND_0_INPUTS 59
 #define EP_ROUND_1_INPUTS 64
 #define EP_ROUND_2_INPUTS 16
-#define EP_ROUND_RAW_INPUTS 64
+#define EP_ROUND_RAW_LSB_INPUTS 64
+#define EP_ROUND_RAW_DATA_INPUTS 2
 
 static uint8_t ep_round;
 
@@ -216,14 +219,22 @@ static void ep_fill_initial_string (void)
   samp[3*8] = 1;
 }
 
-static void ep_init (int raw)
+static void ep_init (int mode)
 {
   chEvtClearFlags (ADC_DATA_AVAILABLE);
-  if (raw)
+  if (mode == NEUG_MODE_RAW_LSB)
     {
-      ep_round = EP_ROUND_RAW;
+      ep_round = EP_ROUND_RAW_LSB;
       adc2_start_conversion ();
-      adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_RAW_INPUTS*8/2);
+      adcStartConversion (&ADCD1, &adcgrpcfg, samp,
+			  EP_ROUND_RAW_LSB_INPUTS*8/2);
+    }
+  else if (mode == NEUG_MODE_RAW_DATA)
+    {
+      ep_round = EP_ROUND_RAW_DATA;
+      adc2_start_conversion ();
+      adcStartConversion (&ADCD1, &adcgrpcfg, samp,
+			  EP_ROUND_RAW_DATA_INPUTS*8/2);
     }
   else
     {
@@ -250,27 +261,32 @@ static uint8_t ep_get_byte_from_samples (int i)
 
 static void noise_source_continuous_test (uint8_t noise);
 
-static void ep_fill_wbuf (int i, int flip)
+static void ep_fill_wbuf (int i, int flip, int mode)
 {
-  uint8_t b0, b1, b2, b3;
-
-  b0 = ep_get_byte_from_samples (i*4 + 0);
-  b1 = ep_get_byte_from_samples (i*4 + 1);
-  b2 = ep_get_byte_from_samples (i*4 + 2);
-  b3 = ep_get_byte_from_samples (i*4 + 3);
-  noise_source_continuous_test (b0);
-  noise_source_continuous_test (b1);
-  noise_source_continuous_test (b2);
-  noise_source_continuous_test (b3);
-
-  if (flip)
-    sha256_ctx_data.wbuf[i] = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
+  if (mode == NEUG_MODE_RAW_DATA)
+    sha256_ctx_data.wbuf[i] = (samp[i*2+1] << 16) | samp[i*2];
   else
-    sha256_ctx_data.wbuf[i] = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
+    {
+      uint8_t b0, b1, b2, b3;
+
+      b0 = ep_get_byte_from_samples (i*4 + 0);
+      b1 = ep_get_byte_from_samples (i*4 + 1);
+      b2 = ep_get_byte_from_samples (i*4 + 2);
+      b3 = ep_get_byte_from_samples (i*4 + 3);
+      noise_source_continuous_test (b0);
+      noise_source_continuous_test (b1);
+      noise_source_continuous_test (b2);
+      noise_source_continuous_test (b3);
+
+      if (flip)
+	sha256_ctx_data.wbuf[i] = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
+      else
+	sha256_ctx_data.wbuf[i] = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
+    }
 }
 
 /* Here assumes little endian architecture.  */
-static int ep_process (int raw)
+static int ep_process (int mode)
 {
   int i, n, flip;
 
@@ -284,18 +300,23 @@ static int ep_process (int raw)
       n = EP_ROUND_2_INPUTS / 4;
       flip = 0;
     }
-  else /* ep_round == EP_ROUND_RAW */
+  else if (ep_round == EP_ROUND_RAW_LSB)
     {
-      n = EP_ROUND_RAW_INPUTS / 4;
+      n = EP_ROUND_RAW_LSB_INPUTS / 4;
+      flip = 0;
+    }
+  else /* ep_round == EP_ROUND_RAW_DATA */
+    {
+      n = EP_ROUND_RAW_DATA_INPUTS;
       flip = 0;
     }
 
   for (i = 0; i < n; i++)
-    ep_fill_wbuf (i, flip);
+    ep_fill_wbuf (i, flip, mode);
 
-  if (raw)
+  if (mode != NEUG_MODE_CONDITIONED)
     {
-      ep_init (1);
+      ep_init (mode);
       return n;
     }
   else
@@ -320,7 +341,7 @@ static int ep_process (int raw)
       else
 	{
 	  n = SHA256_DIGEST_SIZE / 2;
-	  ep_init (0);
+	  ep_init (NEUG_MODE_CONDITIONED);
 	  memcpy (((uint8_t *)sha256_ctx_data.wbuf)+EP_ROUND_2_INPUTS,
 		  sha256_output, n);
 	  sha256_ctx_data.total[0] = 5 + NUM_NOISE_INPUTS + n;
@@ -331,9 +352,9 @@ static int ep_process (int raw)
 }
 
 
-static const uint32_t *ep_output (int raw)
+static const uint32_t *ep_output (int mode)
 {
-  if (raw)
+  if (mode)
     return sha256_ctx_data.wbuf;
   else
     return sha256_output;
@@ -500,7 +521,7 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
-static uint8_t neug_raw;
+static uint8_t neug_mode;
 
 /**
  * @brief  Random number generation from ADC sampling.
@@ -512,18 +533,18 @@ static uint8_t neug_raw;
 static int rng_gen (struct rng_rb *rb)
 {
   int n;
-  int raw = neug_raw;
+  int mode = neug_mode;
 
   while (1)
     {
       chEvtWaitOne (ADC_DATA_AVAILABLE); /* Got a series of ADC sampling.  */
 
-      if ((n = ep_process (raw)))
+      if ((n = ep_process (mode)))
 	{
 	  int i;
 	  const uint32_t *vp;
 
-	  vp = ep_output (raw);
+	  vp = ep_output (mode);
 	  for (i = 0; i < n; i++)
 	    {
 	      rb_add (rb, *vp);
@@ -566,7 +587,7 @@ static msg_t rng (void *arg)
 	  rng_gen (rb);
 	  if (neug_err_state != 0)
 	    {
-	      if (!neug_raw)
+	      if (neug_mode == NEUG_MODE_CONDITIONED)
 		while (!rb->empty)
 		  (void)rb_del (rb);
 	      noise_source_error_reset ();
@@ -585,7 +606,7 @@ static msg_t rng (void *arg)
 }
 
 static struct rng_rb the_ring_buffer;
-static WORKING_AREA(wa_rng, 128);
+static WORKING_AREA(wa_rng, 256);
 
 /**
  * @brief Initialize NeuG.
@@ -595,7 +616,7 @@ neug_init (uint32_t *buf, uint8_t size)
 {
   struct rng_rb *rb = &the_ring_buffer;
 
-  neug_raw = 0;
+  neug_mode = NEUG_MODE_CONDITIONED;
   rb_init (rb, buf, size);
   chThdCreateStatic (wa_rng, sizeof (wa_rng), NORMALPRIO, rng, rb);
 }
@@ -677,11 +698,14 @@ neug_fini (void)
 }
 
 void
-neug_select (uint8_t raw)
+neug_mode_select (uint8_t mode)
 {
   neug_wait_full ();
-  if (neug_raw != raw)
-    ep_init (raw);
-  neug_raw = raw;
+  if (neug_mode != mode)
+    ep_init (mode);
+#if defined(BOARD_FST_01)
+  palClearPad (IOPORT1, 2);
+#endif
+  neug_mode = mode;
   neug_flush ();
 }

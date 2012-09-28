@@ -737,7 +737,7 @@ main (int argc, char **argv)
        * No parity is standard.  It means to provide conditioned output.
        * When parity enabled, it means to provide raw output.
        */
-      neug_select (line_coding.paritytype != 0);
+      neug_mode_select (line_coding.paritytype); /* 0: None, 1: Odd, 2: Even */
 
       while (1)
 	{
