@@ -37,6 +37,20 @@
 #define GPIO_LED	GPIOB_LED
 #define IOPORT_LED	GPIOB
 
+#define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) \
+                              | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING1_SMPR2 0
+#define NEUG_ADC_SETTING1_SQR3  ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR)   \
+                              | ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
+#define NEUG_ADC_SETTING1_NUM_CHANNELS 2
+
+#define NEUG_ADC_SETTING2_SMPR1 0
+#define NEUG_ADC_SETTING2_SMPR2 ADC_SMPR2_SMP_AN0(ADC_SAMPLE_1P5)    \
+                              | ADC_SMPR2_SMP_AN1(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0)      \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1)
+#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
+
 /*
  * Board identifier.
  */
@@ -89,6 +103,8 @@
 
 /*
  * Port A setup.
+ * PA0  - Digital input with PullUp.  AN0
+ * PA1  - Digital input with PullUp.  AN1
  * PA2  - Push pull output   (For Error LED)
  * PA10 - Push pull output   (USB 1:ON 0:OFF)
  * PA11 - input with pull-up (USBDM)
@@ -110,11 +126,9 @@
 
 /*
  * Port C setup.
- * PC0  - Push Pull output 50MHz.
- * PC1  - Push Pull output 50MHz.
  * Everything input with pull-up except:
  */
-#define VAL_GPIOCCRL            0x88888833      /*  PC7...PC0 */
+#define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x88888888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 

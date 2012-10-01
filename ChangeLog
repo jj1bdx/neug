@@ -1,5 +1,6 @@
 2012-10-01  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/random.c (adcgrpcfg): ADC1 and ADC2 channels.
 	* src/main.c (neug_setup, USB_NEUG_GET_ERR_COUNT): New.
 
 2012-09-28  Niibe Yutaka  <gniibe@fsij.org>
