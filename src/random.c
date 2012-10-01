@@ -32,11 +32,25 @@
 static Thread *rng_thread;
 #define ADC_DATA_AVAILABLE ((eventmask_t)1)
 
-/* Total number of channels to be sampled by a single ADC operation.*/
-#define ADC_GRP1_NUM_CHANNELS   1
- 
-/* Depth of the conversion buffer, channels are sampled one time each.*/
+/* Depth of the conversion buffer.  */
 #define ADC_GRP1_BUF_DEPTH      256
+
+#define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_1P5) \
+                              | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING1_SMPR2 0
+#define NEUG_ADC_SETTING1_SQR3  ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR)   \
+                              | ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
+#define NEUG_ADC_SETTING1_NUM_CHANNELS 2
+
+#if !defined(NEUG_ADC_SETTING2_SMPR1)
+#define NEUG_ADC_SETTING2_SMPR1 0
+#define NEUG_ADC_SETTING2_SMPR2 ADC_SMPR2_SMP_AN0(ADC_SAMPLE_1P5)    \
+                              | ADC_SMPR2_SMP_AN1(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0)      \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1)
+#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
+#endif
+
 
 void adc2_init (void)
 {
@@ -90,7 +104,7 @@ static void adc2_stop (void)
 /*
  * ADC samples buffer.
  */
-static adcsample_t samp[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH * 2];
+static adcsample_t samp[ADC_GRP1_BUF_DEPTH * 2];
  
 static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static void adccb_err (ADCDriver *adcp, adcerror_t err);
@@ -98,17 +112,15 @@ static void adccb_err (ADCDriver *adcp, adcerror_t err);
 /*
  * ADC conversion group.
  * Mode: Dual fast interleaved mode.
- *   ADC1: master, 16 samples of 1 channels.
- *   ADC2: slave,  16 samples of 1 channels.
- * Channels:
- *   ADC1:
- *     IN10 (1.5 cycles sample time, port configured as push pull output 50MHz)
- *   ADC2:
- *     IN11 (1.5 cycles sample time, port configured as push pull output 50MHz)
+ *   ADC1: master.
+ *   ADC2: slave.
+ * Channels (default settings):
+ *   ADC1: two channels of SENSOR and VREF
+ *   ADC2: two channels of AN0 and AN1
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,
-  ADC_GRP1_NUM_CHANNELS,
+  1,	       /* This is 1, even if NEUG_ADC_SETTING1_NUM_CHANNELS > 1.  */
   adccb,
   adccb_err,
   ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0,
