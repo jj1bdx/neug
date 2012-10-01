@@ -1,6 +1,8 @@
 2012-10-01  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (adcgrpcfg): ADC1 and ADC2 two channels, each.
+	(adc2_start): Add SCAN for ADC2.
+
 	* boards/FST_01/board.h: Use default ADC settings.
 	* boards/OLIMEX_STM32_H103/board.h (NEUG_ADC_SETTING2_SMPR1)
 	(NEUG_ADC_SETTING2_SMPR2, NEUG_ADC_SETTING2_SQR3)
