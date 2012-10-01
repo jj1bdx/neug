@@ -162,7 +162,11 @@ Then, you can use output of /dev/ttyACM0.
 
 When you want to get raw output (not conditioned), you can configure:
 
-  $ stty -F /dev/ttyACM0 parenb
+  $ stty -F /dev/ttyACM0 parenb parodd
+
+for raw data of LSBs.  For raw data of samples, configure:
+
+  $ stty -F /dev/ttyACM0 parenb -parodd
 
 And you can get conditioned output by configuring:
 

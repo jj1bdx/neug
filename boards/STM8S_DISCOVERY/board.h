@@ -35,6 +35,8 @@
 #define GPIO_LED	GPIOA_LED
 #define IOPORT_LED	GPIOA
 
+/* NeuG settings for ADC2 is default.  */
+
 /*
  * Board identifier.
  */
@@ -84,6 +86,8 @@
 
 /*
  * Port A setup.
+ * PA0  - Digital input with PullUp.  AN0
+ * PA1  - Digital input with PullUp.  AN1
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
