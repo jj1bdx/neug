@@ -1,3 +1,7 @@
+2012-10-02  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (NEUG_ADC_SETTING1_SMPR1): Tweak.
+
 2012-10-01  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (adc2_start): Add SCAN for ADC2.
