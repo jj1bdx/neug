@@ -75,7 +75,8 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        ../boards/common/board-common.c \
        $(BOARD_DIR)/board.c \
-       sys.c aes-constant-ft.c main.c random.c sha256.c usb_lld.c
+       sys.c aes-constant-ft.c main.c sha256.c usb_lld.c \
+       random.c adc_stm32f103.c
 
 # List ASM source files here
 ASMSRC = $(PORTASM)

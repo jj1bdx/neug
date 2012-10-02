@@ -30,6 +30,7 @@
 #include "neug.h"
 #include "usb_lld.h"
 #include "sys.h"
+#include "adc.h"
 
 /*
  * We are trying to avoid dependency to C library. 
@@ -677,8 +678,6 @@ static msg_t led_blinker (void *arg)
 #define RANDOM_BYTES_LENGTH 32
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
-extern void adc2_init (void);
-
 /*
  * Entry point.
  *
@@ -693,7 +692,7 @@ main (int argc, char **argv)
   fill_serial_no_by_unique_id ();
 
   halInit ();
-  adc2_init ();
+  adc_init ();
   chSysInit ();
 
   main_thread = chThdSelf ();

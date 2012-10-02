@@ -1,5 +1,16 @@
 2012-10-02  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/random.c: Use our own ADC driver.
+
+	* src/halconf.h (HAL_USE_ADC): Set FALSE.
+	(STM32_DMA_REQUIRED): Define here.
+
+	* src/chconf.h (CH_USE_SEMAPHORES): Set FALSE.
+
+	* src/Makefile.in (CSRC): Add adc_stm32f103.c.
+
+	* src/adc.h, src/adc_stm32f103.c: New.
+
 	* src/random.c (NEUG_ADC_SETTING1_SMPR1): Tweak.
 
 2012-10-01  Niibe Yutaka  <gniibe@fsij.org>

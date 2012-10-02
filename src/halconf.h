@@ -6,7 +6,7 @@
 #include "mcuconf.h"
 
 #define HAL_USE_PAL              TRUE
-#define HAL_USE_ADC              TRUE
+#define HAL_USE_ADC              FALSE
 #define HAL_USE_CAN              FALSE
 #define HAL_USE_GPT              FALSE
 #define HAL_USE_I2C              FALSE
@@ -27,5 +27,7 @@
 #define SERIAL_BUFFERS_SIZE         16
 
 
+/* Define manually, as we implement ADC driver by ourselves.  */
+#define STM32_DMA_REQUIRED
 
 #endif /* _HALCONF_H_ */

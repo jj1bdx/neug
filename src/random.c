@@ -28,127 +28,11 @@
 #include "ch.h"
 #include "hal.h"
 #include "neug.h"
+#include "adc.h"
 
-static Thread *rng_thread;
+Thread *rng_thread;
 #define ADC_DATA_AVAILABLE ((eventmask_t)1)
 
-/* Depth of the conversion buffer.  */
-#define ADC_GRP1_BUF_DEPTH      256
-
-#define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_1P5)
-#define NEUG_ADC_SETTING1_SMPR2 0
-#define NEUG_ADC_SETTING1_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
-#define NEUG_ADC_SETTING1_NUM_CHANNELS 1
-
-#if !defined(NEUG_ADC_SETTING2_SMPR1)
-#define NEUG_ADC_SETTING2_SMPR1 0
-#define NEUG_ADC_SETTING2_SMPR2 ADC_SMPR2_SMP_AN0(ADC_SAMPLE_1P5)    \
-                              | ADC_SMPR2_SMP_AN1(ADC_SAMPLE_1P5)
-#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0)      \
-                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN1)
-#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
-#endif
-
-
-void adc2_init (void)
-{
-  chSysLock ();
-  rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
-  ADC2->CR1 = 0;
-  ADC2->CR2 = ADC_CR2_ADON;
-  ADC2->CR2 = ADC_CR2_ADON | ADC_CR2_RSTCAL;
-  while ((ADC2->CR2 & ADC_CR2_RSTCAL) != 0)
-    ;
-  ADC2->CR2 = ADC_CR2_ADON | ADC_CR2_CAL;
-  while ((ADC2->CR2 & ADC_CR2_CAL) != 0)
-    ;
-  ADC2->CR2 = 0;
-  rccDisableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
-  chSysUnlock ();
-}
-
-static void adc2_start (void)
-{
-  chSysLock ();
-
-  rccEnableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
-
-  ADC2->CR1 = (ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0
-	       | ADC_CR1_SCAN);
-  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
-  ADC2->SMPR1 = NEUG_ADC_SETTING2_SMPR1;
-  ADC2->SMPR2 = NEUG_ADC_SETTING2_SMPR2;
-  ADC2->SQR1 = ADC_SQR1_NUM_CH(NEUG_ADC_SETTING2_NUM_CHANNELS);
-  ADC2->SQR2 = 0;
-  ADC2->SQR3 = NEUG_ADC_SETTING2_SQR3;
-
-  chSysUnlock ();
-}
-
-static void adc2_start_conversion (void)
-{
-  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
-}
-
-void adc2_stop_conversion (void)
-{
-  ADC2->CR2 &= ~ADC_CR2_CONT;
-}
-
-static void adc2_stop (void)
-{
-  rccDisableAPB2 (RCC_APB2ENR_ADC2EN, FALSE);
-}
-
-/*
- * ADC samples buffer.
- */
-static adcsample_t samp[ADC_GRP1_BUF_DEPTH * 2];
- 
-static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n);
-static void adccb_err (ADCDriver *adcp, adcerror_t err);
-
-/*
- * ADC conversion group.
- * Mode: Dual fast interleaved mode.
- *   ADC1: master.
- *   ADC2: slave.
- * Channels (default settings):
- *   ADC1: two channels of SENSOR and VREF
- *   ADC2: two channels of AN0 and AN1
- */
-static const ADCConversionGroup adcgrpcfg = {
-  FALSE,
-  1,	       /* This is 1, even if NEUG_ADC_SETTING1_NUM_CHANNELS > 1.  */
-  adccb,
-  adccb_err,
-  ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0,
-  ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG | ADC_CR2_SWSTART | ADC_CR2_EXTSEL,
-  NEUG_ADC_SETTING1_SMPR1,
-  NEUG_ADC_SETTING1_SMPR2,
-  ADC_SQR1_NUM_CH(NEUG_ADC_SETTING1_NUM_CHANNELS),
-  0,
-  NEUG_ADC_SETTING1_SQR3
-};
-
-/*
- * ADC end conversion callback.
- */
-static void adccb (ADCDriver *adcp, adcsample_t *buffer, size_t n)
-{
-  (void) buffer; (void) n;
-
-  chSysLockFromIsr();
-  if (adcp->state == ADC_COMPLETE && rng_thread)
-    chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
-  chSysUnlockFromIsr();
-}
-
-static void adccb_err (ADCDriver *adcp, adcerror_t err)
-{
-  (void)adcp;  (void)err;
-}
-
 #include "sha256.h"
 
 static sha256_context sha256_ctx_data;
@@ -207,9 +91,9 @@ static uint8_t ep_round;
  */
 static void ep_fill_initial_string (void)
 {
-  memset (samp, 0, 5 * 8 * sizeof (adcsample_t));
-  samp[0] = 1;
-  samp[3*8] = 1;
+  memset (adc_samp, 0, 5 * 8 * sizeof (uint16_t));
+  adc_samp[0] = 1;
+  adc_samp[3*8] = 1;
 }
 
 static void ep_init (int mode)
@@ -218,16 +102,12 @@ static void ep_init (int mode)
   if (mode == NEUG_MODE_RAW_LSB)
     {
       ep_round = EP_ROUND_RAW_LSB;
-      adc2_start_conversion ();
-      adcStartConversion (&ADCD1, &adcgrpcfg, samp,
-			  EP_ROUND_RAW_LSB_INPUTS*8/2);
+      adc_start_conversion (0, EP_ROUND_RAW_LSB_INPUTS*8/2);
     }
   else if (mode == NEUG_MODE_RAW_DATA)
     {
       ep_round = EP_ROUND_RAW_DATA;
-      adc2_start_conversion ();
-      adcStartConversion (&ADCD1, &adcgrpcfg, samp,
-			  EP_ROUND_RAW_DATA_INPUTS*8/2);
+      adc_start_conversion (0, EP_ROUND_RAW_DATA_INPUTS*8/2);
     }
   else
     {
@@ -238,18 +118,16 @@ static void ep_init (int mode)
        * We take LSBs of each samples.
        * Thus, we need tansactions of: required_number_of_input_in_byte*8/2 
        */
-      adc2_start_conversion ();
-      adcStartConversion (&ADCD1, &adcgrpcfg,
-			  &samp[5*8], EP_ROUND_0_INPUTS*8/2);
+      adc_start_conversion (5*8, EP_ROUND_0_INPUTS*8/2);
     }
 }
 
 static uint8_t ep_get_byte_from_samples (int i)
 {
-  return (  ((samp[i*8+0] & 1) << 0) | ((samp[i*8+1] & 1) << 1)
-	  | ((samp[i*8+2] & 1) << 2) | ((samp[i*8+3] & 1) << 3)
-	  | ((samp[i*8+4] & 1) << 4) | ((samp[i*8+5] & 1) << 5)
-	  | ((samp[i*8+6] & 1) << 6) | ((samp[i*8+7] & 1) << 7));
+  return (  ((adc_samp[i*8+0] & 1) << 0) | ((adc_samp[i*8+1] & 1) << 1)
+	  | ((adc_samp[i*8+2] & 1) << 2) | ((adc_samp[i*8+3] & 1) << 3)
+	  | ((adc_samp[i*8+4] & 1) << 4) | ((adc_samp[i*8+5] & 1) << 5)
+	  | ((adc_samp[i*8+6] & 1) << 6) | ((adc_samp[i*8+7] & 1) << 7));
 }
 
 static void noise_source_continuous_test (uint8_t noise);
@@ -257,7 +135,7 @@ static void noise_source_continuous_test (uint8_t noise);
 static void ep_fill_wbuf (int i, int flip, int mode)
 {
   if (mode == NEUG_MODE_RAW_DATA)
-    sha256_ctx_data.wbuf[i] = (samp[i*2+1] << 16) | samp[i*2];
+    sha256_ctx_data.wbuf[i] = (adc_samp[i*2+1] << 16) | adc_samp[i*2];
   else
     {
       uint8_t b0, b1, b2, b3;
@@ -316,8 +194,7 @@ static int ep_process (int mode)
     {
       if (ep_round == EP_ROUND_0)
 	{
-	  adc2_start_conversion ();
-	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_1_INPUTS*8/2);
+	  adc_start_conversion (0, EP_ROUND_1_INPUTS*8/2);
 	  sha256_start (&sha256_ctx_data);
 	  sha256_process (&sha256_ctx_data);
 	  ep_round++;
@@ -325,8 +202,7 @@ static int ep_process (int mode)
 	}
       else if (ep_round == EP_ROUND_1)
 	{
-	  adc2_start_conversion ();
-	  adcStartConversion (&ADCD1, &adcgrpcfg, samp, EP_ROUND_2_INPUTS*8/2);
+	  adc_start_conversion (0, EP_ROUND_2_INPUTS*8/2);
 	  sha256_process (&sha256_ctx_data);
 	  ep_round++;
 	  return 0;
@@ -560,13 +436,8 @@ static msg_t rng (void *arg)
 
   rng_thread = chThdSelf ();
 
-  adcStart (&ADCD1, NULL);
-  /* Override DMA settings. */
-  ADCD1.dmamode = STM32_DMA_CR_PL(STM32_ADC_ADC1_DMA_PRIORITY)
-    | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD | STM32_DMA_CR_MINC
-    | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE       | STM32_DMA_CR_EN;
-  /* Enable ADC2 */
-  adc2_start ();
+  /* Enable ADCs */
+  adc_start ();
 
   ep_init (0);
 
@@ -592,8 +463,7 @@ static msg_t rng (void *arg)
       chMtxUnlock ();
     }
 
-  adc2_stop ();
-  adcStop (&ADCD1);
+  adc_stop ();
 
   return 0;
 }
