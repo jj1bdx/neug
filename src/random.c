@@ -30,11 +30,12 @@
 #include "sys.h"
 #include "neug.h"
 #include "adc.h"
+#include "sha256.h"
 
 Thread *rng_thread;
 #define ADC_DATA_AVAILABLE ((eventmask_t)1)
 
-#include "sha256.h"
+static uint32_t adc_buf[SHA256_BLOCK_SIZE/sizeof (uint32_t)];
 
 static sha256_context sha256_ctx_data;
 static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
@@ -57,25 +58,25 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  * For us, cryptographic primitive is SHA-256 and its blocksize is 512-bit
  * (64-byte), N >= 128.
  *
- * We chose N=139, since we love prime number, and we have "additional bits"
- * of 32-byte for last block (feedback from previous output of SHA-256).
+ * We chose N=140.  We have "additional bits" of 32-byte for last
+ * block (feedback from previous output of SHA-256).
  *
  * This corresponds to min-entropy >= 3.68.
  *
  */
-#define NUM_NOISE_INPUTS 139
+#define NUM_NOISE_INPUTS 140
 
-#define EP_ROUND_0 0 /* initial-five-byte and 59-byte-input */
+#define EP_ROUND_0 0 /* initial-five-byte and 3-byte, then 56-byte-input */
 #define EP_ROUND_1 1 /* 64-byte-input */
-#define EP_ROUND_2 2 /* 16-byte-input */
-#define EP_ROUND_RAW      3 /* 64-byte-input */
-#define EP_ROUND_RAW_DATA 4 /* 2-sample-input */
+#define EP_ROUND_2 2 /* 17-byte-input */
+#define EP_ROUND_RAW      3 /* 32-byte-input */
+#define EP_ROUND_RAW_DATA 4 /* 8-byte-input */
 
-#define EP_ROUND_0_INPUTS 59
+#define EP_ROUND_0_INPUTS 56
 #define EP_ROUND_1_INPUTS 64
-#define EP_ROUND_2_INPUTS 16
-#define EP_ROUND_RAW_INPUTS 64
-#define EP_ROUND_RAW_DATA_INPUTS 2
+#define EP_ROUND_2_INPUTS 17
+#define EP_ROUND_RAW_INPUTS 32
+#define EP_ROUND_RAW_DATA_INPUTS 8
 
 static uint8_t ep_round;
 
@@ -87,9 +88,8 @@ static uint8_t ep_round;
  */
 static void ep_fill_initial_string (void)
 {
-  memset (adc_samp, 0, 5);
-  adc_samp[0] = 1;
-  adc_samp[3] = 1;
+  adc_buf[0] = 0x01000001; /* Regardless of endian */
+  adc_buf[1] = (CRC->DR & 0xffffff00);
 }
 
 static void ep_init (int mode)
@@ -98,116 +98,105 @@ static void ep_init (int mode)
   if (mode == NEUG_MODE_RAW)
     {
       ep_round = EP_ROUND_RAW;
-      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_RAW_INPUTS);
+      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_RAW_INPUTS);
     }
   else if (mode == NEUG_MODE_RAW_DATA)
     {
       ep_round = EP_ROUND_RAW_DATA;
-      adc_start_conversion (ADC_SAMPLE_MODE, 0, EP_ROUND_RAW_DATA_INPUTS);
+      adc_start_conversion (ADC_SAMPLE_MODE, adc_buf, EP_ROUND_RAW_DATA_INPUTS);
     }
   else
     {
       ep_round = EP_ROUND_0;
       ep_fill_initial_string ();
-      adc_start_conversion (ADC_CRC32_MODE, 5, EP_ROUND_0_INPUTS);
+      adc_start_conversion (ADC_CRC32_MODE,
+			    &adc_buf[2], EP_ROUND_0_INPUTS);
     }
-}
-
-static uint8_t ep_get_byte_from_samples (int i)
-{
-  return adc_samp[i];
 }
 
 static void noise_source_continuous_test (uint8_t noise);
 
-static void ep_fill_wbuf (int i, int flip, int mode)
+static void ep_fill_wbuf (int i, int flip, int test)
 {
-  if (mode == NEUG_MODE_RAW_DATA)
-    sha256_ctx_data.wbuf[i] = (adc_samp[i*4]
-			       | (adc_samp[i*4+1] << 8)
-			       | (adc_samp[i*4+2] << 16)
-			       | (adc_samp[i*4+3] << 24));
-  else
+  uint32_t v = adc_buf[i];
+
+  if (test)
     {
       uint8_t b0, b1, b2, b3;
 
-      b0 = ep_get_byte_from_samples (i*4 + 0);
-      b1 = ep_get_byte_from_samples (i*4 + 1);
-      b2 = ep_get_byte_from_samples (i*4 + 2);
-      b3 = ep_get_byte_from_samples (i*4 + 3);
+      b3 = v >> 24;
+      b2 = v >> 16;
+      b1 = v >> 8;
+      b0 = v;
+
       noise_source_continuous_test (b0);
       noise_source_continuous_test (b1);
       noise_source_continuous_test (b2);
       noise_source_continuous_test (b3);
-
-      if (flip)
-	sha256_ctx_data.wbuf[i] = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
-      else
-	sha256_ctx_data.wbuf[i] = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
     }
+
+  if (flip)
+    v = __builtin_bswap32 (v);
+
+  sha256_ctx_data.wbuf[i] = v;
 }
 
 /* Here assumes little endian architecture.  */
 static int ep_process (int mode)
 {
-  int i, n, flip;
+  int i, n;
 
-  if (ep_round == EP_ROUND_0 || ep_round == EP_ROUND_1)
+  if (ep_round == EP_ROUND_RAW)
     {
-      n = 64 / 4;
-      flip = 1;
-    }
-  else if (ep_round == EP_ROUND_2)
-    {
-      n = EP_ROUND_2_INPUTS / 4;
-      flip = 0;
-    }
-  else if (ep_round == EP_ROUND_RAW)
-    {
-      n = EP_ROUND_RAW_INPUTS / 4;
-      flip = 0;
-    }
-  else /* ep_round == EP_ROUND_RAW_DATA */
-    {
-      n = EP_ROUND_RAW_DATA_INPUTS;
-      flip = 0;
-    }
+      for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
+	ep_fill_wbuf (i, 0, 0);
 
-  for (i = 0; i < n; i++)
-    ep_fill_wbuf (i, flip, mode);
-
-  if (mode != NEUG_MODE_CONDITIONED)
-    {
       ep_init (mode);
-      return n;
+      return EP_ROUND_RAW_INPUTS / 4;
+    }
+  else if (ep_round == EP_ROUND_RAW_DATA)
+    {
+      for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
+	ep_fill_wbuf (i, 0, 0);
+
+      ep_init (mode);
+      return EP_ROUND_RAW_DATA_INPUTS / 4;
+    }
+
+  if (ep_round == EP_ROUND_0)
+    {
+      for (i = 0; i < 64 / 4; i++)
+	ep_fill_wbuf (i, 1, 1);
+
+      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_1_INPUTS);
+      sha256_start (&sha256_ctx_data);
+      sha256_process (&sha256_ctx_data);
+      ep_round++;
+      return 0;
+    }
+  else if (ep_round == EP_ROUND_1)
+    {
+      for (i = 0; i < 64 / 4; i++)
+	ep_fill_wbuf (i, 1, 1);
+
+      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_2_INPUTS);
+      sha256_process (&sha256_ctx_data);
+      ep_round++;
+      return 0;
     }
   else
     {
-      if (ep_round == EP_ROUND_0)
-	{
-	  adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_1_INPUTS);
-	  sha256_start (&sha256_ctx_data);
-	  sha256_process (&sha256_ctx_data);
-	  ep_round++;
-	  return 0;
-	}
-      else if (ep_round == EP_ROUND_1)
-	{
-	  adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_2_INPUTS);
-	  sha256_process (&sha256_ctx_data);
-	  ep_round++;
-	  return 0;
-	}
-      else
-	{
-	  n = SHA256_DIGEST_SIZE / 2;
-	  ep_init (NEUG_MODE_CONDITIONED);
-	  memcpy (((uint8_t *)sha256_ctx_data.wbuf)+EP_ROUND_2_INPUTS,
-		  sha256_output, n);
-	  sha256_ctx_data.total[0] = 5 + NUM_NOISE_INPUTS + n;
-	  sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
-	  return SHA256_DIGEST_SIZE / sizeof (uint32_t);
-	}
+      for (i = 0; i < (EP_ROUND_2_INPUTS + 3) / 4; i++)
+	ep_fill_wbuf (i, 0, 1);
+
+      n = SHA256_DIGEST_SIZE / 2;
+      ep_init (NEUG_MODE_CONDITIONED); /* The three-byte is used here.  */
+      memcpy (((uint8_t *)sha256_ctx_data.wbuf)
+	      + ((NUM_NOISE_INPUTS+5)%SHA256_BLOCK_SIZE),
+	      sha256_output, n); /* Don't use the last three-byte.  */
+      sha256_ctx_data.total[0] = 5 + NUM_NOISE_INPUTS + n;
+      sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
+      return SHA256_DIGEST_SIZE / sizeof (uint32_t);
     }
 }
 

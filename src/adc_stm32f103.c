@@ -27,7 +27,7 @@
 #include "neug.h"
 #include "adc.h"
 
-#define NEUG_CRC32_COUNTS 3
+#define NEUG_CRC32_COUNTS 4
 
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
 #define STM32_ADC_ADC1_IRQ_PRIORITY         5
@@ -43,6 +43,7 @@
 #define ADC_SQR3_SQ1_N(n)       ((n) << 0)
 #define ADC_SQR3_SQ2_N(n)       ((n) << 5)
 #define ADC_SQR3_SQ3_N(n)       ((n) << 10)
+#define ADC_SQR3_SQ4_N(n)       ((n) << 15)
 
 #define ADC_SAMPLE_1P5          0
 
@@ -56,14 +57,11 @@
 
 #ifdef DELIBARATELY_DO_IT_WRONG_VREF_SAMPLE_TIME
 #define ADC_SAMPLE_VREF ADC_SAMPLE_1P5
+#define ADC_SAMPLE_SENSOR ADC_SAMPLE_1P5
 #else
 #define ADC_SAMPLE_VREF ADC_SAMPLE_239P5
+#define ADC_SAMPLE_SENSOR ADC_SAMPLE_239P5
 #endif
-
-/*
- * ADC samples buffer.
- */
-uint8_t adc_samp[NEUG_SAMPLE_BUFSIZE] __attribute__((aligned (4)));
 
 #define NEUG_DMA_CHANNEL STM32_DMA1_STREAM1
 #define NEUG_DMA_MODE_SAMPLE                                            \
@@ -77,10 +75,14 @@ uint8_t adc_samp[NEUG_SAMPLE_BUFSIZE] __attribute__((aligned (4)));
      | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
      | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
 
-#define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)
+#define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)     \
+                              | ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_SENSOR)
 #define NEUG_ADC_SETTING1_SMPR2 0
-#define NEUG_ADC_SETTING1_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)
-#define NEUG_ADC_SETTING1_NUM_CHANNELS 1
+#define NEUG_ADC_SETTING1_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_VREFINT)     \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR)      \
+                              | ADC_SQR3_SQ3_N(ADC_CHANNEL_SENSOR)      \
+                              | ADC_SQR3_SQ4_N(ADC_CHANNEL_VREFINT)     
+#define NEUG_ADC_SETTING1_NUM_CHANNELS 4
 
 #if !defined(NEUG_ADC_SETTING2_SMPR1)
 #define NEUG_ADC_SETTING2_SMPR1 0
@@ -161,9 +163,9 @@ void adc_start (void)
   chSysUnlock ();
 }
 
-static int adc_size;
-static int adc_offset;
 static int adc_mode;
+static uint32_t *adc_ptr;
+static int adc_size;
 
 static void adc_start_conversion_internal (void)
 {
@@ -183,16 +185,16 @@ static void adc_start_conversion_internal (void)
 #endif
 }
 
-void adc_start_conversion (int mode, int offset, int size)
+void adc_start_conversion (int mode, uint32_t *p, int size)
 {
   adc_mode = mode;
-  adc_offset = offset;
+  adc_ptr = p;
   adc_size = size;
 
  if (mode == ADC_SAMPLE_MODE)
     {
-      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, adc_samp + offset);
-      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, size);
+      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, p);
+      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, size / 4);
       dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_SAMPLE);
       dmaStreamEnable (NEUG_DMA_CHANNEL);
     }
@@ -202,23 +204,6 @@ void adc_start_conversion (int mode, int offset, int size)
       dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, NEUG_CRC32_COUNTS);
       dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_CRC32);
       dmaStreamEnable (NEUG_DMA_CHANNEL);
-
-      if ((size & 3))
-	{
-	  uint32_t v;
-	  int i;
-
-	  CRC->DR = SysTick->VAL;
-	  v = CRC->DR;
-
-	  for (i = 0; i < (size & 3); i++)
-	    {
-	      adc_samp[adc_offset++] = v;
-	      v >>= 8;
-	    }
-
-	  adc_size &= ~3;
-	}
     }
 
  adc_start_conversion_internal ();
@@ -268,11 +253,8 @@ static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags)
 
 	  if (adc_mode != ADC_SAMPLE_MODE)
 	    {
-	      uint32_t *p =  (uint32_t *)(&adc_samp[adc_offset]);
-
-	      *p = CRC->DR;
-	      adc_offset += 4;
 	      adc_size -= 4;
+	      *adc_ptr++ = CRC->DR;
 
 	      if (adc_size > 0)
 		{
