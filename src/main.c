@@ -290,15 +290,15 @@ static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
 	}
       else if (req_no == USB_NEUG_EXIT)
 	{
+	  chSysLockFromIsr ();
 	  if (neug_state == NEUG_WAIT_FOR_TX_READY)
 	    {
-	      chSysLockFromIsr ();
 	      main_thread->p_u.rdymsg = RDY_OK;
 	      chSchReadyI (main_thread);
-	      chSysUnlockFromIsr ();
 	    }
 	  else
 	    chEvtSignalFlagsI (main_thread, 1);
+	  chSysUnlockFromIsr ();
 	}
     }
 }
@@ -352,13 +352,13 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
 		{
 		  /* Close call */
 		  connected = 0;
+		  chSysLockFromIsr ();
 		  if (neug_state == NEUG_WAIT_FOR_TX_READY)
 		    {
-		      chSysLockFromIsr ();
 		      main_thread->p_u.rdymsg = RDY_OK;
 		      chSchReadyI (main_thread);
-		      chSysUnlockFromIsr ();
 		    }
+		  chSysUnlockFromIsr ();
 		}
 	    }
 
@@ -611,13 +611,13 @@ CH_IRQ_HANDLER (Vector90)
 void
 EP1_IN_Callback (void)
 {
-  if (main_thread != NULL)
+  chSysLockFromIsr ();
+  if (main_thread != NULL && neug_state == NEUG_WAIT_FOR_TX_READY)
     {
-      chSysLockFromIsr ();
       main_thread->p_u.rdymsg = RDY_OK;
       chSchReadyI (main_thread);
-      chSysUnlockFromIsr ();
     }
+  chSysUnlockFromIsr ();
 }
 
 void
