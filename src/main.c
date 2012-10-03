@@ -231,7 +231,7 @@ static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 #define USB_FSIJ_MEMINFO	  0
 #define USB_FSIJ_DOWNLOAD	  1
 #define USB_FSIJ_EXEC		  2
-#define USB_NEUG_GET_ERR_COUNT	254
+#define USB_NEUG_GET_INFO	254
 #define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
 
 enum {
@@ -384,11 +384,19 @@ neug_setup (uint8_t req, uint8_t req_no,
 	      usb_lld_set_data_to_send (mem_info, sizeof (mem_info));
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_NEUG_GET_ERR_COUNT)
+	  else if (req_no == USB_NEUG_GET_INFO)
 	    {
-	      extern uint16_t neug_err_count;
+	      if (index == 0)
+		usb_lld_set_data_to_send (&neug_mode, sizeof (uint8_t));
+	      else if (index == 1)
+		usb_lld_set_data_to_send (&neug_err_cnt, sizeof (uint16_t));
+	      else if (index == 2)
+		usb_lld_set_data_to_send (&neug_err_cnt_rc, sizeof (uint16_t));
+	      else if (index == 3)
+		usb_lld_set_data_to_send (&neug_err_cnt_p64, sizeof (uint16_t));
+	      else if (index == 4)
+		usb_lld_set_data_to_send (&neug_err_cnt_p4k, sizeof (uint16_t));
 
-	      usb_lld_set_data_to_send (&neug_err_count, sizeof (uint16_t));
 	      return USB_SUCCESS;
 	    }
 	}

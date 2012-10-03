@@ -214,7 +214,10 @@ static const uint32_t *ep_output (int mode)
 #define ADAPTIVE_PROPORTION_4096   4
 
 uint8_t neug_err_state;
-uint16_t neug_err_count;
+uint16_t neug_err_cnt;
+uint16_t neug_err_cnt_rc;
+uint16_t neug_err_cnt_p64;
+uint16_t neug_err_cnt_p4k;
 
 static void noise_source_error_reset (void)
 {
@@ -224,7 +227,14 @@ static void noise_source_error_reset (void)
 static void noise_source_error (uint32_t err)
 {
   neug_err_state |= err;
-  neug_err_count++;
+  neug_err_cnt++;
+
+  if ((err & REPETITION_COUNT))
+    neug_err_cnt_rc++;
+  if ((err & ADAPTIVE_PROPORTION_64))
+    neug_err_cnt_p64++;
+  if ((err & ADAPTIVE_PROPORTION_4096))
+    neug_err_cnt_p4k++;
 
 #include "board.h"
 #if defined(BOARD_FST_01)
@@ -376,7 +386,7 @@ static uint32_t rb_del (struct rng_rb *rb)
   return v;
 }
 
-static uint8_t neug_mode;
+uint8_t neug_mode;
 
 /**
  * @brief  Random number generation from ADC sampling.

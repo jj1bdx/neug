@@ -1,5 +1,9 @@
 2012-10-03  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (USB_NEUG_GET_INFO): New.
+
+	* tool/neug_check.py: Show mode and errors.
+
 	* src/adc_stm32f103.c (adc_lld_serve_rx_interrupt)
 	(adc_start_conversion): Filter by CRC32.
 	* src/random.c (ep_init, ep_fill_wbuf, ep_process): Filter by CRC32.
