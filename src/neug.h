@@ -4,7 +4,7 @@
 #define NEUG_PRE_LOOP 32
 
 #define NEUG_MODE_CONDITIONED 0
-#define NEUG_MODE_RAW_LSB     1
+#define NEUG_MODE_RAW         1
 #define NEUG_MODE_RAW_DATA    2
 
 void neug_init (uint32_t *buf, uint8_t size);

@@ -27,6 +27,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "sys.h"
 #include "neug.h"
 #include "adc.h"
 
@@ -39,11 +40,6 @@ static sha256_context sha256_ctx_data;
 static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
 /*
- * We did an experiment of measuring entropy of ADC output with MUST.
- * The entropy of a byte by raw sampling of LSBs has more than 6.0 bit/byte.
- *
- * More tests will be required, but for now we assume min-entropy >= 5.0.
- * 
  * To be a full entropy source, the requirement is to have N samples for
  * output of 256-bit, where:
  *
@@ -69,16 +65,16 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
  */
 #define NUM_NOISE_INPUTS 139
 
-#define EP_ROUND_0 0 /* initial-five-byte and 59*8-sample-input */
-#define EP_ROUND_1 1 /* 64*8-sample-input */
-#define EP_ROUND_2 2 /* 16*8-sample-input */
-#define EP_ROUND_RAW_LSB  3 /* 64*8-sample-input */
-#define EP_ROUND_RAW_DATA 4 /* 16-sample-input */
+#define EP_ROUND_0 0 /* initial-five-byte and 59-byte-input */
+#define EP_ROUND_1 1 /* 64-byte-input */
+#define EP_ROUND_2 2 /* 16-byte-input */
+#define EP_ROUND_RAW      3 /* 64-byte-input */
+#define EP_ROUND_RAW_DATA 4 /* 2-sample-input */
 
 #define EP_ROUND_0_INPUTS 59
 #define EP_ROUND_1_INPUTS 64
 #define EP_ROUND_2_INPUTS 16
-#define EP_ROUND_RAW_LSB_INPUTS 64
+#define EP_ROUND_RAW_INPUTS 64
 #define EP_ROUND_RAW_DATA_INPUTS 2
 
 static uint8_t ep_round;
@@ -91,43 +87,35 @@ static uint8_t ep_round;
  */
 static void ep_fill_initial_string (void)
 {
-  memset (adc_samp, 0, 5 * 8 * sizeof (uint16_t));
+  memset (adc_samp, 0, 5);
   adc_samp[0] = 1;
-  adc_samp[3*8] = 1;
+  adc_samp[3] = 1;
 }
 
 static void ep_init (int mode)
 {
   chEvtClearFlags (ADC_DATA_AVAILABLE);
-  if (mode == NEUG_MODE_RAW_LSB)
+  if (mode == NEUG_MODE_RAW)
     {
-      ep_round = EP_ROUND_RAW_LSB;
-      adc_start_conversion (0, EP_ROUND_RAW_LSB_INPUTS*8/2);
+      ep_round = EP_ROUND_RAW;
+      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_RAW_INPUTS);
     }
   else if (mode == NEUG_MODE_RAW_DATA)
     {
       ep_round = EP_ROUND_RAW_DATA;
-      adc_start_conversion (0, EP_ROUND_RAW_DATA_INPUTS*8/2);
+      adc_start_conversion (ADC_SAMPLE_MODE, 0, EP_ROUND_RAW_DATA_INPUTS);
     }
   else
     {
       ep_round = EP_ROUND_0;
       ep_fill_initial_string ();
-      /*
-       * We get two samples for a single transaction of DMA.
-       * We take LSBs of each samples.
-       * Thus, we need tansactions of: required_number_of_input_in_byte*8/2 
-       */
-      adc_start_conversion (5*8, EP_ROUND_0_INPUTS*8/2);
+      adc_start_conversion (ADC_CRC32_MODE, 5, EP_ROUND_0_INPUTS);
     }
 }
 
 static uint8_t ep_get_byte_from_samples (int i)
 {
-  return (  ((adc_samp[i*8+0] & 1) << 0) | ((adc_samp[i*8+1] & 1) << 1)
-	  | ((adc_samp[i*8+2] & 1) << 2) | ((adc_samp[i*8+3] & 1) << 3)
-	  | ((adc_samp[i*8+4] & 1) << 4) | ((adc_samp[i*8+5] & 1) << 5)
-	  | ((adc_samp[i*8+6] & 1) << 6) | ((adc_samp[i*8+7] & 1) << 7));
+  return adc_samp[i];
 }
 
 static void noise_source_continuous_test (uint8_t noise);
@@ -135,7 +123,10 @@ static void noise_source_continuous_test (uint8_t noise);
 static void ep_fill_wbuf (int i, int flip, int mode)
 {
   if (mode == NEUG_MODE_RAW_DATA)
-    sha256_ctx_data.wbuf[i] = (adc_samp[i*2+1] << 16) | adc_samp[i*2];
+    sha256_ctx_data.wbuf[i] = (adc_samp[i*4]
+			       | (adc_samp[i*4+1] << 8)
+			       | (adc_samp[i*4+2] << 16)
+			       | (adc_samp[i*4+3] << 24));
   else
     {
       uint8_t b0, b1, b2, b3;
@@ -171,9 +162,9 @@ static int ep_process (int mode)
       n = EP_ROUND_2_INPUTS / 4;
       flip = 0;
     }
-  else if (ep_round == EP_ROUND_RAW_LSB)
+  else if (ep_round == EP_ROUND_RAW)
     {
-      n = EP_ROUND_RAW_LSB_INPUTS / 4;
+      n = EP_ROUND_RAW_INPUTS / 4;
       flip = 0;
     }
   else /* ep_round == EP_ROUND_RAW_DATA */
@@ -194,7 +185,7 @@ static int ep_process (int mode)
     {
       if (ep_round == EP_ROUND_0)
 	{
-	  adc_start_conversion (0, EP_ROUND_1_INPUTS*8/2);
+	  adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_1_INPUTS);
 	  sha256_start (&sha256_ctx_data);
 	  sha256_process (&sha256_ctx_data);
 	  ep_round++;
@@ -202,7 +193,7 @@ static int ep_process (int mode)
 	}
       else if (ep_round == EP_ROUND_1)
 	{
-	  adc_start_conversion (0, EP_ROUND_2_INPUTS*8/2);
+	  adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_2_INPUTS);
 	  sha256_process (&sha256_ctx_data);
 	  ep_round++;
 	  return 0;
@@ -255,10 +246,16 @@ static void noise_source_error (uint32_t err)
 #endif
 }
 
+/*
+ * For health tests, we assumes that the device noise source has
+ * min-entropy >= 4.2, since observing raw data stream (before CRC-32)
+ * has more than 4.2 bit/byte entropy.
+ *
+ */
 
-/* Cuttoff = 10, when min-entropy = 3.7, W= 2^-30 */
-/* ceiling of (1+30/3.7) */
-#define REPITITION_COUNT_TEST_CUTOFF 10
+/* Cuttoff = 6, when min-entropy = 4.2, W= 2^-30 */
+/* ceiling of (1+30/4.2) */
+#define REPITITION_COUNT_TEST_CUTOFF 8
 
 static uint8_t rct_a;
 static uint8_t rct_b;
@@ -278,9 +275,9 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 22, when min-entropy = 3.7, W= 2^-30 */
-/* With R, qbinom(1-2^-30,64,2^-3.7) */
-#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 22
+/* Cuttoff = 18, when min-entropy = 4.2, W= 2^-30 */
+/* With R, qbinom(1-2^-30,64,2^-4.2) */
+#define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 18
 
 static uint8_t ap64t_a;
 static uint8_t ap64t_b;
@@ -306,9 +303,9 @@ static void adaptive_proportion_64_test (uint8_t sample)
     }
 }
 
-/* Cuttoff = 422, when min-entropy = 3.7, W= 2^-30 */
-/* With R, qbinom(1-2^-30,4096,2^-3.7) */
-#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 422
+/* Cuttoff = 315, when min-entropy = 4.2, W= 2^-30 */
+/* With R, qbinom(1-2^-30,4096,2^-4.2) */
+#define ADAPTIVE_PROPORTION_4096_TEST_CUTOFF 315
 
 static uint8_t ap4096t_a;
 static uint16_t ap4096t_b;
@@ -477,7 +474,19 @@ static WORKING_AREA(wa_rng, 256);
 void
 neug_init (uint32_t *buf, uint8_t size)
 {
+  const uint32_t *u = (const uint32_t *)unique_device_id ();
   struct rng_rb *rb = &the_ring_buffer;
+  int i;
+
+  RCC->AHBENR |= RCC_AHBENR_CRCEN;
+  CRC->CR = CRC_CR_RESET;
+
+  /*
+   * This initialization ensures that it generates different sequence
+   * even if all physical conditions are same.
+   */
+  for (i = 0; i < 3; i++)
+    CRC->DR = *u++;
 
   neug_mode = NEUG_MODE_CONDITIONED;
   rb_init (rb, buf, size);

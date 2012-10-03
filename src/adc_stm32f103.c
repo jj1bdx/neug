@@ -27,6 +27,8 @@
 #include "neug.h"
 #include "adc.h"
 
+#define NEUG_CRC32_COUNTS 3
+
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
 #define STM32_ADC_ADC1_IRQ_PRIORITY         5
 
@@ -61,13 +63,19 @@
 /*
  * ADC samples buffer.
  */
-uint16_t adc_samp[NEUG_SAMPLE_BUFSIZE];
+uint8_t adc_samp[NEUG_SAMPLE_BUFSIZE] __attribute__((aligned (4)));
 
 #define NEUG_DMA_CHANNEL STM32_DMA1_STREAM1
-#define NEUG_DMA_MODE (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)     \
-		       | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD \
-		       | STM32_DMA_CR_MINC       | STM32_DMA_CR_TCIE	   \
-		       | STM32_DMA_CR_TEIE)
+#define NEUG_DMA_MODE_SAMPLE                                            \
+  (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
+     | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
+     | STM32_DMA_CR_MINC       | STM32_DMA_CR_TCIE			\
+     | STM32_DMA_CR_TEIE)
+
+#define NEUG_DMA_MODE_CRC32                                             \
+  (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
+     | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
+     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
 
 #define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)
 #define NEUG_ADC_SETTING1_SMPR2 0
@@ -153,15 +161,12 @@ void adc_start (void)
   chSysUnlock ();
 }
 
-void adc_start_conversion (int offset, int size)
+static int adc_size;
+static int adc_offset;
+static int adc_mode;
+
+static void adc_start_conversion_internal (void)
 {
-  uint16_t *p = adc_samp + offset;
-
-  dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, p);
-  dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, size);
-  dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE);
-  dmaStreamEnable (NEUG_DMA_CHANNEL);
-
 #ifdef DELIBARATELY_DO_IT_WRONG_START_STOP
   /* Power on */
   ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
@@ -177,6 +182,48 @@ void adc_start_conversion (int offset, int size)
 	       | ADC_CR2_EXTSEL | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 #endif
 }
+
+void adc_start_conversion (int mode, int offset, int size)
+{
+  adc_mode = mode;
+  adc_offset = offset;
+  adc_size = size;
+
+ if (mode == ADC_SAMPLE_MODE)
+    {
+      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, adc_samp + offset);
+      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, size);
+      dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_SAMPLE);
+      dmaStreamEnable (NEUG_DMA_CHANNEL);
+    }
+  else
+    {
+      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, &CRC->DR);
+      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, NEUG_CRC32_COUNTS);
+      dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_CRC32);
+      dmaStreamEnable (NEUG_DMA_CHANNEL);
+
+      if ((size & 3))
+	{
+	  uint32_t v;
+	  int i;
+
+	  CRC->DR = SysTick->VAL;
+	  v = CRC->DR;
+
+	  for (i = 0; i < (size & 3); i++)
+	    {
+	      adc_samp[adc_offset++] = v;
+	      v >>= 8;
+	    }
+
+	  adc_size &= ~3;
+	}
+    }
+
+ adc_start_conversion_internal ();
+}
+
 
 static void adc_stop_conversion (void)
 {
@@ -209,7 +256,8 @@ static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags)
 
   if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
     {
-      /* access an unmapped address space or violates alignment rules.  */
+      /* Should never happened.  If any, it's coding error. */
+      /* Access an unmapped address space or alignment violation.  */
       adc_stop_conversion ();
     }
   else
@@ -217,10 +265,33 @@ static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags)
       if ((flags & STM32_DMA_ISR_TCIF) != 0) /* Transfer complete */
 	{
 	  adc_stop_conversion ();
-	  chSysLockFromIsr();
-	  if (rng_thread)
-	    chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
-	  chSysUnlockFromIsr();
+
+	  if (adc_mode != ADC_SAMPLE_MODE)
+	    {
+	      uint32_t *p =  (uint32_t *)(&adc_samp[adc_offset]);
+
+	      *p = CRC->DR;
+	      adc_offset += 4;
+	      adc_size -= 4;
+
+	      if (adc_size > 0)
+		{
+		  dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, &CRC->DR);
+		  dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, NEUG_CRC32_COUNTS);
+		  dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_CRC32);
+		  dmaStreamEnable (NEUG_DMA_CHANNEL);
+
+		  adc_start_conversion_internal ();
+		}
+	    }
+
+	  if (adc_mode == ADC_SAMPLE_MODE || adc_size <= 0)
+	    {
+	      chSysLockFromIsr();
+	      if (rng_thread)
+		chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
+	      chSysUnlockFromIsr();
+	    }
 	}
     }
 }
