@@ -35,6 +35,9 @@
 #define ADC_SMPR1_SMP_VREF(n)   ((n) << 21)
 #define ADC_SMPR1_SMP_SENSOR(n) ((n) << 18)
 
+#define ADC_SMPR1_SMP_AN10(n)   ((n) << 0)
+#define ADC_SMPR1_SMP_AN11(n)   ((n) << 3)
+
 #define ADC_SMPR2_SMP_AN0(n)    ((n) << 0)
 #define ADC_SMPR2_SMP_AN1(n)    ((n) << 3)
 
@@ -49,6 +52,8 @@
 
 #define ADC_CHANNEL_IN0         0
 #define ADC_CHANNEL_IN1         1
+#define ADC_CHANNEL_IN10        10
+#define ADC_CHANNEL_IN11        11
 #define ADC_CHANNEL_SENSOR      16
 #define ADC_CHANNEL_VREFINT     17
 
