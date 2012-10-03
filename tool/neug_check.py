@@ -8,12 +8,12 @@ Author: NIIBE Yutaka <gniibe@fsij.org>
 
 This file is a part of NeuG, a TRNG implementation.
 
-Gnuk is free software: you can redistribute it and/or modify it
+NeuG is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Gnuk is distributed in the hope that it will be useful, but WITHOUT
+NeuG is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
 License for more details.
@@ -59,9 +59,20 @@ class neug(object):
 
         self.__timeout = 10000
 
-    def get_err_count(self):
+    def get_mode(self):
+        mode = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
+                                          value = 0, index = 0, buffer = 1,
+                                          timeout = 1000)
+        if mode[0] == 0:
+            return "Conditioned"
+        elif mode[0] == 1:
+            return "Raw data (after filter)"
+        else:
+            return "Raw data (ADC samples)"
+
+    def get_err_cnt(self, index):
         err = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
-                                          value = 0, index = 0, buffer = 2,
+                                          value = 0, index = index, buffer = 2,
                                           timeout = 1000)
         return err[1]*256 + err[0]
 
@@ -92,7 +103,12 @@ def main():
             pass
     if not com:
         raise ValueError, "No NeuG Device Present"
-    print "ERRORS: %d" % com.get_err_count()
+    print
+    print "mode: %s" % com.get_mode()
+    print "Repeat errors: %d" % com.get_err_cnt(2)
+    print "PP 64  errors: %d" % com.get_err_cnt(3)
+    print "PP 4k  errors: %d" % com.get_err_cnt(4)
+    print "Total  errors: %d" % com.get_err_cnt(1)
     return 0
 
 
