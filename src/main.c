@@ -39,7 +39,7 @@
 extern void *memcpy(void *dest, const void *src, size_t n);
 extern void *memset (void *s, int c, size_t n);
 
-static Thread *main_thread = NULL;
+static Thread *main_thread;
 
 
 #define ENDP0_RXADDR        (0x40)
@@ -608,11 +608,7 @@ static void fill_serial_no_by_unique_id (void)
 CH_IRQ_HANDLER (Vector90)
 {
   CH_IRQ_PROLOGUE();
-  chSysLockFromIsr();
-
   usb_interrupt_handler ();
-
-  chSysUnlockFromIsr();
   CH_IRQ_EPILOGUE();
 }
 
@@ -620,7 +616,7 @@ void
 EP1_IN_Callback (void)
 {
   chSysLockFromIsr ();
-  if (main_thread != NULL && neug_state == NEUG_WAIT_FOR_TX_READY)
+  if (neug_state == NEUG_WAIT_FOR_TX_READY)
     {
       main_thread->p_u.rdymsg = RDY_OK;
       chSchReadyI (main_thread);
@@ -783,7 +779,7 @@ main (int argc, char **argv)
 	      chSchGoSleepS (THD_STATE_SUSPENDED);
 	      neug_state = 0;
 	    }
-	  chSysUnlock();
+	  chSysUnlock ();
 
 	  count++;
 	}
