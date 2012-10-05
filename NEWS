@@ -1,3 +1,60 @@
+* Major changes in NeuG 0.03
+
+  Released 2012-10-XX, by NIIBE Yutaka
+
+** Change RNG constuct.
+We replace all basic components again, to conform NIST SP 800-90B.
+Now, we use two analog inputs use in addition to Vref and Temperature
+Sensor.  We take advantage of another A/D convertor, ADC2.
+
+In former versions, we use LSBs of inputs.  From this version, we use
+all bits, and put them to CRC32 calculation unit.  That's because we
+can get more entropy when using full bits.
+
+The central component, the conditioning component is the one with
+SHA-256, to conform NIST SP 80-90B.
+
+** New ADC (A/D convertor) driver
+Now, we use our own ADC driver, so that we can use ADC2 and control
+ADC for our particular usage (such that put it to CRC32 calculation
+unit).
+
+** Selection of output
+Using "stty" command, we can now select one of three outputs: final
+output (conditioned), CRC32 filtered raw data before conditioning, and
+raw input data of ADC.
+
+** USB strings for revision detail, configure options, and system service.
+USB strings now have more information.  There are revision detail
+string, configure options string, system service version string, as
+well as vendor string and product string.  These strings could be
+examined to check NeuG device.
+
+** New mandatory option '--vidpid' for configure
+You must specify USB vendor ID and product ID for Gnuk.
+The file NEUG_USB_DEVICE_ID lists valid USB device IDs.
+
+** Health test
+Health tests are implemented to conform NIST SP 800-90B.  There are
+three tests, repetition count test, adaptive proportion test 64,
+and adaptive proportion test 4096.
+
+** System service blocks at the beginning of flash ROM.
+Once flash ROM is protected, first 4-KiB cannot be modified.  Gnuk use
+this area for "system service".  NeuG has compatible system service
+block as Gnuk.  Note that this area will not be able to be modified by
+firmware upgrade (or by any method).
+
+** New tool: neug_upgrade.py
+The tool neug_upgrade.py is to send reGNUal to NeuG device.  Then, we
+put new NeuG binary (or any binary, say, Gnuk) into the device with
+reGNUal.
+
+** New tool: neug_check.py
+The tool neug_check.py is to check the device condition.  You can see
+error counters of NeuG device with this tool.
+
+
 * Major changes in NeuG 0.02
 
   Released 2012-08-30, by NIIBE Yutaka

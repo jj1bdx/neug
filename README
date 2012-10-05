@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
 							   Version 0.03
-							     2012-10-19
+							     2012-10-XX
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -94,6 +94,47 @@ To build NeuG device, we need external source code.
   We use ChibiOS/RT as the kernel for NeuG device.
 
 
+USB vendor ID and product ID (USB device ID)
+============================================
+
+When you have a vender ID and assign a product ID for NeuG, edit the
+file NEUG_USB_DEVICE_ID and add an entry for yours.  In this case,
+please contact Niibe, so that it is listed to the file in the official
+release of the source code.
+
+When you are modifing NeuG and installing the binary to device, you
+should replace the vendor string to yours, so that users can see it's
+not by original vendor, and it is modified version.
+
+FSIJ allows you to use USB device ID of FSIJ (234b:0001) for devices
+with standalone NeuG under one of following conditions:
+
+  * For everyone for experimental purpose:
+
+    - You must not distribute a binary with FSIJ's USB device ID, but
+      must use the binary by yourself only for your experiment.  Note
+      that "Distributing binary" includes distributing a device which
+      holds the binary.
+
+  * For general individuals:
+
+    - No additional conditions.
+
+  * For individuals with explicit permission from FSIJ.
+
+    - No additional conditions.
+
+FSIJ could give companies or business entities "second source
+manufacturer" license to use USB device ID of FSIJ for devices with
+unmodified version of NeuG, provided they support Free Software and
+respect users' freedom for computing.  Please ask FSIJ for the
+license.
+
+Otherwise, companies which want to distribute NeuG devices, please use
+your own USB vendor ID and product ID.  Please replace vendor string
+and possibly product string to yours, when you modify NeuG.
+
+
 How to compile
 ==============
 
@@ -139,7 +180,7 @@ If you are using Olimex JTAG-Tiny, type following to invoke OpenOCD:
 
   $ openocd -f interface/olimex-jtag-tiny.cfg -f board/olimex_stm32_h103.cfg
 
-Then, with another terminal, type following to write "gnuk.elf" to Flash ROM:
+Then, with another terminal, type following to write "neug.elf" to Flash ROM:
 
   $ telnet localhost 4444
   > reset halt
