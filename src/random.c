@@ -41,27 +41,28 @@ static sha256_context sha256_ctx_data;
 static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
 /*
- * To be a full entropy source, the requirement is to have N samples for
- * output of 256-bit, where:
+ * To be a full entropy source, the requirement is to have N samples
+ * for output of 256-bit, where:
  *
  *      N = (256 * 2) / <min-entropy of a sample>
  *
- * For min-entropy = 5.0, N should be more than 103.
+ * For example, N should be more than 103 for min-entropy = 5.0.
  *
- * On the other hand, in the section 6.2 "Full Entropy Source Requirements",
- * it says:
+ * On the other hand, in the section 6.2 "Full Entropy Source
+ * Requirements", it says:
  *
  *     At least twice the block size of the underlying cryptographic
  *     primitive shall be provided as input to the conditioning
  *     function to produce full entropy output.
  *
- * For us, cryptographic primitive is SHA-256 and its blocksize is 512-bit
- * (64-byte), N >= 128.
+ * For us, cryptographic primitive is SHA-256 and its blocksize is
+ * 512-bit (64-byte), thus, N >= 128.
  *
- * We chose N=140.  We have "additional bits" of 32-byte for last
- * block (feedback from previous output of SHA-256).
+ * We chose N=140.  Note that we have "additional bits" of 16-byte for
+ * last block (feedback from previous output of SHA-256) to feed
+ * hash_df function of SHA-256, together with sample data of 140-byte.
  *
- * This corresponds to min-entropy >= 3.68.
+ * N=140 corresponds to min-entropy >= 3.68.
  *
  */
 #define NUM_NOISE_INPUTS 140
@@ -247,14 +248,17 @@ static void noise_source_error (uint32_t err)
 
 /*
  * For health tests, we assumes that the device noise source has
- * min-entropy >= 4.2, since observing raw data stream (before CRC-32)
- * has more than 4.2 bit/byte entropy.
+ * min-entropy >= 4.2.  Observing raw data stream (before CRC-32) has
+ * more than 4.2 bit/byte entropy.  When the data stream after CRC-32
+ * filter will be less than 4.2 bit/byte entropy, that must be
+ * something wrong.  Note that even we observe < 4.2, we still have
+ * some margin, since we use NUM_NOISE_INPUTS=140.
  *
  */
 
-/* Cuttoff = 6, when min-entropy = 4.2, W= 2^-30 */
+/* Cuttoff = 9, when min-entropy = 4.2, W= 2^-30 */
 /* ceiling of (1+30/4.2) */
-#define REPITITION_COUNT_TEST_CUTOFF 8
+#define REPITITION_COUNT_TEST_CUTOFF 9
 
 static uint8_t rct_a;
 static uint8_t rct_b;
