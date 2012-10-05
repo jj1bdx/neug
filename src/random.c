@@ -435,7 +435,7 @@ static msg_t rng (void *arg)
   /* Enable ADCs */
   adc_start ();
 
-  ep_init (0);
+  ep_init (NEUG_MODE_CONDITIONED);
 
   while (!chThdShouldTerminate ())
     {
