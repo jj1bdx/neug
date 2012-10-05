@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
 							   Version 0.03
-							     2012-09-27
+							     2012-10-19
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -52,7 +52,7 @@ A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
                 looks not that good).
 
 Q1: How fast is NeuG device?
-A1: It's something around 30 Ki-byte/second.
+A1: It's more than 50 Ki-byte/second.
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  Three continuous tests are implemented, following
@@ -164,7 +164,7 @@ When you want to get raw output (not conditioned), you can configure:
 
   $ stty -F /dev/ttyACM0 parenb parodd
 
-for raw data of LSBs.  For raw data of samples, configure:
+for raw data after filter.  For direct raw data of samples, configure:
 
   $ stty -F /dev/ttyACM0 parenb -parodd
 
@@ -178,57 +178,89 @@ Structure of the NeuG
 
 Here is a figure of the circuit.
 
+                                         Noise sources
 
-           Physical-based RNG
-           
-            +--------------+              Noise sources 
+                              /|<---+--- [ Analog input Vref ]
+                16           | |<-+-|--- [ Analog input Temperature Sensor ]
+             +---/-[ADC1] <==| |  | |
+             |               | |<-+ |
+      +-+    |                \|<---+
+      | |<---+                |
+ +----| |          MUX CTL >--+
+ |    | |<---+
+ |    +-+    |                /|
+ |           |  16           | |<------- [ Analog input 0 ] (pull up to Vdd)
+ |           +---/-[ADC2] <==| |
+ |                           | |<------- [ Analog input 1 ] (pull up to Vdd)
+ |                            \|
+ |                            |
+ |                 MUX CTL >--+
+ |
+ +------------------+         <============ (*1)
+                    |
+                    / 32
+                    |
+                    | Put 4 times to output 32-bit
+                    V
+            [ CRC-32 filter ]
+                    |
+                    |           Put 35 times to output 1120-bit
+                    +---------------------------------+         <====== (*2)
+                                                      |
+                                                      / 32
+                                                      |
+                                              [ Entropy Buffer ]
+                                                      |          
+            +--------------+                          |
+            |              |                          |
+            | Conditioning |            1120          |
+            | Component    |<------------/------------+
             |              |
-            | Conditioning |   1112 ||<-- LSB of result of [ IN10 ]
-            | Component    |<---/---||
-            |              |        ||<-- LSB of result of [ IN11 ]
       +-----|  Hash_df     |
       |     |    by        |
       |     |  SHA-256     |
       |     |              |
-      |     |              |   128
-      |     |              |<---/---+
-      |     +--------------+        |
-      |                             |
-      +-----------------------------+
+      |     |              |  128
+      |     |              |<--/--+
+      |     +--------------+      |
+      |                           |
+      +---------------------------+
       |
       / 256
       |
       v
- Random Number Output
+ Random Number Output <========== (*3)
 
 
-STM32F103 has two built-in A/D converters of 12-bit resolution.  NeuG
-uses LSBs of A/D converters' outputs as entropy sources.  It is
-considered noise of quantization error, plus noise from power supply,
-etc.
 
-We chose analog inputs of IN10 and IN11, which is not connected to
-external pin (for the version of 36-pin or 48-pin STM32F103).  The
-input is configured as digital output 50MHz to get maximum noise of
-environment.
+Specifying by "stty", you can get (*3) with -parenb, (*2) with parenb
+parodd, and (*1) with parenb 0parodd.
 
-By 556 samplings of two channels, we can get 1112-bit, as we can get
-two bits (LSB of IN10 and LSB of IN11) from one sampling.  We put this
-1112-bit and half of previous output to conditioning component.
+STM32F103 has two built-in A/D converters.  NeuG uses A/D converters'
+outputs as entropy sources.  It is considered noise of quantization
+error, plus noise from power supply, etc.
 
-Conditioning component is implemented by Hash_df function by SHA-256.
-Since the noise source is not "white", signal is whiten by this
-Conditioning component.
+We chose four analog input sources of: built-in voltage reference,
+temperature sensor and two analog inputs which are pull-up to Vdd.
 
-Experiments show that raw noise source of LSBs has more than 6.0
-bit/byte entropy when it is no computation but just to take samples.
-The entropy varies among different boards.  It seems that a board with
-good power supply and capacitor has smaller entropy (6.2 or so), and
-the one with poor power supply and capacitor has bigger entropy (7.3
-or so).  That is considered noise of quantization error.
+By a single sampling of two channel, we get 32-bit (not all 32-bit is
+valid, as a A/D converter resolution is 12-bit only).  We take four
+sampling of different combinations: (Vref, IN0), (Temp, IN1), (Vref,
+IN1), and (Temp, IN0).  Those 32-bit * 4 is fed into CRC32 filter.
 
-When there is some activities of MCU, it's more than 7.0 bit/byte
-entropy for a board even with good power supply and capacitor.
+We use STM32F103's CRC32 calculation unit as a kind of filter.  We put
+output of A/D converters into CRC32 calculation unit, four times, to
+get 4-byte output.
+
+Output of CRC32 filter is collected 35 times, and it becomes 1120-bit
+(32 * 35).  This is the noise source bits.
+
+We put this 1120-bit and half of previous output (128-bit) to
+conditioning component.
+
+Conditioning Component is implemented by Hash_df function which is
+composed by SHA-256.  Since the noise source is not "white", signal is
+whiten by this Conditioning Component.
 
 My experience with STM32F103 and NeuG shows that noise source is
 stable at least for a year.
@@ -271,38 +303,10 @@ Information on the Web
 Not yet.
 
 
-Known Problem(s)
-================
-
-On STBee (high-density device of STM32), sometimes, I observed stall
-of generation of random number, after two hours, two hours and half,
-etc.
-
-Identified somehow.  When it stalls, status is like this (by OpenOCD, GDB):
-
-	adcp->state = ADC_ACTIVE
-	main thread: wait on condition variable at neug_get
-	rng thread: holding rb->m, event wait at rng_gen for ADC_DATA_AVAILABLE
-	idle thread: running
-	LED thread: event wait
-
-Kicking DMA controller again (note: ADC is continuous mode, no need to
-kick), by doing following:
-
-  (gdb) set ADCD1.dmastp->channel->CCR = 0
-  (gdb) set ADCD1.dmastp->channel->CNDTR = 8
-  (gdb) set ADCD1.dmastp->channel->CCR = 0x258f
-  (gdb) x/x 0x40020000		# DMA interrupt status register (DMA_ISR)
-  0x40020000:	0x00000007
-
-Then, it goes again.
-
-Lost DMA finish interrupt?
-
 
 Your Contributions
 ==================
 
 FSIJ welcomes your contributions.  Please assign your copyright
 to FSIJ (if possible).
--- 
+--
