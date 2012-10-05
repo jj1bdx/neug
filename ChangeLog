@@ -1,3 +1,10 @@
+2012-10-05  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (neug_state): Remove.
+	(neug_ctrl_write_finish, vcom_port_data_setup, EP1_IN_Callback)
+	(main): Use ->p_state (was: neug_state).
+	(main): Call chThdSleep (was: chEvtWaitOneTimeout).
+
 2012-10-03  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (USB_NEUG_GET_INFO): New.
