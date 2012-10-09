@@ -171,7 +171,7 @@ static const uint8_t vcom_string0[4] = {
 static uint8_t vcom_string3[28] = {
   28,                    /* bLength.                         */
   USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType.                 */
-  '0', 0,  '.', 0,  '0', 0, '2', 0,    /* Version number of NeuG.          */
+  '0', 0,  '.', 0,  '0', 0, '3', 0,    /* Version number of NeuG.          */
   '-', 0,
   0, 0, 0, 0,	/* Filled by Unique device ID.      */
   0, 0, 0, 0,

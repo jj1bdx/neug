@@ -1,6 +1,6 @@
 * Major changes in NeuG 0.03
 
-  Released 2012-10-XX, by NIIBE Yutaka
+  Released 2012-10-09, by NIIBE Yutaka
 
 ** Change RNG constuct.
 We replace all basic components again, to conform NIST SP 800-90B.
@@ -11,13 +11,13 @@ In former versions, we use LSBs of inputs.  From this version, we use
 all bits, and put them to CRC32 calculation unit.  That's because we
 can get more entropy when using full bits.
 
-The central component, the conditioning component is the one with
+The central component, the conditioning component, is the one with
 SHA-256, to conform NIST SP 80-90B.
 
 ** New ADC (A/D convertor) driver
-Now, we use our own ADC driver, so that we can use ADC2 and control
-ADC for our particular usage (such that put it to CRC32 calculation
-unit).
+Now, we use our own ADC driver, so that we can use ADC2 and we can
+control ADC for our particular usage (such that put it to CRC32
+calculation unit).
 
 ** Selection of output
 Using "stty" command, we can now select one of three outputs: final
@@ -34,7 +34,7 @@ examined to check NeuG device.
 You must specify USB vendor ID and product ID for Gnuk.
 The file NEUG_USB_DEVICE_ID lists valid USB device IDs.
 
-** Health test
+** Health tests
 Health tests are implemented to conform NIST SP 800-90B.  There are
 three tests, repetition count test, adaptive proportion test 64,
 and adaptive proportion test 4096.

@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
 							   Version 0.03
-							     2012-10-XX
+							     2012-10-09
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -214,8 +214,8 @@ And you can get conditioned output by configuring:
   $ stty -F /dev/ttyACM0 -parenb
 
 
-Structure of the NeuG
-=====================
+Structure of NeuG
+=================
 
 Here is a figure of the circuit.
 
@@ -250,6 +250,7 @@ Here is a figure of the circuit.
                                                       |
                                                       / 32
                                                       |
+                                                      V
                                               [ Entropy Buffer ]
                                                       |          
             +--------------+                          |
@@ -260,7 +261,6 @@ Here is a figure of the circuit.
       +-----|  Hash_df     |
       |     |    by        |
       |     |  SHA-256     |
-      |     |              |
       |     |              |  128
       |     |              |<--/--+
       |     +--------------+      |
@@ -275,7 +275,7 @@ Here is a figure of the circuit.
 
 
 Specifying by "stty", you can get (*3) with -parenb, (*2) with parenb
-parodd, and (*1) with parenb 0parodd.
+parodd, and (*1) with parenb -parodd.
 
 STM32F103 has two built-in A/D converters.  NeuG uses A/D converters'
 outputs as entropy sources.  It is considered noise of quantization
@@ -284,10 +284,10 @@ error, plus noise from power supply, etc.
 We chose four analog input sources of: built-in voltage reference,
 temperature sensor and two analog inputs which are pull-up to Vdd.
 
-By a single sampling of two channel, we get 32-bit (not all 32-bit is
+By a single sampling of two channels, we get 32-bit (not all 32-bit is
 valid, as a A/D converter resolution is 12-bit only).  We take four
-sampling of different combinations: (Vref, IN0), (Temp, IN1), (Vref,
-IN1), and (Temp, IN0).  Those 32-bit * 4 is fed into CRC32 filter.
+sampling of combinations: (Vref, IN0), (Temp, IN1), (Vref, IN1), and
+(Temp, IN0).  Those 32-bit * 4 is fed into CRC32 filter.
 
 We use STM32F103's CRC32 calculation unit as a kind of filter.  We put
 output of A/D converters into CRC32 calculation unit, four times, to
@@ -313,8 +313,8 @@ Test results
 See files under the directory test-results, for test result of
 "rngtest" in rng-tools, NIST STS 2.1.1, and Dieharder.
 
-For Dieharder, I correct 13GiB (it took five days and six hours
-and more), and use scripts to invoke dieharder.
+For Dieharder, I correct 1500MB (it took four days or so), and use
+scripts to invoke dieharder.
 
 
 Read-only Git Repository
