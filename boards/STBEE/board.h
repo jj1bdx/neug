@@ -38,6 +38,14 @@
 #define GPIO_LED	GPIOD_LED1
 #define IOPORT_LED	GPIOD
 
+/* NeuG settings for ADC2.  */
+#define NEUG_ADC_SETTING2_SMPR1 ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5) \
+                              | ADC_SMPR1_SMP_AN11(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING2_SMPR2 0
+#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10)   \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN11)
+#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
+
 /*
  * Board identifier.
  */
@@ -106,11 +114,11 @@
 
 /*
  * Port C setup.
- * PC0  - Push Pull output 50MHz.
- * PC1  - Push Pull output 50MHz.
+ * PC0  - Digital input with PullUp.  AN10
+ * PC1  - Digital input with PullUp.  AN11
  * Everything input with pull-up except:
  */
-#define VAL_GPIOCCRL            0x88888833      /*  PC7...PC0 */
+#define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x88888888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 
