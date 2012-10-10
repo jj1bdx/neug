@@ -393,41 +393,6 @@ static uint32_t rb_del (struct rng_rb *rb)
 uint8_t neug_mode;
 
 /**
- * @brief  Random number generation from ADC sampling.
- * @param  RB: Pointer to ring buffer structure
- * @return -1 when failure, 0 otherwise.
- * @note   Called holding the mutex, with RB->full == 0.
- *         Keep generating until RB->full == 1.
- */
-static int rng_gen (struct rng_rb *rb)
-{
-  int n;
-  int mode = neug_mode;
-
-  while (1)
-    {
-      chEvtWaitOne (ADC_DATA_AVAILABLE); /* Got a series of ADC sampling.  */
-
-      if ((n = ep_process (mode)))
-	{
-	  int i;
-	  const uint32_t *vp;
-
-	  vp = ep_output (mode);
-	  for (i = 0; i < n; i++)
-	    {
-	      rb_add (rb, *vp);
-	      vp++;
-	      if (rb->full)
-		return 0;
-	    }
-	}
-    }
-
-  return 0;			/* success */
-}
-
-/**
  * @brief Random number generation thread.
  */
 static msg_t rng (void *arg)
@@ -443,24 +408,40 @@ static msg_t rng (void *arg)
 
   while (!chThdShouldTerminate ())
     {
-      chMtxLock (&rb->m);
-      while (rb->full)
-	chCondWait (&rb->space_available);
-      while (1)
+      int n;
+      int mode = neug_mode;
+
+      chEvtWaitOne (ADC_DATA_AVAILABLE); /* Get ADC sampling.  */
+
+      if ((n = ep_process (mode)))
 	{
-	  rng_gen (rb);
-	  if (neug_err_state != 0)
+	  int i;
+	  const uint32_t *vp;
+
+	  if (neug_err_state != 0
+	      && neug_mode == NEUG_MODE_CONDITIONED)
 	    {
-	      if (neug_mode == NEUG_MODE_CONDITIONED)
-		while (!rb->empty)
-		  (void)rb_del (rb);
+	      /* Don't use the result and do it again.  */
 	      noise_source_error_reset ();
+	      continue;
 	    }
-	  else
-	    break;
+
+	  vp = ep_output (mode);
+
+	  chMtxLock (&rb->m);
+	  while (rb->full)
+	    chCondWait (&rb->space_available);
+
+	  for (i = 0; i < n; i++)
+	    {
+	      rb_add (rb, *vp++);
+	      if (rb->full)
+		break;
+	    }
+
+	  chCondSignal (&rb->data_available);
+	  chMtxUnlock ();
 	}
-      chCondSignal (&rb->data_available);
-      chMtxUnlock ();
     }
 
   adc_stop ();
@@ -576,11 +557,16 @@ void
 neug_mode_select (uint8_t mode)
 {
   neug_wait_full ();
+  while (rng_thread->p_state != THD_STATE_WTCOND)
+    chThdSleep (MS2ST (1));
+
   if (neug_mode != mode)
     ep_init (mode);
+
 #if defined(BOARD_FST_01)
   palClearPad (IOPORT1, 2);
 #endif
+
   neug_mode = mode;
   neug_flush ();
 }

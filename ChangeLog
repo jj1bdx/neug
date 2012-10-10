@@ -1,3 +1,9 @@
+2012-10-10  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (rng_gen): Remove.
+	(rng): Merge rng_gen, avoiding bigger lock.
+	(neug_mode_select): Better synchronization to rng thread.
+
 2012-10-09  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.03.
