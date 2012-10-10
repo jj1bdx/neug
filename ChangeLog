@@ -1,3 +1,24 @@
+2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/neug.ld.in (.sys): Follow the change of file layout.
+
+	* src/halconf.h (HAL_USE_EXT, HAL_USE_RTC): Define.
+	(ADC_USE_WAIT, ADC_USE_MUTUAL_EXCLUSION, SERIAL_BUFFERS_SIZE):
+	Remove.
+
+	* boards/FST_01/mcuconf.h (STM32_RTCSEL): Define.
+	(STM32_USBPRE, STM32_MCO): Remove.
+
+	* boards/common/mcuconf-common.h (STM32_NO_INIT)
+	(STM32_HSI_ENABLED, STM32_LSI_ENABLED, STM32_HSE_ENABLED)
+	(STM32_LSE_ENABLED, STM32_USB_CLOCK_REQUIRED, STM32_USBPRE)
+	(STM32_MCOSEL, STM32_PVD_ENABLE, STM32_PLS): Define.
+
+	* chibios: Updated to 2.4.3.
+
+	* src/usb_stm32f103.c: Rename (was: usb-lld.c).
+	* src/Makefile.in (CSRC): Follow the rename.
+
 2012-10-10  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (rng_gen): Remove.

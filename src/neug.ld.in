@@ -56,10 +56,10 @@ SECTIONS
         KEEP(*(.vectors))
 	. = ALIGN(16);
 	*(.sys.version)
-	sys.o(.text)
-	sys.o(.text.*)
-        sys.o(.rodata)
-	sys.o(.rodata.*)
+	*/sys.o(.text)
+	*/sys.o(.text.*)
+        */sys.o(.rodata)
+	*/sys.o(.rodata.*)
 	. = ALIGN(1024);
 	*(.sys.0)
 	*(.sys.1)

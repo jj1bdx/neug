@@ -27,9 +27,9 @@ ifeq ($(USE_THUMB),)
   USE_THUMB = yes
 endif
 
-# Enable register caching optimization (read documentation).
-ifeq ($(USE_CURRP_CACHING),)
-  USE_CURRP_CACHING = no
+# Enable this if you want to see the full log while compiling.
+ifeq ($(USE_VERBOSE_COMPILE),)
+  USE_VERBOSE_COMPILE = no
 endif
 
 #
@@ -56,15 +56,15 @@ endif
 # Define project name here
 PROJECT = neug
 
-# Define linker script file here
-LDSCRIPT= neug.ld
-
 # Imported source files
 CHIBIOS = ../chibios
 include $(CHIBIOS)/os/hal/platforms/STM32F1xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F1xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
+
+# Define linker script file here
+LDSCRIPT= neug.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -75,14 +75,13 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        ../boards/common/board-common.c \
        $(BOARD_DIR)/board.c \
-       sys.c aes-constant-ft.c main.c sha256.c usb_lld.c \
+       sys.c aes-constant-ft.c main.c sha256.c usb_stm32f103.c \
        random.c adc_stm32f103.c
 
 # List ASM source files here
 ASMSRC = $(PORTASM)
 
-INCDIR = $(CRYPTINCDIR) $(STMUSBINCDIR) $(VCOMDIR) \
-	 $(PORTINC) $(KERNINC) $(TESTINC) \
+INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) ../boards/common $(BOARD_DIR) \
          $(CHIBIOS)/os/various
 
