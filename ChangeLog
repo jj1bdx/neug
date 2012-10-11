@@ -1,5 +1,7 @@
 2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/chconf.h [DFU_SUPPORT] (CORTEX_VTOR_INIT): Define.
+
 	* src/neug.ld.in (.sys): Follow the change of file layout.
 
 	* src/halconf.h (HAL_USE_EXT, HAL_USE_RTC): Define.
@@ -9,6 +11,11 @@
 	* boards/FST_01/mcuconf.h (STM32_RTCSEL): Define.
 	(STM32_USBPRE, STM32_MCO): Remove.
 	* boards/STBEE/mcuconf.h: Likewise.
+	* boards/STM8S_DISCOVERY/mcuconf.h: Likewise.
+	* boards/OLIMEX_STM32_H103/mcuconf.h: Likewise.
+	* boards/STBEE_MINI/mcuconf.h: Likewise.
+	* boards/CQ_STARM/mcuconf.h: Likewise.
+	* boards/STM32_PRIMER2/mcuconf.h: Likewise.
 
 	* boards/common/mcuconf-common.h (STM32_NO_INIT)
 	(STM32_HSI_ENABLED, STM32_LSI_ENABLED, STM32_HSE_ENABLED)

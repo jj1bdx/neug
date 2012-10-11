@@ -3,6 +3,11 @@
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
 
+#include <config.h>
+#ifdef DFU_SUPPORT
+#define CORTEX_VTOR_INIT 0x00003000
+#endif
+
 #define CH_FREQUENCY                    1000
 #define CH_TIME_QUANTUM                 20
 #define CH_USE_NESTED_LOCKS             FALSE
