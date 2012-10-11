@@ -1,3 +1,11 @@
+* Major changes in NeuG 0.04
+
+  Released 2012-10-XX, by NIIBE Yutaka
+
+** Update of ChibiOS/RT
+ChibiOS/RT is updated to newer 2.4.3.
+
+
 * Major changes in NeuG 0.03
 
   Released 2012-10-09, by NIIBE Yutaka

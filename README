@@ -1,6 +1,6 @@
 NeuG - a random number generator implementation (for STM32F103)
 
-							   Version 0.03
+							   Version 0.04
 							     2012-10-09
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
@@ -28,12 +28,10 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the fourth release of NeuG, which is still experimental.
-Basic features (generating random numbers) are stable, but newly added
+This is the fifth release of NeuG, which is still experimental.  Basic
+features (generating random numbers) are stable, but newly added
 things like reGNUal support should be considered unstable.  Note that
-you need the snapshot of ChibiOS/RT (from trunk).  This means that it
-is covered by GNU GPL.  No "linking exception" option is available for
-the snapshot.
+you need ChibiOS/RT 2.4.x as external source code.
 
 
 FAQ
@@ -100,7 +98,7 @@ External source code
 
 To build NeuG device, we need external source code.
 
-* chibios/  -- ChibiOS/RT 2.3.x snapshot
+* chibios/  -- ChibiOS/RT 2.4.x
 
   Please get it from http://chibios.sourceforge.net/
   We use ChibiOS/RT as the kernel for NeuG device.
