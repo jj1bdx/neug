@@ -6,6 +6,8 @@
 #include <config.h>
 #ifdef DFU_SUPPORT
 #define CORTEX_VTOR_INIT 0x00003000
+#else
+#define CORTEX_VTOR_INIT 0x00001000
 #endif
 
 #define CH_FREQUENCY                    1000

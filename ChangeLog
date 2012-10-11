@@ -1,6 +1,6 @@
 2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
 
-	* src/chconf.h [DFU_SUPPORT] (CORTEX_VTOR_INIT): Define.
+	* src/chconf.h (CORTEX_VTOR_INIT): Define.
 
 	* src/neug.ld.in (.sys): Follow the change of file layout.
 
