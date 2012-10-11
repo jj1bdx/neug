@@ -1,5 +1,7 @@
 2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
 
+	* tool/dfuse.py: Update from Gnuk 1.0.1.
+
 	* src/chconf.h (CORTEX_VTOR_INIT): Define.
 
 	* src/neug.ld.in (.sys): Follow the change of file layout.
