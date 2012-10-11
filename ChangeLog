@@ -1,5 +1,7 @@
 2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/random.c (EP_ROUND_RAW_DATA_INPUTS): Set it to 32.
+
 	* tool/dfuse.py: Update from Gnuk 1.0.1.
 
 	* src/chconf.h (CORTEX_VTOR_INIT): Define.

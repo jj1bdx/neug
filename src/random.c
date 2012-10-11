@@ -71,13 +71,13 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 #define EP_ROUND_1 1 /* 64-byte-input */
 #define EP_ROUND_2 2 /* 17-byte-input */
 #define EP_ROUND_RAW      3 /* 32-byte-input */
-#define EP_ROUND_RAW_DATA 4 /* 8-byte-input */
+#define EP_ROUND_RAW_DATA 4 /* 32-byte-input */
 
 #define EP_ROUND_0_INPUTS 56
 #define EP_ROUND_1_INPUTS 64
 #define EP_ROUND_2_INPUTS 17
 #define EP_ROUND_RAW_INPUTS 32
-#define EP_ROUND_RAW_DATA_INPUTS 8
+#define EP_ROUND_RAW_DATA_INPUTS 32
 
 static uint8_t ep_round;
 
