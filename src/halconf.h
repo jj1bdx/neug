@@ -24,6 +24,6 @@
 #define HAL_USE_USB              FALSE
 
 /* Define manually, as we implement ADC driver by ourselves.  */
-#define STM32_DMA_REQUIRED
+#define STM32_DMA_REQUIRED	1
 
 #endif /* _HALCONF_H_ */

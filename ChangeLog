@@ -8,6 +8,7 @@
 
 	* boards/FST_01/mcuconf.h (STM32_RTCSEL): Define.
 	(STM32_USBPRE, STM32_MCO): Remove.
+	* boards/STBEE/mcuconf.h: Likewise.
 
 	* boards/common/mcuconf-common.h (STM32_NO_INIT)
 	(STM32_HSI_ENABLED, STM32_LSI_ENABLED, STM32_HSE_ENABLED)
