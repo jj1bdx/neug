@@ -37,11 +37,13 @@
 #define IOPORT_USB	GPIOA
 #define GPIO_LED	GPIOA_LED1
 #define IOPORT_LED	GPIOA
-#define NEUG_NON_DEFAULT_ADC_CHANNEL 1
-#define ADC_SMPR2_SMP_ANx_A ADC_SMPR2_SMP_AN1
-#define ADC_SMPR2_SMP_ANx_B ADC_SMPR2_SMP_AN2
-#define NEUG_ADC_CHANNEL_A ADC_CHANNEL_IN1
-#define NEUG_ADC_CHANNEL_B ADC_CHANNEL_IN2
+
+#define NEUG_ADC_SETTING2_SMPR1 0
+#define NEUG_ADC_SETTING2_SMPR2 ADC_SMPR2_SMP_AN1(ADC_SAMPLE_1P5)    \
+                              | ADC_SMPR2_SMP_AN2(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN1)      \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN2)
+#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
 
 /*
  * Board identifier.
@@ -96,8 +98,8 @@
 
 /*
  * Port A setup.
- * PA1  - Push Pull output 50MHz.
- * PA2  - Push Pull output 50MHz.
+ * PA1  - Digital input with PullUp.  AN1
+ * PA2  - Digital input with PullUp.  AN2
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
@@ -105,7 +107,7 @@
  * PA14 - Push pull output  (USB ENABLE 0:DISABLE 1:ENABLE)
  * PA15 - Open Drain output (LED2 0:ON 1:OFF)
  */
-#define VAL_GPIOACRL            0x88888338      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0x88888888      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x63688888      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 
