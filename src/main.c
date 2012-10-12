@@ -397,6 +397,14 @@ neug_setup (uint8_t req, uint8_t req_no,
 		usb_lld_set_data_to_send (&neug_err_cnt_p64, sizeof (uint16_t));
 	      else if (index == 4)
 		usb_lld_set_data_to_send (&neug_err_cnt_p4k, sizeof (uint16_t));
+	      else if (index == 5)
+		usb_lld_set_data_to_send (&neug_rc_max, sizeof (uint16_t));
+	      else if (index == 6)
+		usb_lld_set_data_to_send (&neug_p64_max, sizeof (uint16_t));
+	      else if (index == 7)
+		usb_lld_set_data_to_send (&neug_p4k_max, sizeof (uint16_t));
+	      else
+		return USB_UNSUPPORT;
 
 	      return USB_SUCCESS;
 	    }

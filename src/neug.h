@@ -12,6 +12,9 @@ extern uint16_t neug_err_cnt;
 extern uint16_t neug_err_cnt_rc;
 extern uint16_t neug_err_cnt_p64;
 extern uint16_t neug_err_cnt_p4k;
+extern uint16_t neug_rc_max;
+extern uint16_t neug_p64_max;
+extern uint16_t neug_p4k_max;
 
 void neug_init (uint32_t *buf, uint8_t size);
 void neug_prng_reseed (void);

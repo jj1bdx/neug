@@ -158,7 +158,7 @@ static int ep_process (int mode)
   else if (ep_round == EP_ROUND_RAW_DATA)
     {
       for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
-	ep_fill_wbuf (i, 0, 0);
+	ep_fill_wbuf (i, 0, 1);
 
       ep_init (mode);
       return EP_ROUND_RAW_DATA_INPUTS / 4;
@@ -220,6 +220,25 @@ uint16_t neug_err_cnt_rc;
 uint16_t neug_err_cnt_p64;
 uint16_t neug_err_cnt_p4k;
 
+uint16_t neug_rc_max;
+uint16_t neug_p64_max;
+uint16_t neug_p4k_max;
+
+#include "board.h"
+
+static void noise_source_cnt_max_reset (void)
+{
+  neug_err_cnt = neug_err_cnt_rc = neug_err_cnt_p64 = neug_err_cnt_p4k = 0;
+  neug_rc_max = neug_p64_max = neug_p4k_max = 0;
+
+#if defined(BOARD_FST_01)
+  palClearPad (IOPORT1, 2);
+#endif
+#if defined(BOARD_STBEE_MINI)
+  palSetPad (IOPORT1, GPIOA_LED2);
+#endif
+}
+
 static void noise_source_error_reset (void)
 {
   neug_err_state = 0;
@@ -237,7 +256,6 @@ static void noise_source_error (uint32_t err)
   if ((err & ADAPTIVE_PROPORTION_4096))
     neug_err_cnt_p4k++;
 
-#include "board.h"
 #if defined(BOARD_FST_01)
   palSetPad (IOPORT1, 2);
 #endif
@@ -270,6 +288,8 @@ static void repetition_count_test (uint8_t sample)
       rct_b++;
       if (rct_b >= REPITITION_COUNT_TEST_CUTOFF)
 	noise_source_error (REPETITION_COUNT);
+      if (rct_b > neug_rc_max)
+	neug_rc_max = rct_b;
    }
   else
     {
@@ -302,6 +322,8 @@ static void adaptive_proportion_64_test (uint8_t sample)
 	  ap64t_b++;
 	  if (ap64t_b > ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
 	    noise_source_error (ADAPTIVE_PROPORTION_64);
+	  if (ap64t_b > neug_p64_max)
+	    neug_p64_max = ap64t_b;
 	}
     }
 }
@@ -330,6 +352,8 @@ static void adaptive_proportion_4096_test (uint8_t sample)
 	  ap4096t_b++;
 	  if (ap4096t_b > ADAPTIVE_PROPORTION_4096_TEST_CUTOFF)
 	    noise_source_error (ADAPTIVE_PROPORTION_4096);
+	  if (ap4096t_b > neug_p4k_max)
+	    neug_p4k_max = ap4096t_b;
 	}
     }
 }
@@ -419,7 +443,7 @@ static msg_t rng (void *arg)
 	  const uint32_t *vp;
 
 	  if (neug_err_state != 0
-	      && neug_mode == NEUG_MODE_CONDITIONED)
+	      && (mode == NEUG_MODE_CONDITIONED || mode == NEUG_MODE_RAW_DATA))
 	    {
 	      /* Don't use the result and do it again.  */
 	      noise_source_error_reset ();
@@ -556,17 +580,16 @@ neug_fini (void)
 void
 neug_mode_select (uint8_t mode)
 {
+  if (neug_mode == mode)
+    return;
+
   neug_wait_full ();
+
   while (rng_thread->p_state != THD_STATE_WTCOND)
     chThdSleep (MS2ST (1));
 
-  if (neug_mode != mode)
-    ep_init (mode);
-
-#if defined(BOARD_FST_01)
-  palClearPad (IOPORT1, 2);
-#endif
-
+  ep_init (mode);
+  noise_source_cnt_max_reset ();
   neug_mode = mode;
   neug_flush ();
 }

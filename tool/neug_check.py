@@ -70,7 +70,7 @@ class neug(object):
         else:
             return "Raw data (ADC samples)"
 
-    def get_err_cnt(self, index):
+    def get_info(self, index):
         err = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
                                           value = 0, index = index, buffer = 2,
                                           timeout = 1000)
@@ -105,10 +105,13 @@ def main():
         raise ValueError, "No NeuG Device Present"
     print
     print "mode: %s" % com.get_mode()
-    print "Repeat errors: %d" % com.get_err_cnt(2)
-    print "PP 64  errors: %d" % com.get_err_cnt(3)
-    print "PP 4k  errors: %d" % com.get_err_cnt(4)
-    print "Total  errors: %d" % com.get_err_cnt(1)
+    print "Repeat errors: %d" % com.get_info(2)
+    print "PP 64  errors: %d" % com.get_info(3)
+    print "PP 4k  errors: %d" % com.get_info(4)
+    print "Total  errors: %d" % com.get_info(1)
+    print "Repeat max counts: %d" % com.get_info(5)
+    print "PP 64  max counts: %d" % com.get_info(6)
+    print "PP 4k  max counts: %d" % com.get_info(7)
     return 0
 
 

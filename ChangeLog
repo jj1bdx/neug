@@ -1,3 +1,20 @@
+2012-10-12  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (neug_setup): Support neug_*_max.
+
+	* src/random.c (ep_process): Enable health tests for
+	NEUG_MODE_RAW_DATA.
+	(rng): Don't use the result on error for NEUG_MODE_RAW_DATA.
+	(neug_rc_max, neug_p64_max, neug_p4k_max): New.
+	(repetition_count_test, adaptive_proportion_64_test)
+	(adaptive_proportion_4096_test): Record maximum counts.
+	(noise_source_cnt_max_reset): New.
+	(neug_mode_select): Call noise_source_cnt_max_reset on mode
+	change.
+
+	* tool/neug_check.py (get_info): Rename.
+	(main): Support max counts.
+
 2012-10-11  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (EP_ROUND_RAW_DATA_INPUTS): Set it to 32.
