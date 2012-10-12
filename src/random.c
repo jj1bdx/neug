@@ -265,7 +265,7 @@ static void noise_source_error (uint32_t err)
 }
 
 /*
- * For health tests, we assumes that the device noise source has
+ * For health tests, we assume that the device noise source has
  * min-entropy >= 4.2.  Observing raw data stream (before CRC-32) has
  * more than 4.2 bit/byte entropy.  When the data stream after CRC-32
  * filter will be less than 4.2 bit/byte entropy, that must be
