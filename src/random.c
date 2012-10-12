@@ -150,7 +150,7 @@ static int ep_process (int mode)
   if (ep_round == EP_ROUND_RAW)
     {
       for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
-	ep_fill_wbuf (i, 0, 0);
+	ep_fill_wbuf (i, 0, 1);
 
       ep_init (mode);
       return EP_ROUND_RAW_INPUTS / 4;
@@ -158,7 +158,7 @@ static int ep_process (int mode)
   else if (ep_round == EP_ROUND_RAW_DATA)
     {
       for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
-	ep_fill_wbuf (i, 0, 1);
+	ep_fill_wbuf (i, 0, 0);
 
       ep_init (mode);
       return EP_ROUND_RAW_DATA_INPUTS / 4;
@@ -443,7 +443,7 @@ static msg_t rng (void *arg)
 	  const uint32_t *vp;
 
 	  if (neug_err_state != 0
-	      && (mode == NEUG_MODE_CONDITIONED || mode == NEUG_MODE_RAW_DATA))
+	      && (mode == NEUG_MODE_CONDITIONED || mode == NEUG_MODE_RAW))
 	    {
 	      /* Don't use the result and do it again.  */
 	      noise_source_error_reset ();

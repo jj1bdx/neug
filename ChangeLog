@@ -3,8 +3,8 @@
 	* src/main.c (neug_setup): Support neug_*_max.
 
 	* src/random.c (ep_process): Enable health tests for
-	NEUG_MODE_RAW_DATA.
-	(rng): Don't use the result on error for NEUG_MODE_RAW_DATA.
+	NEUG_MODE_RAW.
+	(rng): Don't use the result on error for NEUG_MODE_RAW.
 	(neug_rc_max, neug_p64_max, neug_p4k_max): New.
 	(repetition_count_test, adaptive_proportion_64_test)
 	(adaptive_proportion_4096_test): Record maximum counts.
