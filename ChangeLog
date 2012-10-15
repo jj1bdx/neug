@@ -1,3 +1,7 @@
+2012-10-15  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/neug_check.py (main): Display USB strings.
+
 2012-10-13  Niibe Yutaka  <gniibe@fsij.org>
 
 	* boards/STBEE_MINI/board.c [!DFU_SUPPORT] (boardInit): Don't run

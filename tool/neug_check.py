@@ -25,8 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from struct import *
 import sys, time, os, string
 
-# INPUT: binary file
-
 # Assume only single NeuG device is attached to computer
 
 import usb
@@ -59,6 +57,9 @@ class neug(object):
 
         self.__timeout = 10000
 
+    def get_string(self,no,maxsize):
+        return self.__devhandle.getString(no,maxsize)
+
     def get_mode(self):
         mode = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
                                           value = 0, index = 0, buffer = 1,
@@ -89,6 +90,7 @@ def com_devices():
                                 alt.interfaceProtocol == COM_PROTOCOL_0:
                             yield dev, config, alt
 
+field = [ '', 'Vendor', 'Product', 'Serial', 'Revision', 'Config', 'Sys' ]
 
 def main():
     com = None
@@ -103,6 +105,10 @@ def main():
             pass
     if not com:
         raise ValueError, "No NeuG Device Present"
+    print
+    for i in range(1,7):
+        s = com.get_string(i, 512)
+        print "%9s: %s" % (field[i], s)
     print
     print "mode: %s" % com.get_mode()
     print "Repeat errors: %d" % com.get_info(2)
