@@ -1,7 +1,7 @@
 NeuG - a random number generator implementation (for STM32F103)
 
 							   Version 0.04
-							     2012-10-09
+							     2012-10-2X
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -48,12 +48,14 @@ A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
                 looks not that good).
 
 Q1: How fast is NeuG device?
-A1: It's more than 50 Ki-byte/second.  Please note that the NeuG
-    device is USB "full-speed" device.  If you connect it to
-    full-speed hub or root hub which runs at full-speed, you just get
-    about 30 Ki-byte/second.  That's because host submits a frame to
-    device once per 1ms frame with full-speed hub.  When you connect
-    it to high-speed hub, you get higher performance.
+A1: It's more than 50 Ki-byte/sec for conditioned output (by SHA-256),
+    and more than 200 Ki-byte/sec for CRC-32 filtered output.  Please
+    note that the NeuG device is USB "full-speed" device.  If you
+    connect it to full-speed hub or root hub which runs at full-speed,
+    you get lower speed than the real capability of the device.
+    That's because host submits a frame to device once per 1ms frame
+    with full-speed hub.  When you connect it to high-speed hub, you
+    get higher performance for CRC-32 filtered output.
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  Three continuous tests are implemented, following

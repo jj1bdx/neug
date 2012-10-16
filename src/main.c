@@ -671,24 +671,24 @@ static msg_t led_blinker (void *arg)
 
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
-	chThdSleep (MS2ST (100));
+	chThdSleepMilliseconds (100);
       else if (m == LED_TWOSHOTS)
 	{
-	  chThdSleep (MS2ST (50));
+	  chThdSleepMilliseconds (50);
 	  set_led (0);
-	  chThdSleep (MS2ST (50));
+	  chThdSleepMilliseconds (50);
 	  set_led (1);
-	  chThdSleep (MS2ST (50));
+	  chThdSleepMilliseconds (50);
 	}
       else
-	chThdSleep (MS2ST (250));
+	chThdSleepMilliseconds (250);
       set_led (0);
     }
 
   return 0;
 }
 
-#define RANDOM_BYTES_LENGTH 32
+#define RANDOM_BYTES_LENGTH 64
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
 /*
@@ -719,6 +719,7 @@ main (int argc, char **argv)
   while (1)
     {
       unsigned int count = 0;
+      int last_was_fullsizepacket = 0;
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
@@ -733,7 +734,7 @@ main (int argc, char **argv)
 
 	  if ((count & 0x0007) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
-	  chThdSleep (MS2ST (25));
+	  chThdSleepMilliseconds (25);
 	  count++;
 	}
 
@@ -745,7 +746,7 @@ main (int argc, char **argv)
 
 	  neug_flush ();
 	  chEvtSignalFlags (led_thread, LED_TWOSHOTS);
-	  chThdSleep (MS2ST (5000));
+	  chThdSleepMilliseconds (5000);
 	}
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -761,19 +762,37 @@ main (int argc, char **argv)
 
       while (1)
 	{
+	  int i;
+
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;
 
 	  if (bDeviceState != CONFIGURED)
 	    break;
 
-	  neug_wait_full ();
-
 	  if ((count & 0x03ff) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 
-	  usb_lld_txcpy (random_word, ENDP1, 0, RANDOM_BYTES_LENGTH);
-	  neug_flush ();
+	  for (i = 0; i < 64/4; i++)
+	    {
+	      uint32_t v;
+
+	      if (neug_get_nonblock (&v) < 0)
+		break;
+
+	      usb_lld_txcpy (&v, ENDP1, i * 4, 4);
+	    }
+
+	  if (i == 0 && !last_was_fullsizepacket)
+	    {	 /* Only send ZLP when the last packet was fullsize.  */
+	      chThdSleepMicroseconds (250);
+	      continue;
+	    }
+
+	  if (i == 64/4)
+	    last_was_fullsizepacket = 1;
+	  else
+	    last_was_fullsizepacket = 0;
 
 	  chSysLock ();
 	  if (connected == 0)
@@ -783,7 +802,7 @@ main (int argc, char **argv)
 	    }
 	  else
 	    {
-	      usb_lld_tx_enable (ENDP1, RANDOM_BYTES_LENGTH);
+	      usb_lld_tx_enable (ENDP1, i * 4);
 	      chSchGoSleepS (THD_STATE_SUSPENDED);
 	    }
 	  chSysUnlock ();
@@ -803,7 +822,7 @@ main (int argc, char **argv)
   fsij_device_state = FSIJ_DEVICE_EXITED;
 
   while (fsij_device_state == FSIJ_DEVICE_EXITED)
-    chThdSleep (MS2ST (500));
+    chThdSleepMilliseconds (500);
 
   flash_unlock ();		/* Flash unlock should be done here */
   set_led (1);

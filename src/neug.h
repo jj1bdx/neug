@@ -19,6 +19,7 @@ extern uint16_t neug_p4k_max;
 void neug_init (uint32_t *buf, uint8_t size);
 void neug_prng_reseed (void);
 uint32_t neug_get (int kick);
+int neug_get_nonblock (uint32_t *p);
 void neug_kick_filling (void);
 void neug_flush (void);
 void neug_wait_full (void);

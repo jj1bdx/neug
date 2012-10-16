@@ -5,8 +5,9 @@
 ** Update of ChibiOS/RT
 ChibiOS/RT is updated to newer 2.4.3.
 
-** A bit of improved performance
-A few percent of improvement for generation speed, due to finer lock.
+** Improved performance
+Improvement on generation speed, even when it's not connected to USB
+2.0 Hub.
 
 ** Health tests run for NEUG_MODE_RAW
 Health tests run when NEUG_MODE_RAW (CRC32 filter output).

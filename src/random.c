@@ -554,6 +554,25 @@ neug_get (int kick)
   return v;
 }
 
+int
+neug_get_nonblock (uint32_t *p)
+{
+  struct rng_rb *rb = &the_ring_buffer;
+  int r = 0;
+
+  chMtxLock (&rb->m);
+  if (rb->empty)
+    {
+      r = -1;
+      chCondSignal (&rb->space_available);
+    }
+  else
+    *p = rb_del (rb);
+  chMtxUnlock ();
+
+  return r;
+}
+
 void
 neug_wait_full (void)
 {

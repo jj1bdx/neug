@@ -1,3 +1,11 @@
+2012-10-16  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (neug_get_nonblock): New function.
+
+	* src/main.c (RANDOM_BYTES_LENGTH): Now, it's 64 to fill Tx
+	buffer.
+	(main): Fill 64-byte Tx buffer if possible.
+
 2012-10-15  Niibe Yutaka  <gniibe@fsij.org>
 
 	* tool/neug_check.py (main): Display USB strings.
