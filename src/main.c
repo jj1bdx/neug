@@ -785,7 +785,7 @@ main (int argc, char **argv)
 
 	  if (i == 0 && !last_was_fullsizepacket)
 	    {	 /* Only send ZLP when the last packet was fullsize.  */
-	      chThdSleepMicroseconds (250);
+	      neug_wait_full ();
 	      continue;
 	    }
 
