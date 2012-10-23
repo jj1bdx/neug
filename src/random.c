@@ -573,6 +573,26 @@ neug_get_nonblock (uint32_t *p)
   return r;
 }
 
+int neug_consume_random (void (*proc) (uint32_t, int))
+{
+  int i = 0;
+  struct rng_rb *rb = &the_ring_buffer;
+
+  chMtxLock (&rb->m);
+  while (!rb->empty)
+    {
+      uint32_t v;
+
+      v = rb_del (rb);
+      proc (v, i);
+      i++;
+    }
+  chCondSignal (&rb->space_available);
+  chMtxUnlock ();
+
+  return i;
+}
+
 void
 neug_wait_full (void)
 {

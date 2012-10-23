@@ -691,6 +691,11 @@ static msg_t led_blinker (void *arg)
 #define RANDOM_BYTES_LENGTH 64
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
+static void copy_to_tx (uint32_t v, int i)
+{
+  usb_lld_txcpy (&v, ENDP1, i * 4, 4);
+}
+
 /*
  * Entry point.
  *
@@ -773,15 +778,7 @@ main (int argc, char **argv)
 	  if ((count & 0x03ff) == 0)
 	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
 
-	  for (i = 0; i < 64/4; i++)
-	    {
-	      uint32_t v;
-
-	      if (neug_get_nonblock (&v) < 0)
-		break;
-
-	      usb_lld_txcpy (&v, ENDP1, i * 4, 4);
-	    }
+	  i = neug_consume_random (copy_to_tx);
 
 	  if (i == 0 && !last_was_fullsizepacket)
 	    {	 /* Only send ZLP when the last packet was fullsize.  */

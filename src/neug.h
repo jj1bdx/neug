@@ -25,3 +25,5 @@ void neug_flush (void);
 void neug_wait_full (void);
 void neug_fini (void);
 void neug_mode_select (uint8_t mode);
+
+int neug_consume_random (void (*proc) (uint32_t, int));
