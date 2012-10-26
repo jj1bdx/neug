@@ -1,3 +1,7 @@
+2012-10-26  Niibe Yutaka  <gniibe@fsij.org>
+
+	* NEUG_USB_DEVICE_ID (Product_STRING): Rename to NeuG True RNG.
+
 2012-10-23  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c (neug_consume_random): New.
