@@ -1,18 +1,20 @@
+NeuG NEWS - User visible changes
+
 * Major changes in NeuG 0.04
 
-  Released 2012-10-XX, by NIIBE Yutaka
+  Released 2012-10-30, by NIIBE Yutaka
 
 ** Update of ChibiOS/RT
 ChibiOS/RT is updated to newer 2.4.3.
 
 ** Improved performance
-Improvement on generation speed, even when it's not connected to USB
+Improvement on generation speed, even when it's _not_ connected to USB
 2.0 Hub.
 
 ** Health tests run for NEUG_MODE_RAW
 Health tests run when NEUG_MODE_RAW (CRC32 filter output).
 
-** More runtime checks: tool/neug_check.py 
+** More runtime info: tool/neug_check.py 
 Now, we can observe max counts of repeat count test, adaptive
 propotion test 64, and adaptive propotion test 4096.
 

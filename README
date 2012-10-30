@@ -1,7 +1,7 @@
-NeuG - a random number generator implementation (for STM32F103)
+NeuG - a true random number generator implementation (for STM32F103)
 
 							   Version 0.04
-							     2012-10-2X
+							     2012-10-30
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -49,13 +49,7 @@ A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
 
 Q1: How fast is NeuG device?
 A1: It's more than 50 Ki-byte/sec for conditioned output (by SHA-256),
-    and more than 200 Ki-byte/sec for CRC-32 filtered output.  Please
-    note that the NeuG device is USB "full-speed" device.  If you
-    connect it to full-speed hub or root hub which runs at full-speed,
-    you get lower speed than the real capability of the device.
-    That's because host submits a frame to device once per 1ms frame
-    with full-speed hub.  When you connect it to high-speed hub, you
-    get higher performance for CRC-32 filtered output.
+    and more than 140 Ki-byte/sec for CRC-32 filtered output.
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  Three continuous tests are implemented, following
@@ -71,8 +65,8 @@ A3: It is because NIST SP 800-90B mandates something like that for
     RNG-tools to feed entropy to your kernel, or use for computer
     simulations, I think that CRC32 filter would be good enough.  You
     can configure NeuG device by "stty -F /dev/ttyACM0 parenb parodd"
-    to get raw data before SHA-256 conditioning component.  Then,
-    you'll get more than 350 Ki-byte/second (with high speed hub).
+    to get raw data before SHA-256 conditioning component.  With
+    high speed hub, you'll get more than 240 Ki-byte/second .
 
 
 Targets
@@ -98,7 +92,7 @@ It is distributed under GNU General Public Licence version 3 or later
 External source code
 ====================
 
-To build NeuG device, we need external source code.
+To build NeuG device, you need external source code.
 
 * chibios/  -- ChibiOS/RT 2.4.x
 
@@ -152,7 +146,7 @@ How to compile
 
 You need GNU toolchain and newlib for 'arm-none-eabi' target.
 
-See http://github.com/uwehermann/summon-arm-toolchain/ for preparation
+See https://launchpad.net/gcc-arm-embedded for preparation
 of GNU Toolchain for 'arm-none-eabi' target.
 
 Change directory to `src':
@@ -326,14 +320,16 @@ Test results
 See files under the directory test-results, for test result of
 "rngtest" in rng-tools, NIST STS 2.1.1, and Dieharder.
 
-For Dieharder, I correct 1500MB (it took four days or so), and use
-scripts to invoke dieharder.
+I collect 110 files of 125MB (= 13750MB), and use scripts to invoke
+dieharder and rngtest.  Collecting 110 files, it took three days.
+
+For NIST STS 2.1.1, I used only 10 files of size 125MB.
 
 
 Read-only Git Repository
 ========================
 
-You can browse at http://www.gniibe.org/gitweb?p=neug.git;a=summary
+You can browse at http://www.gniibe.org/gitweb?p=neug.git
 
 You can get it by:
 
@@ -354,7 +350,7 @@ I put ChibiOS/RT as a submodule of Git.  Please do this:
 Information on the Web
 ======================
 
-Not yet.
+Please use FST-01 Q&A Forum at: http://no-passwd.net/askbot/questions/
 
 
 

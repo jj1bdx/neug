@@ -5,7 +5,7 @@
  * Copyright (C) 2011, 2012 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
- * This file is a part of NeuG, a Random Number Generator
+ * This file is a part of NeuG, a True Random Number Generator
  * implementation.
  *
  * NeuG is free software: you can redistribute it and/or modify it
@@ -171,7 +171,7 @@ static const uint8_t vcom_string0[4] = {
 static uint8_t vcom_string3[28] = {
   28,                    /* bLength.                         */
   USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType.                 */
-  '0', 0,  '.', 0,  '0', 0, '3', 0,    /* Version number of NeuG.          */
+  '0', 0,  '.', 0,  '0', 0, '4', 0,    /* Version number of NeuG.          */
   '-', 0,
   0, 0, 0, 0,	/* Filled by Unique device ID.      */
   0, 0, 0, 0,

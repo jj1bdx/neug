@@ -4,7 +4,7 @@
  * Copyright (C) 2011, 2012 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
- * This file is a part of NeuG, a Random Number Generator
+ * This file is a part of NeuG, a True Random Number Generator
  * implementation based on quantization error of ADC (for STM32F103).
  *
  * NeuG is free software: you can redistribute it and/or modify it
