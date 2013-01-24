@@ -1,3 +1,13 @@
+2013-01-24  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/sha256.c (v_cycle0): New.  Special case of v_cycle(i,j)
+	where j == 0.  Do byte order swapping here.
+	(v_cycle): Assume j != 0.
+	(sha256_process): Use v_cycle0 and v_cycle.
+	(sha256_update): Don't do byte order swapping.
+	(sha256_finish): Follow the change of sha256_process does byte
+	order swapping.
+
 2012-12-17  Niibe Yutaka  <gniibe@fsij.org>
 
 	* boards/FST_01_00: Added.
