@@ -1,3 +1,9 @@
+2013-01-25  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/sha256.c (memcpy_bswap32): New function.
+	(bswap32_buf): Removed.
+	(sha256_finish): Use memcpy_bswap32.
+
 2013-01-24  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/sha256.c (v_cycle0): New.  Special case of v_cycle(i,j)
