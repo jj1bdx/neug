@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							   Version 0.04
-							     2012-10-30
+							   Version 0.05
+							     2013-02-07
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,7 +28,7 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the fifth release of NeuG, which is still experimental.  Basic
+This is the sixth release of NeuG, which is still experimental.  Basic
 features (generating random numbers) are stable, but newly added
 things like reGNUal support should be considered unstable.  Note that
 you need ChibiOS/RT 2.4.x as external source code.

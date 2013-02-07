@@ -1,5 +1,14 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 0.05
+
+  Released 2013-02-07, by NIIBE Yutaka
+
+** Improvement on SHA256 calculation
+The output of random numbers got faster than the previous
+implementation by 2% or so.
+
+
 * Major changes in NeuG 0.04
 
   Released 2012-10-30, by NIIBE Yutaka
