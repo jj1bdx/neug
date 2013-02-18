@@ -30,6 +30,14 @@
 /*
  * Setup for the STM32 Primer2.
  */
+#define	SET_USB_CONDITION(en) (!en)	/* To connect USB, call palClearPad */
+#define	SET_LED_CONDITION(on) (!on)	/* To emit light, call palClearPad */
+#define GPIO_USB	GPIOD_DISC
+#define IOPORT_USB	GPIOD
+#define GPIO_LED	GPIOE_LED
+#define IOPORT_LED	GPIOE
+
+/* NeuG settings for ADC2.  */
 
 /*
  * Board identifier.
@@ -85,6 +93,8 @@
 /*
  * Port A setup.
  * Everything input with pull-up except:
+ * PA0  - Digital input with PullUp.  AN0
+ * PA1  - Digital input with PullUp.  AN1
  * PA2  - Alternate output  (USART2 TX).
  * PA3  - Normal input      (USART2 RX).
  * PA8  - Input with pull-down (PBUTTON).
@@ -151,5 +161,15 @@
 #define VAL_GPIOGCRH            0x88888888      /* PG15...PG8 */
 #define VAL_GPIOGODR            0xFFFFFFFF
 #endif
+
+#if !defined(_FROM_ASM_)
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void boardInit(void);
+#ifdef __cplusplus
+}
+#endif
+#endif /* _FROM_ASM_ */
 
 #endif /* _BOARD_H_ */
