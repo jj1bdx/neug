@@ -34,7 +34,7 @@
 #define	SET_LED_CONDITION(on) (!on)	/* To emit light, call palClearPad */
 #define GPIO_USB	GPIOD_DISC
 #define IOPORT_USB	GPIOD
-#define GPIO_LED	GPIOE_LED
+#define GPIO_LED	GPIOE_LEDR
 #define IOPORT_LED	GPIOE
 
 /* NeuG settings for ADC2.  */
