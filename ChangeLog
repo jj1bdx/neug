@@ -1,5 +1,7 @@
 2013-02-18  Niibe Yutaka  <gniibe@fsij.org>
 
+	* boards/FST_01/board.h: Use AN0 and AN9.
+
 	* src/random.c (noise_source_cnt_max_reset, noise_source_error):
 	Remove LED I/O.
 

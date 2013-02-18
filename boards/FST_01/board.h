@@ -37,7 +37,13 @@
 #define GPIO_LED	GPIOB_LED
 #define IOPORT_LED	GPIOB
 
-/* NeuG settings for ADC2 is default.  */
+/* NeuG settings for ADC2.  */
+#define NEUG_ADC_SETTING2_SMPR1 0
+#define NEUG_ADC_SETTING2_SMPR2 ADC_SMPR2_SMP_AN0(ADC_SAMPLE_1P5)    \
+                              | ADC_SMPR2_SMP_AN9(ADC_SAMPLE_1P5)
+#define NEUG_ADC_SETTING2_SQR3  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN0)      \
+                              | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN9)
+#define NEUG_ADC_SETTING2_NUM_CHANNELS 2
 
 /*
  * Board identifier.
@@ -91,20 +97,26 @@
 
 /*
  * Port A setup.
- * PA0  - Digital input with PullUp.  AN0
- * PA1  - Digital input with PullUp.  AN1
- * PA2  - Push pull output   (For Error LED)
+ * PA0  - input with pull-up (TIM2_CH1): AN0 for NeuG
+ * PA1  - input with pull-down (TIM2_CH2)
+ * PA2  - input with pull-up (TIM2_CH3) connected to CIR module
+ * PA3  - input with pull-up: external pin available to user
+ * PA4  - Push pull output           (SPI1_NSS)
+ * PA5  - Alternate Push pull output (SPI1_SCK)
+ * PA6  - Alternate Push pull output (SPI1_MISO)
+ * PA7  - Alternate Push pull output (SPI1_MOSI)
  * PA10 - Push pull output   (USB 1:ON 0:OFF)
  * PA11 - input with pull-up (USBDM)
  * PA12 - input with pull-up (USBDP)
  * Everything input with pull-up except:
  */
-#define VAL_GPIOACRL            0x88888388      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0xBBB38888      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x88888388      /* PA15...PA8 */
-#define VAL_GPIOAODR            0xFFFFFFFB
+#define VAL_GPIOAODR            0xFFFFFFFD
 
 /*
  * Port B setup.
+ * PB1  - input with pull-up: AN9 for NeuG
  * Everything input with pull-up except:
  * PB0  - Push pull output   (LED 1:ON 0:OFF)
  */
