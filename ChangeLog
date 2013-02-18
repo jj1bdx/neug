@@ -1,3 +1,14 @@
+2013-02-18  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c (noise_source_cnt_max_reset, noise_source_error):
+	Remove LED I/O.
+
+	* src/adc_stm32f103.c (ADC_SMPR2_SMP_AN9, ADC_CHANNEL_IN9): New.
+
+	* src/neug.h (neug_prng_reseed): Remove.
+
+	* chibios: Update.
+
 2013-02-07  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.05.

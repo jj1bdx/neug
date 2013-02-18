@@ -41,6 +41,7 @@
 #define ADC_SMPR2_SMP_AN0(n)    ((n) << 0)
 #define ADC_SMPR2_SMP_AN1(n)    ((n) << 3)
 #define ADC_SMPR2_SMP_AN2(n)    ((n) << 6)
+#define ADC_SMPR2_SMP_AN9(n)    ((n) << 27)
 
 #define ADC_SQR1_NUM_CH(n)      (((n) - 1) << 20)
 
@@ -54,6 +55,7 @@
 #define ADC_CHANNEL_IN0         0
 #define ADC_CHANNEL_IN1         1
 #define ADC_CHANNEL_IN2         2
+#define ADC_CHANNEL_IN9         9
 #define ADC_CHANNEL_IN10        10
 #define ADC_CHANNEL_IN11        11
 #define ADC_CHANNEL_SENSOR      16

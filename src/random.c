@@ -230,13 +230,6 @@ static void noise_source_cnt_max_reset (void)
 {
   neug_err_cnt = neug_err_cnt_rc = neug_err_cnt_p64 = neug_err_cnt_p4k = 0;
   neug_rc_max = neug_p64_max = neug_p4k_max = 0;
-
-#if defined(BOARD_FST_01)
-  palClearPad (IOPORT1, 2);
-#endif
-#if defined(BOARD_STBEE_MINI)
-  palSetPad (IOPORT1, GPIOA_LED2);
-#endif
 }
 
 static void noise_source_error_reset (void)
@@ -255,13 +248,6 @@ static void noise_source_error (uint32_t err)
     neug_err_cnt_p64++;
   if ((err & ADAPTIVE_PROPORTION_4096))
     neug_err_cnt_p4k++;
-
-#if defined(BOARD_FST_01)
-  palSetPad (IOPORT1, 2);
-#endif
-#if defined(BOARD_STBEE_MINI)
-  palClearPad (IOPORT1, GPIOA_LED2);
-#endif
 }
 
 /*
