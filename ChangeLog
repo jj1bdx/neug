@@ -1,3 +1,7 @@
+2013-03-15  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/usb_lld.h, src/usb_stm32f103.c: Updated from Gnuk.
+
 2013-02-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* boards/STM32_PRIMER2/board.c, boards/STM32_PRIMER2/board.h:
