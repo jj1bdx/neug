@@ -2,7 +2,7 @@
  * main.c - main routine of neug
  *
  * Main routine:
- * Copyright (C) 2011, 2012 Free Software Initiative of Japan
+ * Copyright (C) 2011, 2012, 2013 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
  * This file is a part of NeuG, a True Random Number Generator
@@ -179,40 +179,19 @@ static uint8_t vcom_string3[28] = {
   0, 0, 0, 0,
 };
 
-static const struct Descriptor device_desc = {
-  vcom_device_desc,
-  sizeof (vcom_device_desc)
-};
-
-static const struct Descriptor config_desc = {
-  vcom_configuration_desc,
-  sizeof (vcom_configuration_desc)
-};
-
-static const struct Descriptor string_descs[] = {
-  {vcom_string0, sizeof vcom_string0},
-  {neug_string_vendor, sizeof (neug_string_vendor)},
-  {neug_string_product, sizeof (neug_string_product)},
-  {vcom_string3, sizeof (vcom_string3)},
-  {neug_revision_detail, sizeof (neug_revision_detail)},
-  {neug_config_options, sizeof (neug_config_options)},
-  {sys_version, sizeof (sys_version)},
-};
-
-#define NUM_STRING_DESC (sizeof (string_descs)/sizeof (struct Descriptor))
 
 #define NUM_INTERFACES 2
 
 uint32_t bDeviceState = UNCONNECTED; /* USB device status */
 
-static void
-neug_device_reset (void)
+void
+usb_cb_device_reset (void)
 {
   /* Set DEVICE as not configured */
   usb_lld_set_configuration (0);
 
   /* Current Feature initialization */
-  usb_lld_set_feature (config_desc.Descriptor[7]);
+  usb_lld_set_feature (vcom_configuration_desc[7]);
 
   usb_lld_reset ();
 
@@ -267,9 +246,9 @@ static int download_check_crc32 (const uint32_t *end_p)
   return USB_UNSUPPORT;
 }
 
-static void neug_ctrl_write_finish (uint8_t req, uint8_t req_no,
-				    uint16_t value, uint16_t index,
-				    uint16_t len)
+void
+usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
+			  uint16_t index, uint16_t len)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
@@ -370,8 +349,8 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
   return USB_UNSUPPORT;
 }
 
-static int
-neug_setup (uint8_t req, uint8_t req_no,
+int
+usb_cb_setup (uint8_t req, uint8_t req_no,
 	       uint16_t value, uint16_t index, uint16_t len)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
@@ -454,32 +433,63 @@ neug_setup (uint8_t req, uint8_t req_no,
   return USB_UNSUPPORT;
 }
 
-static int
-neug_get_descriptor (uint8_t desc_type, uint16_t index, uint16_t value)
+int
+usb_cb_get_descriptor (uint8_t desc_type, uint16_t index, uint16_t value)
 {
   (void)index;
   if (desc_type == DEVICE_DESCRIPTOR)
     {
-      usb_lld_set_data_to_send (device_desc.Descriptor,
-				device_desc.Descriptor_Size);
+      usb_lld_set_data_to_send (vcom_device_desc, sizeof (vcom_device_desc));
       return USB_SUCCESS;
     }
   else if (desc_type == CONFIG_DESCRIPTOR)
     {
-      usb_lld_set_data_to_send (config_desc.Descriptor,
-				config_desc.Descriptor_Size);
+      usb_lld_set_data_to_send (vcom_configuration_desc,
+				sizeof (vcom_configuration_desc));
       return USB_SUCCESS;
     }
   else if (desc_type == STRING_DESCRIPTOR)
     {
       uint8_t desc_index = value & 0xff;
+      const uint8_t *str;
+      int size;
 
-      if (desc_index < NUM_STRING_DESC)
+      switch (desc_index)
 	{
-	  usb_lld_set_data_to_send (string_descs[desc_index].Descriptor,
-				    string_descs[desc_index].Descriptor_Size);
-	  return USB_SUCCESS;
+	case 0:
+	  str = vcom_string0;
+	  size = sizeof (vcom_string0);
+	  break;
+	case 1:
+	  str = neug_string_vendor;
+	  size = sizeof (neug_string_vendor);
+	  break;
+	case 2:
+	  str = neug_string_product;
+	  size = sizeof (neug_string_product);
+	  break;
+	case 3:
+	  str = vcom_string3;
+	  size = sizeof (vcom_string3);
+	  break;
+	case 4:
+	  str = neug_revision_detail;
+	  size = sizeof (neug_revision_detail);
+	  break;
+	case 5:
+	  str = neug_config_options;
+	  size = sizeof (neug_config_options);
+	  break;
+	case 6:
+	  str = sys_version;
+	  size = sizeof (sys_version);
+	  break;
+	default:
+	  return USB_UNSUPPORT;
 	}
+
+      usb_lld_set_data_to_send (str, size);
+      return USB_SUCCESS;
     }
 
   return USB_UNSUPPORT;
@@ -510,7 +520,7 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
     }
 }
 
-static int neug_usb_event (uint8_t event_type, uint16_t value)
+int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 {
   int i;
   uint8_t current_conf;
@@ -554,7 +564,7 @@ static int neug_usb_event (uint8_t event_type, uint16_t value)
 }
 
 
-static int neug_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
+int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
 {
   static uint8_t zero = 0;
 
@@ -581,16 +591,6 @@ static int neug_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
       return USB_SUCCESS;
     }
 }
-
-const struct usb_device_method Device_Method = {
-  neug_device_reset,
-  neug_ctrl_write_finish,
-  neug_setup,
-  neug_get_descriptor,
-  neug_usb_event,
-  neug_interface,
-};
-
 
 
 static void fill_serial_no_by_unique_id (void)
@@ -719,7 +719,7 @@ main (int argc, char **argv)
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 
-  usb_lld_init (config_desc.Descriptor[7]);
+  usb_lld_init (vcom_configuration_desc[7]);
 
   while (1)
     {

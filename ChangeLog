@@ -1,5 +1,14 @@
 2013-03-15  Niibe Yutaka  <gniibe@fsij.org>
 
+	New USB stack.
+
+	* src/main.c (device_desc, config_desc, string_descs): Remove.
+	(neug_device_reset, neug_ctrl_write_finish, neug_setup)
+	(neug_get_descriptor, neug_usb_event, usb_cb_interface): Rename to
+	usb_cb_*.
+	(Device_Method): Remove.
+	(main): Use vcom_configuration_desc.
+
 	* src/usb_lld.h, src/usb_stm32f103.c: Updated from Gnuk.
 
 2013-02-18  Niibe Yutaka  <gniibe@fsij.org>
