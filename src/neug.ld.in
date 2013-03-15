@@ -163,8 +163,8 @@ SECTIONS
     PROVIDE(end = .);
     _end            = .;
     . = ALIGN(512);
-    /* it is at offset 0x1400 from ram start */
-    _regnual_start = __ram_start__ + 0x1400;
+    /* reGNUal is now relocatable, it's OK not using fixed address. */
+    _regnual_start = .;
 
     .fill_ffff :
     {

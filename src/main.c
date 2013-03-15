@@ -697,6 +697,24 @@ static void copy_to_tx (uint32_t v, int i)
 }
 
 /*
+ * In Gnuk 1.0.[12], reGNUal was not relocatable.
+ * Now, it's relocatable, but we need to calculate its entry address
+ * based on it's pre-defined address.
+ */
+#define REGNUAL_START_ADDRESS_COMPATIBLE 0x20001400
+static uint32_t
+calculate_regnual_entry_address (const uint8_t *addr)
+{
+  const uint8_t *p = addr + 4;
+  uint32_t v = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
+
+  v -= REGNUAL_START_ADDRESS_COMPATIBLE;
+  v += (uint32_t)addr;
+  return v;
+}
+
+
+/*
  * Entry point.
  *
  * NOTE: the main function is already a thread in the system on entry.
@@ -704,6 +722,8 @@ static void copy_to_tx (uint32_t v, int i)
 int
 main (int argc, char **argv)
 {
+  uint32_t entry;
+
   (void)argc;
   (void)argv;
 
@@ -830,6 +850,7 @@ main (int argc, char **argv)
   port_disable ();
   /* Set vector */
   SCB->VTOR = (uint32_t)&_regnual_start;
+  entry = calculate_regnual_entry_address (&_regnual_start);
 #ifdef DFU_SUPPORT
 #define FLASH_SYS_START_ADDR 0x08000000
 #define FLASH_SYS_END_ADDR (0x08000000+0x1000)
@@ -848,12 +869,12 @@ main (int argc, char **argv)
     flash_write (FLASH_SYS_START_ADDR, &_sys, 0x1000);
 
     /* Leave NeuG to exec reGNUal */
-    (*func) (*((void (**)(void))(&_regnual_start+4)));
+    (*func) ((void (*)(void))entry);
     for (;;);
   }
 #else
   /* Leave NeuG to exec reGNUal */
-  flash_erase_all_and_exec (*((void (**)(void))(&_regnual_start+4)));
+  flash_erase_all_and_exec ((void (*)(void))entry);
 #endif
 
   /* Never reached */
