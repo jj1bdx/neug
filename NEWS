@@ -1,5 +1,13 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 0.06
+
+  Released 2013-03-15, by NIIBE Yutaka
+
+** Support for relocatable reGNUal
+For firmware upgrade, we can use newer reGNUal (>= 1.0.4).
+
+
 * Major changes in NeuG 0.05
 
   Released 2013-02-07, by NIIBE Yutaka

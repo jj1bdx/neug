@@ -1,5 +1,9 @@
 2013-03-15  Niibe Yutaka  <gniibe@fsij.org>
 
+	* Version 0.06.
+
+	* src/main.c (vcom_string3): Updated.
+
 	Support relocatable reGNUal.
 
 	* src/neug.ld.in (_regnual_start): Now, it's just '.'.
