@@ -1,186 +1,37 @@
 # Makefile for NeuG
 
-BOARD_DIR=@BOARD_DIR@
-
-##############################################################################
-# Build global options
-# NOTE: Can be overridden externally.
-#
-
-# Compiler options here.
-ifeq ($(USE_OPT),)
-  USE_OPT = -O3 -Os -ggdb -fomit-frame-pointer -falign-functions=16
-endif
-
-# C++ specific options here (added to USE_OPT).
-ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti
-endif
-
-# Enable this if you want the linker to remove unused code and data
-ifeq ($(USE_LINK_GC),)
-  USE_LINK_GC = yes
-endif
-
-# If enabled, this option allows to compile the application in THUMB mode.
-ifeq ($(USE_THUMB),)
-  USE_THUMB = yes
-endif
-
-# Enable this if you want to see the full log while compiling.
-ifeq ($(USE_VERBOSE_COMPILE),)
-  USE_VERBOSE_COMPILE = no
-endif
-
-#
-# Build global options
-##############################################################################
-
-##############################################################################
-# Architecture or project specific options
-#
-
-# Enable this if you really want to use the STM FWLib.
-ifeq ($(USE_FWLIB),)
-  USE_FWLIB = no
-endif
-
-#
-# Architecture or project specific options
-##############################################################################
-
-##############################################################################
-# Project, sources and paths
-#
-
 # Define project name here
 PROJECT = neug
 
-# Imported source files
-CHIBIOS = ../chibios
-include $(CHIBIOS)/os/hal/platforms/STM32F1xx/platform.mk
-include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F1xx/port.mk
-include $(CHIBIOS)/os/kernel/kernel.mk
+CHOPSTX = ../chopstx
 
 # Define linker script file here
 LDSCRIPT= neug.ld
 
-# C sources that can be compiled in ARM or THUMB mode depending on the global
-# setting.
-CSRC = $(PORTSRC) \
-       $(KERNSRC) \
-       $(HALSRC) \
-       $(PLATFORMSRC) \
-       $(BOARDSRC) \
-       ../boards/common/board-common.c \
-       $(BOARD_DIR)/board.c \
-       sys.c aes-constant-ft.c main.c sha256.c usb_stm32f103.c \
-       random.c adc_stm32f103.c
+CSRC = sys.c aes-constant-ft.c \
+       main.c sha256.c random.c usb_stm32f103.c adc_stm32f103.c
 
-# List ASM source files here
-ASMSRC = $(PORTASM)
+###################################
+CROSS = arm-none-eabi-
+CC   = $(CROSS)gcc
+LD   = $(CROSS)gcc
+OBJCOPY   = $(CROSS)objcopy
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         $(HALINC) $(PLATFORMINC) ../boards/common $(BOARD_DIR) \
-         $(CHIBIOS)/os/various
-
-#
-# Project, sources and paths
-##############################################################################
-
-##############################################################################
-# Compiler settings
-#
-
-MCU  = cortex-m3
-
-#TRGT = arm-elf-
-TRGT = arm-none-eabi-
-CC   = $(TRGT)gcc
-CPPC = $(TRGT)g++
-# Enable loading with g++ only if you need C++ runtime support.
-# NOTE: You can use C++ even without C++ support if you are careful. C++
-#       runtime support makes code size explode.
-LD   = $(TRGT)gcc
-#LD   = $(TRGT)g++
-CP   = $(TRGT)objcopy
-AS   = $(TRGT)gcc -x assembler-with-cpp
-OD   = $(TRGT)objdump
-HEX  = $(CP) -O ihex
-BIN  = $(CP) -O binary
-
-# ARM-specific options here
-AOPT =
-
-# THUMB-specific options here
-TOPT = -mthumb -DTHUMB
-
-# Define C warning options here
+MCU   = cortex-m3
 CWARN = -Wall -Wextra -Wstrict-prototypes
+DEFS  = -DFREE_STANDING
+OPT   = -O3 -Os -g
+LIBS  =
 
-# Define C++ warning options here
-CPPWARN = -Wall -Wextra
+#######################
+include $(CHOPSTX)/rules.mk
 
-#
-# Compiler settings
-##############################################################################
+board.h:
+	@echo Please make a symbolic link \'board.h\' to a file in $(CHOPSTX)/board;
+	@exit 1
 
-##############################################################################
-# Start of default section
-#
-
-# List all default C defines here, like -D_DEBUG=1
-DDEFS =
-
-# List all default ASM defines here, like -D_DEBUG=1
-DADEFS =
-
-# List all default directories to look for include files here
-DINCDIR =
-
-# List the default directory to look for the libraries here
-DLIBDIR =
-
-# List all default libraries here
-DLIBS =
-
-#
-# End of default section
-##############################################################################
-
-##############################################################################
-# Start of user section
-#
-
-# List all user C define here, like -D_DEBUG=1
-UDEFS =
-
-# Define ASM defines here
-UADEFS =
-
-# List all user directories here
-UINCDIR =
-
-# List the user directory to look for the libraries here
-ULIBDIR =
-
-# List all user libraries here
-ULIBS =
-
-#
-# End of user defines
-##############################################################################
-
-ifeq ($(USE_FWLIB),yes)
-  include $(CHIBIOS)/ext/stm32lib/stm32lib.mk
-  CSRC += $(STM32SRC)
-  INCDIR += $(STM32INC)
-  USE_OPT += -DUSE_STDPERIPH_DRIVER
-endif
-
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
-MCFLAGS= -mcpu=$(MCU) -mfix-cortex-m3-ldrd
+sys.c: board.h
 
 distclean: clean
-	-rm -f Makefile neug.ld config.h usb-strings.c.inc usb-vid-pid-ver.c.inc
+	-rm -f neug.ld config.h board.h \
+	       usb-strings.c.inc usb-vid-pid-ver.c.inc

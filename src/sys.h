@@ -1,7 +1,7 @@
 extern const uint8_t sys_version[8];
 
 typedef void (*handler)(void);
-extern handler vector[14];
+extern handler vector[18];
 
 static inline const uint8_t *
 unique_device_id (void)

@@ -1,7 +1,7 @@
 /*
  * adc_stm32f103.c - ADC driver for STM32F103
  *
- * Copyright (C) 2011, 2012 Free Software Initiative of Japan
+ * Copyright (C) 2011, 2012, 2013 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
  * This file is a part of NeuG, a True Random Number Generator
@@ -22,15 +22,17 @@
  *
  */
 
-#include "ch.h"
-#include "hal.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <chopstx.h>
+
 #include "neug.h"
+#include "stm32f103.h"
 #include "adc.h"
 
 #define NEUG_CRC32_COUNTS 4
 
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
-#define STM32_ADC_ADC1_IRQ_PRIORITY         5
 
 #define ADC_SMPR1_SMP_VREF(n)   ((n) << 21)
 #define ADC_SMPR1_SMP_SENSOR(n) ((n) << 18)
@@ -108,8 +110,7 @@
  */
 void adc_init (void)
 {
-  chSysLock ();
-  rccEnableAPB2 (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN, FALSE);
+  RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
   ADC1->CR1 = 0;
   ADC1->CR2 = ADC_CR2_ADON;
   ADC1->CR2 = ADC_CR2_ADON | ADC_CR2_RSTCAL;
@@ -129,21 +130,56 @@ void adc_init (void)
   while ((ADC2->CR2 & ADC_CR2_CAL) != 0)
     ;
   ADC2->CR2 = 0;
-  rccDisableAPB2 (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN, FALSE);
-  chSysUnlock ();
+  RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
+
+  /* ... and DMA Initialize.  */
+  DMA1_Channel1->CCR = 0;
+  DMA1->IFCR = 0xffffffff;
 }
 
-static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags);
+extern uint8_t __process4_stack_base__, __process4_stack_size__;
+const uint32_t __stackaddr_adc = (uint32_t)&__process4_stack_base__;
+const size_t __stacksize_adc = (size_t)&__process4_stack_size__;
+#define PRIO_ADC 1
+
+static void adc_lld_serve_rx_interrupt (uint32_t flags);
+
+#define INTR_REQ_DMA1_Channel1 11
+static void *
+adc_intr_thread (void *arg)
+{
+  chopstix_intr_t interrupt;
+
+  (void)arg;
+  chopstx_intr_register (&interrupt, INTR_REQ_DMA1_Channel1);
+
+  while (1)
+    {
+      uint32_t flags;
+
+      chopstx_wait_intr (&interrupt);
+      flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
+      DMA1->IFCR = STM32_DMA_ISR_MASK; /* Clear interrupt of channel 1.  */
+      adc_lld_serve_rx_interrupt (flags);
+    }
+
+  return NULL;
+}
+
 
 void adc_start (void)
 {
-  dmaStreamAllocate (NEUG_DMA_CHANNEL, STM32_ADC_ADC1_IRQ_PRIORITY,
-		     adc_lld_serve_rx_interrupt, NULL);
-  dmaStreamSetPeripheral (NEUG_DMA_CHANNEL, &ADC1->DR);
+  chopstx_t thd;
+  chopstx_attr_t attr;
 
-  chSysLock ();
+  /* Allocate a DMA channel.  */
+  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+  DMA1_Channel1->CCR = STM32_DMA_CCR_RESET_VALUE;
 
-  rccEnableAPB2 (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN, FALSE);
+  /**/
+  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
+
+  RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
 
   ADC1->CR1 = (ADC_CR1_DUALMOD_2 | ADC_CR1_DUALMOD_1 | ADC_CR1_DUALMOD_0
 	       | ADC_CR1_SCAN);
@@ -169,7 +205,10 @@ void adc_start (void)
   ADC1->CR2 = 0;
 #endif
 
-  chSysUnlock ();
+  chopstx_attr_init (&attr);
+  chopstx_attr_setschedparam (&attr, PRIO_ADC);
+  chopstx_attr_setstack (&attr, __stackaddr_adc, __stacksize_adc);
+  chopstx_create (&thd, &attr, adc_intr_thread, NULL);
 }
 
 static int adc_mode;
@@ -202,17 +241,17 @@ void adc_start_conversion (int mode, uint32_t *p, int size)
 
  if (mode == ADC_SAMPLE_MODE)
     {
-      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, p);
-      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, size / 4);
-      dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_SAMPLE);
-      dmaStreamEnable (NEUG_DMA_CHANNEL);
+      DMA1_Channel1->CMAR  = (uint32_t)p; /* SetMemory0 */
+      DMA1_Channel1->CNDTR  = (uint32_t)size / 4; /* size */
+      DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_SAMPLE; /*mode*/
+      DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
   else
     {
-      dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, &CRC->DR);
-      dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, NEUG_CRC32_COUNTS);
-      dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_CRC32);
-      dmaStreamEnable (NEUG_DMA_CHANNEL);
+      DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
+      DMA1_Channel1->CNDTR  = (uint32_t)NEUG_CRC32_COUNTS; /* size */
+      DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_CRC32; /*mode*/
+      DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
 
  adc_start_conversion_internal ();
@@ -221,7 +260,8 @@ void adc_start_conversion (int mode, uint32_t *p, int size)
 
 static void adc_stop_conversion (void)
 {
-  dmaStreamDisable (NEUG_DMA_CHANNEL);
+  DMA1_Channel1->CCR &= ~DMA_CCR1_EN;
+
 #ifdef DELIBARATELY_DO_IT_WRONG_START_STOP
   ADC1->CR2 = 0;
   ADC2->CR2 = 0;
@@ -239,15 +279,14 @@ void adc_stop (void)
   ADC2->CR1 = 0;
   ADC2->CR2 = 0;
 
-  dmaStreamRelease (NEUG_DMA_CHANNEL);
-  rccDisableAPB2 (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN, FALSE);
+  /* XXX: here to disable the associated IRQ vector; stop intr thread.  */
+  RCC->AHBENR &= ~RCC_AHBENR_DMA1EN;
+  RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
 }
 
 
-static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags)
+static void adc_lld_serve_rx_interrupt (uint32_t flags)
 {
-  (void)arg;
-
   if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
     {
       /* Should never happened.  If any, it's coding error. */
@@ -267,21 +306,21 @@ static void adc_lld_serve_rx_interrupt (void *arg, uint32_t flags)
 
 	      if (adc_size > 0)
 		{
-		  dmaStreamSetMemory0 (NEUG_DMA_CHANNEL, &CRC->DR);
-		  dmaStreamSetTransactionSize (NEUG_DMA_CHANNEL, NEUG_CRC32_COUNTS);
-		  dmaStreamSetMode (NEUG_DMA_CHANNEL, NEUG_DMA_MODE_CRC32);
-		  dmaStreamEnable (NEUG_DMA_CHANNEL);
-
+		  DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
+		  DMA1_Channel1->CNDTR  = (uint32_t)NEUG_CRC32_COUNTS; /* size */
+		  DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_CRC32; /*mode*/
+		  DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
 		  adc_start_conversion_internal ();
 		}
 	    }
 
 	  if (adc_mode == ADC_SAMPLE_MODE || adc_size <= 0)
 	    {
-	      chSysLockFromIsr();
-	      if (rng_thread)
-		chEvtSignalFlagsI (rng_thread, ADC_DATA_AVAILABLE);
-	      chSysUnlockFromIsr();
+	      chopstx_mutex_lock (&adc_mtx);
+	      adc_data_available++;
+	      if (adc_waiting)
+		chopstx_cond_signal (&adc_cond);
+	      chopstx_mutex_unlock (&adc_mtx);
 	    }
 	}
     }

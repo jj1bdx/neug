@@ -1,5 +1,12 @@
 #ifdef FREE_STANDING
-#include "types.h"
+#include <stdint.h>
+#include <stdlib.h>
+#define TRUE  1
+#define FALSE 0
+
+#define NULL  0
+
+#define     __IO    volatile
 #else
 #include "ch.h"
 #include "hal.h"

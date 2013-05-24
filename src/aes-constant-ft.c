@@ -1,7 +1,28 @@
 /*
- * Taken from polarssl aes.c
+ * aes-constant-ft.c - AES forward tables.
  *
- * Original copyright is below:
+ * We need something useful for the initial flash ROM page (4 Ki
+ * bytes), which cannot be modified after installation.  Even after
+ * upgrade of the firmware, it stays intact.
+ *
+ * We decide to put 3/4 of AES forward tables to fill 3 Ki bytes, as
+ * its useful and it won't change.
+ *
+ * The code was taken from aes.c of PolarSSL version 0.14, and then,
+ * modified to add section names.
+ *
+ * Since this is just a data, it wouldn't be copyright-able, but the
+ * original auther would claim so.  Thus, we put original copyright
+ * notice here.  It is highly likely that there will be no such a
+ * thing for copyright.  Nevertheless, we think that PolarSSL is good
+ * software to address here, and encourage people using it.
+ *
+ */
+
+#include <stdint.h>
+
+/*
+ * Original copyright notice is below:
  */
 
 /*
@@ -106,13 +127,19 @@
     V(CB,B0,B0,7B), V(FC,54,54,A8), V(D6,BB,BB,6D), V(3A,16,16,2C)
 
 #define V(a,b,c,d) 0x##a##b##c##d
-const unsigned long FT0[256] __attribute__((section(".sys.0"))) = { FT };
+const uint32_t FT0[256] __attribute__((section(".sys.0"))) = { FT };
 #undef V
 
 #define V(a,b,c,d) 0x##b##c##d##a
-const unsigned long FT1[256] __attribute__((section(".sys.1"))) = { FT };
+const uint32_t FT1[256] __attribute__((section(".sys.1"))) = { FT };
 #undef V
 
 #define V(a,b,c,d) 0x##c##d##a##b
-const unsigned long FT2[256] __attribute__((section(".sys.2"))) = { FT };
+const uint32_t FT2[256] __attribute__((section(".sys.2"))) = { FT };
 #undef V
+
+#ifdef ORIGINAL_IMPLEMENTATION 
+#define V(a,b,c,d) 0x##d##a##b##c
+const uint32_t FT3[256] = { FT };
+#undef V
+#endif

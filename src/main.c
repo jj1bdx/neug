@@ -23,25 +23,22 @@
  *
  */
 
+
+#include <stdint.h>
+#include <string.h>
+#include <chopstx.h>
+
 #include "config.h"
-#include "ch.h"
-#include "hal.h"
-#include "board.h"
 #include "neug.h"
 #include "usb_lld.h"
 #include "sys.h"
+#include "stm32f103.h"
 #include "adc.h"
 
-/*
- * We are trying to avoid dependency to C library. 
- * GCC built-in function(s) are declared here.
- */
-extern void *memcpy(void *dest, const void *src, size_t n);
-extern void *memset (void *s, int c, size_t n);
+chopstx_mutex_t usb_mtx;
+chopstx_cond_t cnd_usb_connection;
+chopstx_cond_t cnd_usb_buffer_ready;
 
-static Thread *main_thread;
-
-
 #define ENDP0_RXADDR        (0x40)
 #define ENDP0_TXADDR        (0x80)
 #define ENDP1_TXADDR        (0xc0)
@@ -266,6 +263,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	}
       else if (req_no == USB_NEUG_EXIT)
 	{
+#if 0
 	  chSysLockFromIsr ();
 	  if (main_thread->p_state == THD_STATE_SUSPENDED
 	      || main_thread->p_state == THD_STATE_SLEEPING)
@@ -274,6 +272,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	      chSchReadyI (main_thread);
 	    }
 	  chSysUnlockFromIsr ();
+#endif
 	}
     }
 }
@@ -330,17 +329,10 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
 		connected = 0;
 	    }
 
+	  chopstx_mutex_lock (&usb_mtx);
 	  if (connected != connected_saved)
-	    {
-	      chSysLockFromIsr ();
-	      if (main_thread->p_state == THD_STATE_SUSPENDED
-		  || main_thread->p_state == THD_STATE_SLEEPING)
-		{
-		  main_thread->p_u.rdymsg = RDY_OK;
-		  chSchReadyI (main_thread);
-		}
-	      chSysUnlockFromIsr ();
-	    }
+	    chopstx_cond_signal (&cnd_usb_connection);
+	  chopstx_mutex_unlock (&usb_mtx);
 
 	  return USB_SUCCESS;
 	}
@@ -592,6 +584,33 @@ int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
     }
 }
 
+#define INTR_REQ_USB 20
+#define PRIO_USB 2
+
+static void *
+usb_intr (void *arg)
+{
+  chopstix_intr_t interrupt;
+
+  (void)arg;
+  asm volatile ("cpsid   i" : : : "memory");
+  /* Disable because usb_lld_init assumes interrupt handler.  */
+  usb_lld_init (vcom_configuration_desc[7]);
+  chopstx_intr_register (&interrupt, INTR_REQ_USB);
+  /* Enable */
+  asm volatile ("cpsie   i" : : : "memory");
+
+  while (1)
+    {
+      chopstx_wait_intr (&interrupt);
+
+      /* Process interrupt. */
+      usb_interrupt_handler ();
+    }
+
+  return NULL;
+}
+
 
 static void fill_serial_no_by_unique_id (void)
 {
@@ -614,23 +633,12 @@ static void fill_serial_no_by_unique_id (void)
     }
 }
 
-CH_IRQ_HANDLER (Vector90)
-{
-  CH_IRQ_PROLOGUE();
-  usb_interrupt_handler ();
-  CH_IRQ_EPILOGUE();
-}
-
 void
 EP1_IN_Callback (void)
 {
-  chSysLockFromIsr ();
-  if (main_thread->p_state == THD_STATE_SUSPENDED)
-    {
-      main_thread->p_u.rdymsg = RDY_OK;
-      chSchReadyI (main_thread);
-    }
-  chSysUnlockFromIsr ();
+  chopstx_mutex_lock (&usb_mtx);
+  chopstx_cond_signal (&cnd_usb_buffer_ready);
+  chopstx_mutex_unlock (&usb_mtx);
 }
 
 void
@@ -644,44 +652,92 @@ EP3_OUT_Callback (void)
   usb_lld_rx_enable (ENDP3);
 }
 
-static WORKING_AREA(wa_led, 64);
+typedef uint32_t eventmask_t;
+#define ALL_EVENTS (~0)
+
+struct event_flag {
+  chopstx_mutex_t mutex;
+  chopstx_cond_t cond;
+  eventmask_t flag;
+};
+
+static void event_flag_init (struct event_flag *ev)
+{
+  ev->flag = 0;
+  chopstx_mutex_init (&ev->mutex);
+  chopstx_cond_init (&ev->cond);
+}
+
+
+static eventmask_t event_flag_waitone (struct event_flag *ev, eventmask_t m)
+{
+  int n;
+
+  chopstx_mutex_lock (&ev->mutex);
+  while (!(ev->flag & m))
+    chopstx_cond_wait (&ev->cond, &ev->mutex);
+
+  n = __builtin_ffs ((ev->flag & m));
+  ev->flag &= ~(1 << (n - 1));
+  chopstx_mutex_unlock (&ev->mutex);
+
+  return (1 << (n - 1));
+}
+
+static void event_flag_signal (struct event_flag *ev, eventmask_t m)
+{
+  chopstx_mutex_lock (&ev->mutex);
+  ev->flag |= m;
+  chopstx_cond_signal (&ev->cond);
+  chopstx_mutex_unlock (&ev->mutex);
+}
+
+extern uint8_t __process1_stack_base__, __process1_stack_size__;
+extern uint8_t __process3_stack_base__, __process3_stack_size__;
+
+const uint32_t __stackaddr_led = (uint32_t)&__process1_stack_base__;
+const size_t __stacksize_led = (size_t)&__process1_stack_size__;
+const uint32_t __stackaddr_usb = (uint32_t)&__process3_stack_base__;
+const size_t __stacksize_usb = (size_t)&__process3_stack_size__;
+
+
+#define PRIO_LED 1
+struct event_flag led_event;
 
 #define LED_ONESHOT_SHORT	((eventmask_t)1)
 #define LED_TWOSHOTS		((eventmask_t)2)
 #define LED_ONESHOT_LONG	((eventmask_t)4)
-static Thread *led_thread;
 
 /*
  * LED blinker: When notified, let LED emit for 100ms.
  */
-static msg_t led_blinker (void *arg)
+static void *led_blinker (void *arg)
 {
   (void)arg;
 
-  led_thread = chThdSelf ();
   set_led (0);
 
   while (1)
     {
       eventmask_t m;
 
-      m = chEvtWaitOne (ALL_EVENTS);
+      m = event_flag_waitone (&led_event, ALL_EVENTS);
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
 
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
-	chThdSleepMilliseconds (100);
+	chopstx_usleep (100*1000);
       else if (m == LED_TWOSHOTS)
 	{
-	  chThdSleepMilliseconds (50);
+	  chopstx_usleep (50*1000);
 	  set_led (0);
-	  chThdSleepMilliseconds (50);
+	  chopstx_usleep (50*1000);
 	  set_led (1);
-	  chThdSleepMilliseconds (50);
+	  chopstx_usleep (50*1000);
 	}
       else
-	chThdSleepMilliseconds (250);
+	chopstx_usleep (250*1000);
       set_led (0);
     }
 
@@ -723,23 +779,32 @@ int
 main (int argc, char **argv)
 {
   uint32_t entry;
+  chopstx_t led_thread, thd;
+  chopstx_attr_t attr;
 
   (void)argc;
   (void)argv;
 
   fill_serial_no_by_unique_id ();
 
-  halInit ();
   adc_init ();
-  chSysInit ();
 
-  main_thread = chThdSelf ();
+  event_flag_init (&led_event);
 
-  chThdCreateStatic (wa_led, sizeof (wa_led), NORMALPRIO, led_blinker, NULL);
+  chopstx_attr_init (&attr);
+  chopstx_attr_setschedparam (&attr, PRIO_LED);
+  chopstx_attr_setstack (&attr, __stackaddr_led, __stacksize_led);
+  chopstx_create (&led_thread, &attr, led_blinker, NULL);
+
+  chopstx_mutex_init (&usb_mtx);
+  chopstx_cond_init (&cnd_usb_connection);
+  chopstx_cond_init (&cnd_usb_buffer_ready);
+
+  chopstx_attr_setschedparam (&attr, PRIO_USB);
+  chopstx_attr_setstack (&attr, __stackaddr_usb, __stacksize_usb);
+  chopstx_create (&thd, &attr, usb_intr, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
-
-  usb_lld_init (vcom_configuration_desc[7]);
 
   while (1)
     {
@@ -758,8 +823,8 @@ main (int argc, char **argv)
 	  neug_flush ();
 
 	  if ((count & 0x0007) == 0)
-	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
-	  chThdSleepMilliseconds (25);
+	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
+	  chopstx_usleep (25*1000);
 	  count++;
 	}
 
@@ -770,8 +835,8 @@ main (int argc, char **argv)
 	    break;
 
 	  neug_flush ();
-	  chEvtSignalFlags (led_thread, LED_TWOSHOTS);
-	  chThdSleepMilliseconds (5000);
+	  event_flag_signal (&led_event, LED_TWOSHOTS);
+	  chopstx_usleep (5000*1000);
 	}
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -796,7 +861,7 @@ main (int argc, char **argv)
 	    break;
 
 	  if ((count & 0x03ff) == 0)
-	    chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
+	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
 
 	  i = neug_consume_random (copy_to_tx);
 
@@ -811,25 +876,27 @@ main (int argc, char **argv)
 	  else
 	    last_was_fullsizepacket = 0;
 
-	  chSysLock ();
+	  chopstx_mutex_lock (&usb_mtx);
 	  if (connected == 0)
 	    {
-	      chSysUnlock();
+	      chopstx_mutex_unlock (&usb_mtx);
 	      goto waiting_connection;
 	    }
 	  else
 	    {
 	      usb_lld_tx_enable (ENDP1, i * 4);
-	      chSchGoSleepS (THD_STATE_SUSPENDED);
+	      chopstx_cond_wait (&cnd_usb_buffer_ready, &usb_mtx);
 	    }
-	  chSysUnlock ();
+	  chopstx_mutex_unlock (&usb_mtx);
 
 	  count++;
 	}
     }
 
-  chEvtSignalFlags (led_thread, LED_ONESHOT_SHORT);
-  chThdWait (led_thread);
+  event_flag_signal (&led_event, LED_ONESHOT_SHORT);
+#if 0
+  chopstx_join (led_thread, NULL);
+#endif
 
   /*
    * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED.
@@ -839,15 +906,15 @@ main (int argc, char **argv)
   fsij_device_state = FSIJ_DEVICE_EXITED;
 
   while (fsij_device_state == FSIJ_DEVICE_EXITED)
-    chThdSleepMilliseconds (500);
+    chopstx_usleep (500*1000);
 
   flash_unlock ();		/* Flash unlock should be done here */
   set_led (1);
   usb_lld_shutdown ();
-  /* Disable SysTick */
-  SysTick->CTRL = 0;
-  /* Disable all interrupts */
-  port_disable ();
+#if 0
+  /* Finish kernel: stop scheduler, timer.  */
+  chx_fini ();
+#endif
   /* Set vector */
   SCB->VTOR = (uint32_t)&_regnual_start;
   entry = calculate_regnual_entry_address (&_regnual_start);
