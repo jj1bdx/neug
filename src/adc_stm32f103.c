@@ -111,6 +111,9 @@
 void adc_init (void)
 {
   RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
+  RCC->APB2RSTR = (RCC_APB2RSTR_ADC1RST | RCC_APB2RSTR_ADC2RST);
+  RCC->APB2RSTR = 0;
+
   ADC1->CR1 = 0;
   ADC1->CR2 = ADC_CR2_ADON;
   ADC1->CR2 = ADC_CR2_ADON | ADC_CR2_RSTCAL;
@@ -131,10 +134,6 @@ void adc_init (void)
     ;
   ADC2->CR2 = 0;
   RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
-
-  /* ... and DMA Initialize.  */
-  DMA1_Channel1->CCR = 0;
-  DMA1->IFCR = 0xffffffff;
 }
 
 extern uint8_t __process4_stack_base__, __process4_stack_size__;
@@ -148,16 +147,16 @@ static void adc_lld_serve_rx_interrupt (uint32_t flags);
 static void *
 adc_intr_thread (void *arg)
 {
-  chopstix_intr_t interrupt;
+  chopstx_intr_t interrupt;
 
   (void)arg;
-  chopstx_intr_register (&interrupt, INTR_REQ_DMA1_Channel1);
+  chopstx_claim_irq (&interrupt, INTR_REQ_DMA1_Channel1);
 
   while (1)
     {
       uint32_t flags;
 
-      chopstx_wait_intr (&interrupt);
+      chopstx_intr_wait (&interrupt);
       flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
       DMA1->IFCR = STM32_DMA_ISR_MASK; /* Clear interrupt of channel 1.  */
       adc_lld_serve_rx_interrupt (flags);
@@ -172,12 +171,10 @@ void adc_start (void)
   chopstx_t thd;
   chopstx_attr_t attr;
 
-  /* Allocate a DMA channel.  */
+  /* Use DMA channel 1.  */
   RCC->AHBENR |= RCC_AHBENR_DMA1EN;
   DMA1_Channel1->CCR = STM32_DMA_CCR_RESET_VALUE;
-
-  /**/
-  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
+  DMA1->IFCR = 0xffffffff;
 
   RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
 
@@ -241,16 +238,18 @@ void adc_start_conversion (int mode, uint32_t *p, int size)
 
  if (mode == ADC_SAMPLE_MODE)
     {
+      DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
       DMA1_Channel1->CMAR  = (uint32_t)p; /* SetMemory0 */
       DMA1_Channel1->CNDTR  = (uint32_t)size / 4; /* size */
-      DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_SAMPLE; /*mode*/
+      DMA1_Channel1->CCR  = NEUG_DMA_MODE_SAMPLE; /*mode*/
       DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
   else
     {
+      DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
       DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
-      DMA1_Channel1->CNDTR  = (uint32_t)NEUG_CRC32_COUNTS; /* size */
-      DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_CRC32; /*mode*/
+      DMA1_Channel1->CNDTR  = NEUG_CRC32_COUNTS; /* size */
+      DMA1_Channel1->CCR  = NEUG_DMA_MODE_CRC32; /*mode*/
       DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
 
@@ -306,9 +305,10 @@ static void adc_lld_serve_rx_interrupt (uint32_t flags)
 
 	      if (adc_size > 0)
 		{
+		  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
 		  DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
-		  DMA1_Channel1->CNDTR  = (uint32_t)NEUG_CRC32_COUNTS; /* size */
-		  DMA1_Channel1->CCR  = (uint32_t)NEUG_DMA_MODE_CRC32; /*mode*/
+		  DMA1_Channel1->CNDTR = NEUG_CRC32_COUNTS; /* size */
+		  DMA1_Channel1->CCR  = NEUG_DMA_MODE_CRC32; /*mode*/
 		  DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
 		  adc_start_conversion_internal ();
 		}

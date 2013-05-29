@@ -590,19 +590,19 @@ int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
 static void *
 usb_intr (void *arg)
 {
-  chopstix_intr_t interrupt;
+  chopstx_intr_t interrupt;
 
   (void)arg;
   asm volatile ("cpsid   i" : : : "memory");
   /* Disable because usb_lld_init assumes interrupt handler.  */
   usb_lld_init (vcom_configuration_desc[7]);
-  chopstx_intr_register (&interrupt, INTR_REQ_USB);
+  chopstx_claim_irq (&interrupt, INTR_REQ_USB);
   /* Enable */
   asm volatile ("cpsie   i" : : : "memory");
 
   while (1)
     {
-      chopstx_wait_intr (&interrupt);
+      chopstx_intr_wait (&interrupt);
 
       /* Process interrupt. */
       usb_interrupt_handler ();
@@ -727,17 +727,17 @@ static void *led_blinker (void *arg)
 
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
-	chopstx_usleep (100*1000);
+	chopstx_usec_wait (100*1000);
       else if (m == LED_TWOSHOTS)
 	{
-	  chopstx_usleep (50*1000);
+	  chopstx_usec_wait (50*1000);
 	  set_led (0);
-	  chopstx_usleep (50*1000);
+	  chopstx_usec_wait (50*1000);
 	  set_led (1);
-	  chopstx_usleep (50*1000);
+	  chopstx_usec_wait (50*1000);
 	}
       else
-	chopstx_usleep (250*1000);
+	chopstx_usec_wait (250*1000);
       set_led (0);
     }
 
@@ -824,7 +824,7 @@ main (int argc, char **argv)
 
 	  if ((count & 0x0007) == 0)
 	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
-	  chopstx_usleep (25*1000);
+	  chopstx_usec_wait (25*1000);
 	  count++;
 	}
 
@@ -836,7 +836,7 @@ main (int argc, char **argv)
 
 	  neug_flush ();
 	  event_flag_signal (&led_event, LED_TWOSHOTS);
-	  chopstx_usleep (5000*1000);
+	  chopstx_usec_wait (5000*1000);
 	}
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -906,7 +906,7 @@ main (int argc, char **argv)
   fsij_device_state = FSIJ_DEVICE_EXITED;
 
   while (fsij_device_state == FSIJ_DEVICE_EXITED)
-    chopstx_usleep (500*1000);
+    chopstx_usec_wait (500*1000);
 
   flash_unlock ();		/* Flash unlock should be done here */
   set_led (1);

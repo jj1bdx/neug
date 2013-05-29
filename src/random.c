@@ -640,7 +640,7 @@ neug_mode_select (uint8_t mode)
   while (adc_waiting == 0)
     {
       chopstx_mutex_unlock (&adc_mtx);
-      chopstx_usleep (1000);
+      chopstx_usec_wait (1000);
       chopstx_mutex_lock (&adc_mtx);
     }
   chopstx_mutex_unlock (&adc_mtx);

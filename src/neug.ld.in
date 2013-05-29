@@ -27,7 +27,7 @@ SECTIONS
 {
     . = 0;
 
-    .sys : ALIGN(16) SUBALIGN(16)
+    .sys : ALIGN(4) SUBALIGN(4)
     {
         _sys = .;
         KEEP(*(.vectors))

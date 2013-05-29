@@ -2,6 +2,9 @@
 #define APB2PERIPH_BASE	(PERIPH_BASE + 0x10000)
 #define AHBPERIPH_BASE	(PERIPH_BASE + 0x20000)
 
+#define RCC_APB2RSTR_ADC1RST 0x00000200
+#define RCC_APB2RSTR_ADC2RST 0x00000400
+
 struct RCC {
   volatile uint32_t CR;
   volatile uint32_t CFGR;
