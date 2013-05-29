@@ -263,16 +263,10 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	}
       else if (req_no == USB_NEUG_EXIT)
 	{
-#if 0
-	  chSysLockFromIsr ();
-	  if (main_thread->p_state == THD_STATE_SUSPENDED
-	      || main_thread->p_state == THD_STATE_SLEEPING)
-	    {
-	      main_thread->p_u.rdymsg = RDY_OK;
-	      chSchReadyI (main_thread);
-	    }
-	  chSysUnlockFromIsr ();
-#endif
+	  /* Force exit from the main loop.  */
+	  chopstx_mutex_lock (&usb_mtx);
+	  chopstx_cond_signal (&cnd_usb_buffer_ready);
+	  chopstx_mutex_unlock (&usb_mtx);
 	}
     }
 }
@@ -779,7 +773,7 @@ int
 main (int argc, char **argv)
 {
   uint32_t entry;
-  chopstx_t led_thread, thd;
+  chopstx_t led_thread, usb_thd;
   chopstx_attr_t attr;
 
   (void)argc;
@@ -802,7 +796,7 @@ main (int argc, char **argv)
 
   chopstx_attr_setschedparam (&attr, PRIO_USB);
   chopstx_attr_setstack (&attr, __stackaddr_usb, __stacksize_usb);
-  chopstx_create (&thd, &attr, usb_intr, NULL);
+  chopstx_create (&usb_thd, &attr, usb_intr, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 
@@ -894,9 +888,7 @@ main (int argc, char **argv)
     }
 
   event_flag_signal (&led_event, LED_ONESHOT_SHORT);
-#if 0
   chopstx_join (led_thread, NULL);
-#endif
 
   /*
    * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED.
@@ -911,10 +903,11 @@ main (int argc, char **argv)
   flash_unlock ();		/* Flash unlock should be done here */
   set_led (1);
   usb_lld_shutdown ();
-#if 0
-  /* Finish kernel: stop scheduler, timer.  */
-  chx_fini ();
-#endif
+
+  /* Finish application.  */
+  chopstx_cancel (usb_thd);
+  chopstx_join (usb_thd, NULL);
+
   /* Set vector */
   SCB->VTOR = (uint32_t)&_regnual_start;
   entry = calculate_regnual_entry_address (&_regnual_start);

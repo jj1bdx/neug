@@ -623,9 +623,7 @@ neug_fini (void)
 {
   rng_should_terminate = 1;
   neug_get (1);
-#if 0
   chopstx_join (rng_thread, NULL);
-#endif
 }
 
 void

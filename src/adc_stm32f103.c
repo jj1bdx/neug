@@ -165,10 +165,10 @@ adc_intr_thread (void *arg)
   return NULL;
 }
 
+static chopstx_t adc_thd;
 
 void adc_start (void)
 {
-  chopstx_t thd;
   chopstx_attr_t attr;
 
   /* Use DMA channel 1.  */
@@ -205,7 +205,7 @@ void adc_start (void)
   chopstx_attr_init (&attr);
   chopstx_attr_setschedparam (&attr, PRIO_ADC);
   chopstx_attr_setstack (&attr, __stackaddr_adc, __stacksize_adc);
-  chopstx_create (&thd, &attr, adc_intr_thread, NULL);
+  chopstx_create (&adc_thd, &attr, adc_intr_thread, NULL);
 }
 
 static int adc_mode;
@@ -281,6 +281,9 @@ void adc_stop (void)
   /* XXX: here to disable the associated IRQ vector; stop intr thread.  */
   RCC->AHBENR &= ~RCC_AHBENR_DMA1EN;
   RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
+
+  chopstx_cancel (adc_thd);
+  chopstx_join (adc_thd, NULL);
 }
 
 
