@@ -578,7 +578,7 @@ int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
 }
 
 #define INTR_REQ_USB 20
-#define PRIO_USB 2
+#define PRIO_USB 4
 
 static void *
 usb_intr (void *arg)

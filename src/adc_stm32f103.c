@@ -147,7 +147,7 @@ void adc_init (void)
 extern uint8_t __process4_stack_base__, __process4_stack_size__;
 const uint32_t __stackaddr_adc = (uint32_t)&__process4_stack_base__;
 const size_t __stacksize_adc = (size_t)&__process4_stack_size__;
-#define PRIO_ADC 4
+#define PRIO_ADC 3
 
 static void adc_lld_serve_rx_interrupt (uint32_t flags);
 

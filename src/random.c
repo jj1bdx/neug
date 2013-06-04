@@ -483,7 +483,7 @@ static struct rng_rb the_ring_buffer;
 extern uint8_t __process2_stack_base__, __process2_stack_size__;
 const uint32_t __stackaddr_rng = (uint32_t)&__process2_stack_base__;
 const size_t __stacksize_rng = (size_t)&__process2_stack_size__;
-#define PRIO_RNG 3
+#define PRIO_RNG 2
 
 /**
  * @brief Initialize NeuG.
