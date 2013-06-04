@@ -177,8 +177,6 @@ static chopstx_t adc_thd;
 
 void adc_start (void)
 {
-  chopstx_attr_t attr;
-
   /* Use DMA channel 1.  */
   RCC->AHBENR |= RCC_AHBENR_DMA1EN;
   DMA1_Channel1->CCR = STM32_DMA_CCR_RESET_VALUE;
@@ -210,10 +208,8 @@ void adc_start (void)
   ADC1->CR2 = 0;
 #endif
 
-  chopstx_attr_init (&attr);
-  chopstx_attr_setschedparam (&attr, PRIO_ADC);
-  chopstx_attr_setstack (&attr, __stackaddr_adc, __stacksize_adc);
-  chopstx_create (&adc_thd, &attr, adc_intr_thread, NULL);
+  adc_thd = chopstx_create (PRIO_ADC, __stackaddr_adc, __stacksize_adc,
+			    adc_intr_thread, NULL);
 }
 
 static int adc_mode;

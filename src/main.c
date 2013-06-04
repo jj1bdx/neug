@@ -773,7 +773,6 @@ main (int argc, char **argv)
 {
   uint32_t entry;
   chopstx_t led_thread, usb_thd;
-  chopstx_attr_t attr;
 
   (void)argc;
   (void)argv;
@@ -784,17 +783,15 @@ main (int argc, char **argv)
 
   event_flag_init (&led_event);
 
-  chopstx_attr_init (&attr);
-  chopstx_attr_setschedparam (&attr, PRIO_LED);
-  chopstx_attr_setstack (&attr, __stackaddr_led, __stacksize_led);
-  chopstx_create (&led_thread, &attr, led_blinker, NULL);
+  
+  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
+			       led_blinker, NULL);
 
   chopstx_mutex_init (&usb_mtx);
   chopstx_cond_init (&cnd_usb);
 
-  chopstx_attr_setschedparam (&attr, PRIO_USB);
-  chopstx_attr_setstack (&attr, __stackaddr_usb, __stacksize_usb);
-  chopstx_create (&usb_thd, &attr, usb_intr, NULL);
+  usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+			    usb_intr, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 

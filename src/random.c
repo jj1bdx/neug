@@ -491,7 +491,6 @@ const size_t __stacksize_rng = (size_t)&__process2_stack_size__;
 void
 neug_init (uint32_t *buf, uint8_t size)
 {
-  chopstx_attr_t attr;
   const uint32_t *u = (const uint32_t *)unique_device_id ();
   struct rng_rb *rb = &the_ring_buffer;
   int i;
@@ -509,10 +508,8 @@ neug_init (uint32_t *buf, uint8_t size)
   neug_mode = NEUG_MODE_CONDITIONED;
   rb_init (rb, buf, size);
 
-  chopstx_attr_init (&attr);
-  chopstx_attr_setschedparam (&attr, PRIO_RNG);
-  chopstx_attr_setstack (&attr, __stackaddr_rng, __stacksize_rng);
-  chopstx_create (&rng_thread, &attr, rng, rb);
+  rng_thread = chopstx_create (PRIO_RNG, __stackaddr_rng, __stacksize_rng,
+			       rng, rb);
 }
 
 /**
