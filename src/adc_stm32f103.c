@@ -81,10 +81,18 @@
      | STM32_DMA_CR_MINC       | STM32_DMA_CR_TCIE			\
      | STM32_DMA_CR_TEIE)
 
+#if 0
 #define NEUG_DMA_MODE_CRC32                                             \
   (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
      | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
      | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
+#else
+#define NEUG_DMA_MODE_CRC32                                             \
+  (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
+     | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
+     | STM32_DMA_CR_MINC       						\
+     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
+#endif
 
 #define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)     \
                               | ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_SENSOR)
@@ -139,7 +147,7 @@ void adc_init (void)
 extern uint8_t __process4_stack_base__, __process4_stack_size__;
 const uint32_t __stackaddr_adc = (uint32_t)&__process4_stack_base__;
 const size_t __stacksize_adc = (size_t)&__process4_stack_size__;
-#define PRIO_ADC 1
+#define PRIO_ADC 4
 
 static void adc_lld_serve_rx_interrupt (uint32_t flags);
 
@@ -211,6 +219,7 @@ void adc_start (void)
 static int adc_mode;
 static uint32_t *adc_ptr;
 static int adc_size;
+static uint32_t adc_buf[64];
 
 static void adc_start_conversion_internal (void)
 {
@@ -240,15 +249,15 @@ void adc_start_conversion (int mode, uint32_t *p, int size)
     {
       DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
       DMA1_Channel1->CMAR  = (uint32_t)p; /* SetMemory0 */
-      DMA1_Channel1->CNDTR  = (uint32_t)size / 4; /* size */
+      DMA1_Channel1->CNDTR  = (uint32_t)size / 4; /* counter */
       DMA1_Channel1->CCR  = NEUG_DMA_MODE_SAMPLE; /*mode*/
       DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
   else
     {
       DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
-      DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
-      DMA1_Channel1->CNDTR  = NEUG_CRC32_COUNTS; /* size */
+      DMA1_Channel1->CMAR  = (uint32_t)adc_buf; /* SetMemory0 */
+      DMA1_Channel1->CNDTR  = size; /* counter */
       DMA1_Channel1->CCR  = NEUG_DMA_MODE_CRC32; /*mode*/
       DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
     }
@@ -303,28 +312,23 @@ static void adc_lld_serve_rx_interrupt (uint32_t flags)
 
 	  if (adc_mode != ADC_SAMPLE_MODE)
 	    {
-	      adc_size -= 4;
-	      *adc_ptr++ = CRC->DR;
+	      int i;
 
-	      if (adc_size > 0)
+	      for (i = 0; i < adc_size;)
 		{
-		  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
-		  DMA1_Channel1->CMAR  = (uint32_t)&CRC->DR; /* SetMemory0 */
-		  DMA1_Channel1->CNDTR = NEUG_CRC32_COUNTS; /* size */
-		  DMA1_Channel1->CCR  = NEUG_DMA_MODE_CRC32; /*mode*/
-		  DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
-		  adc_start_conversion_internal ();
+		  CRC->DR = adc_buf[i++];
+		  CRC->DR = adc_buf[i++];
+		  CRC->DR = adc_buf[i++];
+		  CRC->DR = adc_buf[i++];
+		  *adc_ptr++ = CRC->DR;
 		}
 	    }
 
-	  if (adc_mode == ADC_SAMPLE_MODE || adc_size <= 0)
-	    {
-	      chopstx_mutex_lock (&adc_mtx);
-	      adc_data_available++;
-	      if (adc_waiting)
-		chopstx_cond_signal (&adc_cond);
-	      chopstx_mutex_unlock (&adc_mtx);
-	    }
+	  chopstx_mutex_lock (&adc_mtx);
+	  adc_data_available++;
+	  if (adc_waiting)
+	    chopstx_cond_signal (&adc_cond);
+	  chopstx_mutex_unlock (&adc_mtx);
 	}
     }
 }

@@ -36,8 +36,7 @@
 #include "adc.h"
 
 chopstx_mutex_t usb_mtx;
-chopstx_cond_t cnd_usb_connection;
-chopstx_cond_t cnd_usb_buffer_ready;
+chopstx_cond_t cnd_usb;
 
 #define ENDP0_RXADDR        (0x40)
 #define ENDP0_TXADDR        (0x80)
@@ -265,7 +264,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	{
 	  /* Force exit from the main loop.  */
 	  chopstx_mutex_lock (&usb_mtx);
-	  chopstx_cond_signal (&cnd_usb_buffer_ready);
+	  chopstx_cond_signal (&cnd_usb);
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
     }
@@ -325,7 +324,7 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
 
 	  chopstx_mutex_lock (&usb_mtx);
 	  if (connected != connected_saved)
-	    chopstx_cond_signal (&cnd_usb_connection);
+	    chopstx_cond_signal (&cnd_usb);
 	  chopstx_mutex_unlock (&usb_mtx);
 
 	  return USB_SUCCESS;
@@ -631,7 +630,7 @@ void
 EP1_IN_Callback (void)
 {
   chopstx_mutex_lock (&usb_mtx);
-  chopstx_cond_signal (&cnd_usb_buffer_ready);
+  chopstx_cond_signal (&cnd_usb);
   chopstx_mutex_unlock (&usb_mtx);
 }
 
@@ -791,8 +790,7 @@ main (int argc, char **argv)
   chopstx_create (&led_thread, &attr, led_blinker, NULL);
 
   chopstx_mutex_init (&usb_mtx);
-  chopstx_cond_init (&cnd_usb_connection);
-  chopstx_cond_init (&cnd_usb_buffer_ready);
+  chopstx_cond_init (&cnd_usb);
 
   chopstx_attr_setschedparam (&attr, PRIO_USB);
   chopstx_attr_setstack (&attr, __stackaddr_usb, __stacksize_usb);
@@ -879,7 +877,7 @@ main (int argc, char **argv)
 	  else
 	    {
 	      usb_lld_tx_enable (ENDP1, i * 4);
-	      chopstx_cond_wait (&cnd_usb_buffer_ready, &usb_mtx);
+	      chopstx_cond_wait (&cnd_usb, &usb_mtx);
 	    }
 	  chopstx_mutex_unlock (&usb_mtx);
 
