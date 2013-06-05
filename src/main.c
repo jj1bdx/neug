@@ -38,6 +38,9 @@
 chopstx_mutex_t usb_mtx;
 chopstx_cond_t cnd_usb;
 
+extern uint8_t __process0_stack_end__;
+static chopstx_t main_thd = (uint32_t)(&__process0_stack_end__ - 60);
+
 #define ENDP0_RXADDR        (0x40)
 #define ENDP0_TXADDR        (0x80)
 #define ENDP1_TXADDR        (0xc0)
@@ -407,6 +410,8 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		return USB_UNSUPPORT;
 
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
+	      chopstx_wakeup_usec_wait (main_thd);
+
 	      return USB_SUCCESS;
 	    }
 	}
@@ -882,7 +887,7 @@ main (int argc, char **argv)
 	}
     }
 
-  event_flag_signal (&led_event, LED_ONESHOT_SHORT);
+  chopstx_cancel (led_thread);
   chopstx_join (led_thread, NULL);
 
   /*
