@@ -19,8 +19,8 @@ OBJCOPY   = $(CROSS)objcopy
 
 MCU   = cortex-m3
 CWARN = -Wall -Wextra -Wstrict-prototypes
-# DEFS: Add -DHAVE_SYS_H when you are sure that it's sys version 2.0.
-DEFS  = -DFREE_STANDING
+# DEFS: Add  
+DEFS  = -DFREE_STANDING @HAVE_SYS_H@
 OPT   = -O3 -Os -g
 LIBS  =
 
@@ -28,11 +28,11 @@ LIBS  =
 include $(CHOPSTX)/rules.mk
 
 board.h:
-	@echo Please make a symbolic link \'board.h\' to a file in $(CHOPSTX)/board;
+	@echo Please run configure to have a symbolic link \'board.h\'
 	@exit 1
 
 sys.c: board.h
 
 distclean: clean
-	-rm -f neug.ld config.h board.h \
+	-rm -f neug.ld config.h board.h Makefile \
 	       usb-strings.c.inc usb-vid-pid-ver.c.inc
