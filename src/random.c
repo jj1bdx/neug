@@ -26,8 +26,6 @@
 #include <string.h>
 #include <chopstx.h>
 
-#include "config.h"
-
 #include "sys.h"
 #include "neug.h"
 #include "stm32f103.h"

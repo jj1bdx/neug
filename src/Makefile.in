@@ -19,6 +19,7 @@ OBJCOPY   = $(CROSS)objcopy
 
 MCU   = cortex-m3
 CWARN = -Wall -Wextra -Wstrict-prototypes
+# DEFS: Add -DHAVE_SYS_H when you are sure that it's sys version 2.0.
 DEFS  = -DFREE_STANDING
 OPT   = -O3 -Os -g
 LIBS  =
