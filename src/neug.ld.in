@@ -1,12 +1,12 @@
 /*
  * ST32F103 memory setup.
  */
-__main_stack_size__     = 0x0100;	/* Exception handlers     */
-__process0_stack_size__  = 0x0400;	/* main */
-__process1_stack_size__  = 0x0100;	/* led */
-__process2_stack_size__  = 0x0200;	/* rng */
-__process3_stack_size__  = 0x0100;	/* intr: usb */
-__process4_stack_size__  = 0x0100;	/* intr: adc dma */
+__main_stack_size__     = 0x0100;       /* Exception handlers     */
+__process0_stack_size__  = 0x0400;      /* main */
+__process1_stack_size__  = 0x0100;      /* led */
+__process2_stack_size__  = 0x0200;      /* rng */
+__process3_stack_size__  = 0x0100;      /* intr: usb */
+__process4_stack_size__  = 0x0100;      /* intr: adc dma */
 
 MEMORY
 {
@@ -17,7 +17,7 @@ MEMORY
 
 /* __flash_start__: flash ROM start address regardless of DFU_SUPPORT */
 __flash_start__         = 0x08001000;
-__flash_end__		= ORIGIN(flash) + LENGTH(flash);
+__flash_end__           = ORIGIN(flash) + LENGTH(flash);
 
 __ram_start__           = ORIGIN(ram);
 __ram_size__            = LENGTH(ram);
@@ -31,16 +31,16 @@ SECTIONS
     {
         _sys = .;
         KEEP(*(.vectors))
-	. = ALIGN(16);
-	*(.sys.version)
-	build/sys.o(.text)
-	build/sys.o(.text.*)
+        . = ALIGN(16);
+        *(.sys.version)
+        build/sys.o(.text)
+        build/sys.o(.text.*)
         build/sys.o(.rodata)
-	build/sys.o(.rodata.*)
-	. = ALIGN(1024);
-	*(.sys.0)
-	*(.sys.1)
-	*(.sys.2)
+        build/sys.o(.rodata.*)
+        . = ALIGN(1024);
+        *(.sys.0)
+        *(.sys.1)
+        *(.sys.2)
     } > flash0
 
     _text = .;

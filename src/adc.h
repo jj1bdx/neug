@@ -10,4 +10,3 @@ void adc_stop (void);
 #define ADC_SAMPLE_MODE 0
 #define ADC_CRC32_MODE       1
 void adc_start_conversion (int mode, uint32_t *p, int size);
-

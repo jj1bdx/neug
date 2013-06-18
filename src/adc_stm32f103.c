@@ -81,18 +81,11 @@
      | STM32_DMA_CR_MINC       | STM32_DMA_CR_TCIE			\
      | STM32_DMA_CR_TEIE)
 
-#if 0
-#define NEUG_DMA_MODE_CRC32                                             \
-  (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
-     | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
-     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
-#else
 #define NEUG_DMA_MODE_CRC32                                             \
   (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
      | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
      | STM32_DMA_CR_MINC       						\
      | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
-#endif
 
 #define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)     \
                               | ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_SENSOR)
@@ -283,7 +276,6 @@ void adc_stop (void)
   ADC2->CR1 = 0;
   ADC2->CR2 = 0;
 
-  /* XXX: here to disable the associated IRQ vector; stop intr thread.  */
   RCC->AHBENR &= ~RCC_AHBENR_DMA1EN;
   RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
 

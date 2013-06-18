@@ -1,3 +1,46 @@
+2013-06-18  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/random.c: Update for Chopstx.
+
+	* src/sys.c: Portable version (not for ChibiOS).  Version 2.0.
+	* src/sys.h (clock_init, gpio_init): New.
+
+	* src/stm32f103.h: New.
+
+	* src/neug.ld.in: Declare stack sizes.
+
+	* src/main.c: Update for Chopstx.
+	(usb_intr): Thread for interrupt handling.
+	(Vector90): Remove.
+	(EP1_IN_Callback): Use mutex and cond.
+	(event_flag_init, event_flag_waitone, event_flag_signal): New.
+	(led_blinker): Use event flag of our own.
+	(main): Use mutex and cond.  Use cancel and join.
+
+	* src/configure: Update for Chopstx.
+	(target): Defaults to FST_01.
+
+	* src/adc_stm32f103.c (STM32_ADC_ADC1_IRQ_PRIORITY): Remove.
+	(NEUG_DMA_MODE_CRC32): Add MINC, memory address increment.
+	(adc_init): Handle RCC initialization for ADC.
+	(adc_intr_thread): New.
+	(adc_start): Create a thread for interrupt handling.
+	(adc_start_conversion): Add DMA handling.
+	(adc_stop): Cancel a thread for interrupt handling.
+	(adc_lld_serve_rx_interrupt): Use bigger buffer (256-byte long).
+
+	* src/aes-constant-ft.c: Add comments.  Use stdint.h.
+
+	* src/config.h.in (FLASH_PAGE_SIZE): Remove.
+
+	* src/adc.h: Declare mutex and cond for Chopstx.
+
+	* chopstx: New, Chopstx RT Thread Library.
+	* chibios: Remove.
+	* src/Makefile.in: Update for Chopstx.
+
+	* src/usb_stm32f103.c (TRUE, FALSE, NULL): Defined here.
+
 2013-03-15  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.06.
