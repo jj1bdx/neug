@@ -20,7 +20,7 @@ OBJCOPY   = $(CROSS)objcopy
 MCU   = cortex-m3
 CWARN = -Wall -Wextra -Wstrict-prototypes
 # DEFS: Add  
-DEFS  = -DFREE_STANDING @HAVE_SYS_H@
+DEFS  = @HAVE_SYS_H@
 OPT   = -O3 -Os -g
 LIBS  =
 

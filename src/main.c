@@ -591,12 +591,9 @@ usb_intr (void *arg)
   chopstx_intr_t interrupt;
 
   (void)arg;
-  asm volatile ("cpsid   i" : : : "memory");
-  /* Disable because usb_lld_init assumes interrupt handler.  */
   usb_lld_init (vcom_configuration_desc[7]);
   chopstx_claim_irq (&interrupt, INTR_REQ_USB);
-  /* Enable */
-  asm volatile ("cpsie   i" : : : "memory");
+  usb_interrupt_handler ();
 
   while (1)
     {
@@ -787,7 +784,6 @@ main (int argc, char **argv)
   adc_init ();
 
   event_flag_init (&led_event);
-
   
   led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
 			       led_blinker, NULL);

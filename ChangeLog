@@ -1,3 +1,7 @@
+2013-06-19  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (usb_intr): Avoid interrupt masking by application.
+
 2013-06-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/random.c: Update for Chopstx.
@@ -39,7 +43,7 @@
 	* chibios: Remove.
 	* src/Makefile.in: Update for Chopstx.
 
-	* src/usb_stm32f103.c (TRUE, FALSE, NULL): Defined here.
+	* src/usb_stm32f103.c (TRUE, FALSE): Defined here.
 
 2013-03-15  Niibe Yutaka  <gniibe@fsij.org>
 
