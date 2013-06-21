@@ -1,3 +1,16 @@
+2013-06-21  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/neug.ld.in: Change the placement of stacks.
+
+	* src/neug.c (rng): Handle interrupt by this thread.
+	(neug_mode_select): Mutual exclusion for mode change.
+
+	* src/adc_stm32f103.c (adc_wait): New.
+	(adc_start): Don't create thread.
+	(adc_intr_thread): Remove.
+
+	* src/neug.c: Rename from random.c.
+
 2013-06-19  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (usb_intr): Avoid interrupt masking by application.

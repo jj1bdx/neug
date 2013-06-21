@@ -1,12 +1,11 @@
 /*
  * ST32F103 memory setup.
  */
-__main_stack_size__     = 0x0100;       /* Exception handlers     */
+__main_stack_size__      = 0x0100;      /* Exception handlers     */
 __process0_stack_size__  = 0x0200;      /* main */
 __process1_stack_size__  = 0x0100;      /* led */
 __process2_stack_size__  = 0x0180;      /* rng */
 __process3_stack_size__  = 0x0100;      /* intr: usb */
-__process4_stack_size__  = 0x0100;      /* intr: adc dma */
 
 MEMORY
 {
@@ -83,31 +82,26 @@ SECTIONS
     .stacks :
     {
         . = ALIGN(8);
-        __process4_stack_base__ = .;
-        . += __process4_stack_size__;
-        . = ALIGN(8);
-        __process4_stack_end__ = .;
-        __process3_stack_base__ = .;
-        . += __process3_stack_size__;
-        . = ALIGN(8);
-        __process3_stack_end__ = .;
-        __process2_stack_base__ = .;
-        . += __process2_stack_size__;
-        . = ALIGN(8);
-        __process2_stack_end__ = .;
-        __process1_stack_base__ = .;
-        . += __process1_stack_size__;
-        . = ALIGN(8);
-        __process1_stack_end__ = .;
-        __process0_stack_base__ = .;
-        . += __process0_stack_size__;
-        . = ALIGN(8);
-        __process0_stack_end__ = .;
-        . = ALIGN(8);
         __main_stack_base__ = .;
         . += __main_stack_size__;
         . = ALIGN(8);
         __main_stack_end__ = .;
+        __process0_stack_base__ = .;
+        . += __process0_stack_size__;
+        . = ALIGN(8);
+        __process0_stack_end__ = .;
+        __process1_stack_base__ = .;
+        . += __process1_stack_size__;
+        . = ALIGN(8);
+        __process1_stack_end__ = .;
+        __process2_stack_base__ = .;
+        . += __process2_stack_size__;
+        . = ALIGN(8);
+        __process2_stack_end__ = .;
+        __process3_stack_base__ = .;
+        . += __process3_stack_size__;
+        . = ALIGN(8);
+        __process3_stack_end__ = .;
     } > ram
 
     .data :
