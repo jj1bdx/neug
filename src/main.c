@@ -583,7 +583,7 @@ int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
 }
 
 #define INTR_REQ_USB 20
-#define PRIO_USB 4
+#define PRIO_USB 3
 
 static void *
 usb_intr (void *arg)
@@ -696,8 +696,8 @@ const uint32_t __stackaddr_usb = (uint32_t)&__process3_stack_base__;
 const size_t __stacksize_usb = (size_t)&__process3_stack_size__;
 
 
-#define PRIO_LED 1
-struct event_flag led_event;
+#define PRIO_LED 3
+static struct event_flag led_event;
 
 #define LED_ONESHOT_SHORT	((eventmask_t)1)
 #define LED_TWOSHOTS		((eventmask_t)2)
@@ -706,7 +706,8 @@ struct event_flag led_event;
 /*
  * LED blinker: When notified, let LED emit for 100ms.
  */
-static void *led_blinker (void *arg)
+static void *
+led_blinker (void *arg)
 {
   (void)arg;
 
@@ -736,7 +737,7 @@ static void *led_blinker (void *arg)
       set_led (0);
     }
 
-  return 0;
+  return NULL;
 }
 
 #define RANDOM_BYTES_LENGTH 64
