@@ -1,3 +1,7 @@
+2013-08-12  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/sys.c (reset): Remove unneeded & for FT0, FT1, and FT2.
+
 2013-06-21  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/neug.ld.in: Change the placement of stacks.
