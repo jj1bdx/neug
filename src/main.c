@@ -271,6 +271,14 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
     }
+  else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
+	   && index == 0 && USB_SETUP_SET (req)
+	   && req_no == USB_CDC_REQ_SET_LINE_CODING)
+    {
+      chopstx_mutex_lock (&usb_mtx);
+      chopstx_cond_signal (&cnd_usb);
+      chopstx_mutex_unlock (&usb_mtx);
+    }
 }
 
 struct line_coding
@@ -279,7 +287,7 @@ struct line_coding
   uint8_t format;
   uint8_t paritytype;
   uint8_t datatype;
-};
+} __attribute__((packed));
 
 static struct line_coding line_coding = {
   115200, /* baud rate: 115200    */
@@ -828,6 +836,7 @@ main (int argc, char **argv)
 	  neug_flush ();
 	  event_flag_signal (&led_event, LED_TWOSHOTS);
 	  chopstx_usec_wait (5000*1000);
+	  neug_mode_select (line_coding.paritytype);
 	}
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -835,15 +844,20 @@ main (int argc, char **argv)
 
       /* The connection opened.  */
       count = 0;
-      /*
-       * No parity is standard.  It means to provide conditioned output.
-       * When parity enabled, it means to provide raw output.
-       */
-      neug_mode_select (line_coding.paritytype); /* 0: None, 1: Odd, 2: Even */
 
       while (1)
 	{
 	  int i;
+
+	  /*
+	   * No parity is standard.  It means providing conditioned output.
+	   * When parity enabled, it means to provide raw output
+	   * (CRC32 filtered when odd, direct sample of ADC when even).
+	   *
+	   * line_coding.paritytype:
+	   *   0: None, 1: Odd, 2: Even
+	   */
+	  neug_mode_select (line_coding.paritytype);
 
 	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;

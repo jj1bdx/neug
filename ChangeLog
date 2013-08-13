@@ -1,5 +1,15 @@
 2013-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (struct line_coding): Add packed attribute.
+	(usb_cb_ctrl_write_finish): Wake up main thread if it wait
+	on condition variable.
+	(main): Call neug_mode_select in the loop of waiting_connection.
+	Call neug_mode_select in the main loop to allow changing mode
+	while connected.
+
+	* tool/neug_check.py (neug.get_mode): Change the explanation of
+	filter "CRC32 filter".
+
 	* src/neug.c (adc_buf): Remove.
 	(ep_fill_initial_string): Call noise_source_continuous_test.
 	(ep_init): Follow the change of adc_start_conversion.

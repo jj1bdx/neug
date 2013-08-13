@@ -67,7 +67,7 @@ class neug(object):
         if mode[0] == 0:
             return "Conditioned"
         elif mode[0] == 1:
-            return "Raw data (after filter)"
+            return "Raw data (CRC32 filter)"
         else:
             return "Raw data (ADC samples)"
 
