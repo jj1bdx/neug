@@ -1,3 +1,19 @@
+2013-08-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/neug.c (adc_buf): Remove.
+	(ep_fill_initial_string): Call noise_source_continuous_test.
+	(ep_init): Follow the change of adc_start_conversion.
+	(ep_fill_wbuf_v): New name and new argument V, remove FLIP.
+	(ep_process): Access CRC unit from here.  Correct calling
+	noise_source_continuous_test for the last byte of output.
+	(rng): Handle error of ADC.
+
+	* src/adc_stm32f103.c (adc_mode, adc_ptr, adc_size): Remove.
+	(adc_buf): Make it public.
+	(adc_start_conversion): Change arguments.
+	(adc_lld_serve_rx_interrupt, adc_wait): Remove.
+	(adc_wait_completion): New with error code.
+
 2013-08-12  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/sys.c (reset): Remove unneeded & for FT0, FT1, and FT2.

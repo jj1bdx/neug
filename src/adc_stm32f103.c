@@ -172,10 +172,7 @@ void adc_start (void)
 #endif
 }
 
-static int adc_mode;
-static uint32_t *adc_ptr;
-static int adc_size;
-static uint32_t adc_buf[64];
+uint32_t adc_buf[64];
 
 static void adc_start_conversion_internal (void)
 {
@@ -195,28 +192,21 @@ static void adc_start_conversion_internal (void)
 #endif
 }
 
-void adc_start_conversion (int mode, uint32_t *p, int size)
+void adc_start_conversion (int mode, int offset, int size)
 {
-  adc_mode = mode;
-  adc_ptr = p;
-  adc_size = size;
-
+  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
+  DMA1_Channel1->CMAR = (uint32_t)&adc_buf[offset]; /* SetMemory0 */
  if (mode == ADC_SAMPLE_MODE)
     {
-      DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
-      DMA1_Channel1->CMAR  = (uint32_t)p; /* SetMemory0 */
-      DMA1_Channel1->CNDTR  = (uint32_t)size / 4; /* counter */
-      DMA1_Channel1->CCR  = NEUG_DMA_MODE_SAMPLE; /*mode*/
-      DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
+      DMA1_Channel1->CNDTR = (uint32_t)size / 4; /* counter */
+      DMA1_Channel1->CCR = NEUG_DMA_MODE_SAMPLE; /*mode*/
     }
   else
     {
-      DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
-      DMA1_Channel1->CMAR  = (uint32_t)adc_buf; /* SetMemory0 */
-      DMA1_Channel1->CNDTR  = size; /* counter */
-      DMA1_Channel1->CCR  = NEUG_DMA_MODE_CRC32; /*mode*/
-      DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
+      DMA1_Channel1->CNDTR = size; /* counter */
+      DMA1_Channel1->CCR = NEUG_DMA_MODE_CRC32; /*mode*/
     }
+ DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
 
  adc_start_conversion_internal ();
 }
@@ -248,43 +238,31 @@ void adc_stop (void)
 }
 
 
-static void adc_lld_serve_rx_interrupt (uint32_t flags)
-{
-  if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
-    {
-      /* Should never happened.  If any, it's coding error. */
-      /* Access an unmapped address space or alignment violation.  */
-      adc_stop_conversion ();
-    }
-  else
-    {
-      if ((flags & STM32_DMA_ISR_TCIF) != 0) /* Transfer complete */
-	{
-	  adc_stop_conversion ();
-
-	  if (adc_mode != ADC_SAMPLE_MODE)
-	    {
-	      int i;
-
-	      for (i = 0; i < adc_size;)
-		{
-		  CRC->DR = adc_buf[i++];
-		  CRC->DR = adc_buf[i++];
-		  CRC->DR = adc_buf[i++];
-		  CRC->DR = adc_buf[i++];
-		  *adc_ptr++ = CRC->DR;
-		}
-	    }
-	}
-    }
-}
-
-void adc_wait (chopstx_intr_t *intr)
+/*
+ * Return 0 on success.
+ * Return 1 on error.
+ */
+int adc_wait_completion (chopstx_intr_t *intr)
 {
   uint32_t flags;
 
-  chopstx_intr_wait (intr);
-  flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
-  DMA1->IFCR = STM32_DMA_ISR_MASK; /* Clear interrupt of channel 1.  */
-  adc_lld_serve_rx_interrupt (flags);
+  while (1)
+    {
+      chopstx_intr_wait (intr);
+      flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
+      DMA1->IFCR = STM32_DMA_ISR_MASK; /* Clear interrupt of channel 1.  */
+
+      if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
+	{
+	  /* Should never happened.  If any, it's coding error. */
+	  /* Access an unmapped address space or alignment violation.  */
+	  adc_stop_conversion ();
+	  return 1;
+	}
+      else if ((flags & STM32_DMA_ISR_TCIF) != 0) /* Transfer complete */
+	{
+	  adc_stop_conversion ();
+	  return 0;
+	}
+    }
 }

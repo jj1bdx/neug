@@ -41,8 +41,6 @@ static chopstx_cond_t  mode_cond;
 #define INTR_REQ_DMA1_Channel1 11
 
 
-static uint32_t adc_buf[SHA256_BLOCK_SIZE/sizeof (uint32_t)];
-
 static sha256_context sha256_ctx_data;
 static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
@@ -87,16 +85,35 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 
 static uint8_t ep_round;
 
+static void noise_source_continuous_test (uint8_t noise);
+
 /*
  * Hash_df initial string:
  *
- *  1,          : counter = 1
- *  0, 0, 1, 0  : no_of_bits_returned (in big endian)
+ *  Initial five bytes are:
+ *    1,          : counter = 1
+ *    0, 0, 1, 0  : no_of_bits_returned (in big endian)
+ *
+ *  Then, three-byte from noise source follows.
+ *
+ *  One-byte was used in the previous turn, and we have three bytes in
+ *  CRC->DR.
  */
 static void ep_fill_initial_string (void)
 {
-  adc_buf[0] = 0x01000001; /* Regardless of endian */
-  adc_buf[1] = (CRC->DR & 0xffffff00);
+  uint32_t v = CRC->DR;
+  uint8_t b1, b2, b3;
+
+  b3 = v >> 24;
+  b2 = v >> 16;
+  b1 = v >> 8;
+
+  noise_source_continuous_test (b1);
+  noise_source_continuous_test (b2);
+  noise_source_continuous_test (b3);
+
+  adc_buf[0] = 0x01000001;
+  adc_buf[1] = (v & 0xffffff00);
 }
 
 static void ep_init (int mode)
@@ -104,28 +121,24 @@ static void ep_init (int mode)
   if (mode == NEUG_MODE_RAW)
     {
       ep_round = EP_ROUND_RAW;
-      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_RAW_INPUTS);
+      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_RAW_INPUTS);
     }
   else if (mode == NEUG_MODE_RAW_DATA)
     {
       ep_round = EP_ROUND_RAW_DATA;
-      adc_start_conversion (ADC_SAMPLE_MODE, adc_buf, EP_ROUND_RAW_DATA_INPUTS);
+      adc_start_conversion (ADC_SAMPLE_MODE, 0, EP_ROUND_RAW_DATA_INPUTS);
     }
   else
     {
       ep_round = EP_ROUND_0;
       ep_fill_initial_string ();
-      adc_start_conversion (ADC_CRC32_MODE,
-			    &adc_buf[2], EP_ROUND_0_INPUTS);
+      adc_start_conversion (ADC_CRC32_MODE, 2, EP_ROUND_0_INPUTS);
     }
 }
 
-static void noise_source_continuous_test (uint8_t noise);
 
-static void ep_fill_wbuf (int i, int flip, int test)
+static void ep_fill_wbuf_v (int i, int test, uint32_t v)
 {
-  uint32_t v = adc_buf[i];
-
   if (test)
     {
       uint8_t b0, b1, b2, b3;
@@ -141,9 +154,6 @@ static void ep_fill_wbuf (int i, int flip, int test)
       noise_source_continuous_test (b3);
     }
 
-  if (flip)
-    v = __builtin_bswap32 (v);
-
   sha256_ctx_data.wbuf[i] = v;
 }
 
@@ -151,11 +161,19 @@ static void ep_fill_wbuf (int i, int flip, int test)
 static int ep_process (int mode)
 {
   int i, n;
+  uint32_t v;
 
   if (ep_round == EP_ROUND_RAW)
     {
       for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
-	ep_fill_wbuf (i, 0, 1);
+	{
+	  CRC->DR = adc_buf[i*4];
+	  CRC->DR = adc_buf[i*4 + 1];
+	  CRC->DR = adc_buf[i*4 + 2];
+	  CRC->DR = adc_buf[i*4 + 3];
+	  v = CRC->DR;
+	  ep_fill_wbuf_v (i, 1, v);
+	}
 
       ep_init (mode);
       return EP_ROUND_RAW_INPUTS / 4;
@@ -163,7 +181,10 @@ static int ep_process (int mode)
   else if (ep_round == EP_ROUND_RAW_DATA)
     {
       for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
-	ep_fill_wbuf (i, 0, 0);
+	{
+	  v = adc_buf[i];
+	  ep_fill_wbuf_v (i, 0, v);
+	}
 
       ep_init (mode);
       return EP_ROUND_RAW_DATA_INPUTS / 4;
@@ -171,35 +192,65 @@ static int ep_process (int mode)
 
   if (ep_round == EP_ROUND_0)
     {
-      for (i = 0; i < 64 / 4; i++)
-	ep_fill_wbuf (i, 1, 1);
-
-      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_1_INPUTS);
       sha256_start (&sha256_ctx_data);
+      sha256_ctx_data.wbuf[0] = adc_buf[0];
+      sha256_ctx_data.wbuf[1] = adc_buf[1];
+      for (i = 0; i < EP_ROUND_0_INPUTS / 4; i++)
+	{
+	  CRC->DR = adc_buf[i*4 + 2];
+	  CRC->DR = adc_buf[i*4 + 3];
+	  CRC->DR = adc_buf[i*4 + 4];
+	  CRC->DR = adc_buf[i*4 + 5];
+	  v = CRC->DR;
+	  ep_fill_wbuf_v (i+2, 1, v);
+	}
+
+      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_1_INPUTS);
       sha256_process (&sha256_ctx_data);
       ep_round++;
       return 0;
     }
   else if (ep_round == EP_ROUND_1)
     {
-      for (i = 0; i < 64 / 4; i++)
-	ep_fill_wbuf (i, 1, 1);
+      for (i = 0; i < EP_ROUND_1_INPUTS / 4; i++)
+	{
+	  CRC->DR = adc_buf[i*4];
+	  CRC->DR = adc_buf[i*4 + 1];
+	  CRC->DR = adc_buf[i*4 + 2];
+	  CRC->DR = adc_buf[i*4 + 3];
+	  v = CRC->DR;
+	  ep_fill_wbuf_v (i, 1, v);
+	}
 
-      adc_start_conversion (ADC_CRC32_MODE, adc_buf, EP_ROUND_2_INPUTS);
+      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_2_INPUTS + 3);
       sha256_process (&sha256_ctx_data);
       ep_round++;
       return 0;
     }
   else
     {
-      for (i = 0; i < (EP_ROUND_2_INPUTS + 3) / 4; i++)
-	ep_fill_wbuf (i, 0, 1);
+      for (i = 0; i < EP_ROUND_2_INPUTS / 4; i++)
+	{
+	  CRC->DR = adc_buf[i*4];
+	  CRC->DR = adc_buf[i*4 + 1];
+	  CRC->DR = adc_buf[i*4 + 2];
+	  CRC->DR = adc_buf[i*4 + 3];
+	  v = CRC->DR;
+	  ep_fill_wbuf_v (i, 1, v);
+	}
 
+      CRC->DR = adc_buf[i*4];
+      CRC->DR = adc_buf[i*4 + 1];
+      CRC->DR = adc_buf[i*4 + 2];
+      CRC->DR = adc_buf[i*4 + 3];
+      v = CRC->DR & 0xff;
+      noise_source_continuous_test (v);
+      sha256_ctx_data.wbuf[i] = v;
+      ep_init (NEUG_MODE_CONDITIONED); /* The rest three-byte of
+					  CRC->DR is used here.  */
       n = SHA256_DIGEST_SIZE / 2;
-      ep_init (NEUG_MODE_CONDITIONED); /* The three-byte is used here.  */
-      memcpy (((uint8_t *)sha256_ctx_data.wbuf)
-	      + ((NUM_NOISE_INPUTS+5)%SHA256_BLOCK_SIZE),
-	      sha256_output, n); /* Don't use the last three-byte.  */
+      memcpy (((uint8_t *)sha256_ctx_data.wbuf) + EP_ROUND_2_INPUTS,
+	      sha256_output, n);
       sha256_ctx_data.total[0] = 5 + NUM_NOISE_INPUTS + n;
       sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
       return SHA256_DIGEST_SIZE / sizeof (uint32_t);
@@ -431,12 +482,13 @@ rng (void *arg)
   ep_init (mode);
   while (!rng_should_terminate)
     {
+      int err;
       int n;
 
-      adc_wait (&adc_intr);
+      err = adc_wait_completion (&adc_intr);
 
       chopstx_mutex_lock (&mode_mtx);
-      if (mode != neug_mode)
+      if (err || mode != neug_mode)
 	{
 	  mode = neug_mode;
 
@@ -445,8 +497,11 @@ rng (void *arg)
 	  /* Discarding data available, re-initiate from the start.  */
 	  ep_init (mode);
 	  chopstx_cond_signal (&mode_cond);
+	  chopstx_mutex_unlock (&mode_mtx);
+	  continue;
 	}
-      chopstx_mutex_unlock (&mode_mtx);
+      else
+	chopstx_mutex_unlock (&mode_mtx);
 
       if ((n = ep_process (mode)))
 	{
