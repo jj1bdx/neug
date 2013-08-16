@@ -232,7 +232,7 @@ int adc_wait_completion (chopstx_intr_t *intr)
     {
       chopstx_intr_wait (intr);
       flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
-      DMA1->IFCR = STM32_DMA_ISR_MASK; /* Clear interrupt of channel 1.  */
+      DMA1->IFCR = flags; /* Clear interrupt of channel 1.  */
 
       if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
 	{

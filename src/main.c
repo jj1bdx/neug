@@ -35,8 +35,21 @@
 #include "stm32f103.h"
 #include "adc.h"
 
-chopstx_mutex_t usb_mtx;
-chopstx_cond_t cnd_usb;
+enum {
+  FSIJ_DEVICE_RUNNING = 0,
+  FSIJ_DEVICE_EXITED,
+  FSIJ_DEVICE_EXEC_REQUESTED,
+  /**/
+  FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
+}; 
+
+static chopstx_mutex_t usb_mtx;
+static chopstx_cond_t cnd_usb;
+static uint32_t bDeviceState = UNCONNECTED; /* USB device status */
+static uint8_t fsij_device_state = FSIJ_DEVICE_RUNNING;
+static uint8_t connected;
+static uint32_t wait_usb_connection; /* Timer variable.  */
+
 
 extern uint8_t __process0_stack_end__;
 static chopstx_t main_thd = (uint32_t)(&__process0_stack_end__ - 60);
@@ -181,7 +194,6 @@ static uint8_t vcom_string3[28] = {
 
 #define NUM_INTERFACES 2
 
-uint32_t bDeviceState = UNCONNECTED; /* USB device status */
 
 void
 usb_cb_device_reset (void)
@@ -209,15 +221,6 @@ static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 #define USB_NEUG_GET_INFO	254
 #define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
 
-enum {
-  FSIJ_DEVICE_RUNNING = 0,
-  FSIJ_DEVICE_EXITED,
-  FSIJ_DEVICE_EXEC_REQUESTED,
-  /**/
-  FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
-}; 
-
-static uint8_t fsij_device_state = FSIJ_DEVICE_RUNNING;
 
 static uint32_t rbit (uint32_t v)
 {
@@ -256,27 +259,47 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
     {
       if (req_no == USB_FSIJ_EXEC)
 	{
-	  if (fsij_device_state != FSIJ_DEVICE_EXITED)
-	    return;
-
-	  (void)value; (void)index;
-	  usb_lld_prepare_shutdown (); /* No further USB communication */
-	  fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
+	  chopstx_mutex_lock (&usb_mtx);
+	  if (fsij_device_state == FSIJ_DEVICE_EXITED)
+	    {
+	      usb_lld_prepare_shutdown (); /* No further USB communication */
+	      fsij_device_state = FSIJ_DEVICE_EXEC_REQUESTED;
+	    }
+	  chopstx_mutex_unlock (&usb_mtx);
 	}
       else if (req_no == USB_NEUG_EXIT)
 	{
 	  /* Force exit from the main loop.  */
-	  chopstx_mutex_lock (&usb_mtx);
-	  chopstx_cond_signal (&cnd_usb);
-	  chopstx_mutex_unlock (&usb_mtx);
+	  if (wait_usb_connection)
+	    {
+	      wait_usb_connection = 0;
+	      chopstx_wakeup_usec_wait (main_thd);
+	    }
+	  else
+	    {
+	      chopstx_mutex_lock (&usb_mtx);
+	      chopstx_cond_signal (&cnd_usb);
+	      chopstx_mutex_unlock (&usb_mtx);
+	    }
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
 	   && index == 0 && USB_SETUP_SET (req)
-	   && req_no == USB_CDC_REQ_SET_LINE_CODING)
+	   && req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
     {
+      /* Open/close the connection.  */
       chopstx_mutex_lock (&usb_mtx);
-      chopstx_cond_signal (&cnd_usb);
+      connected = (value != 0)? 1 : 0;
+      if (wait_usb_connection)
+	{			/* It is waiting a connection.  */
+	  if (connected)	/* It's now connected.  */
+	    {
+	      wait_usb_connection = 0;
+	      chopstx_wakeup_usec_wait (main_thd);
+	    }
+	}
+      else
+	chopstx_cond_signal (&cnd_usb);
       chopstx_mutex_unlock (&usb_mtx);
     }
 }
@@ -296,50 +319,31 @@ static struct line_coding line_coding = {
   0x08    /* bits:      8         */
 };
 
-static uint8_t connected;
 
 static int
-vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value)
+vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value,
+		      uint16_t len)
 {
+  (void)value;
   if (USB_SETUP_GET (req))
     {
-      if (req_no == USB_CDC_REQ_GET_LINE_CODING)
+      if (req_no == USB_CDC_REQ_GET_LINE_CODING
+	  && len == sizeof (line_coding))
 	{
-	  usb_lld_set_data_to_send (&line_coding, sizeof(line_coding));
+	  usb_lld_set_data_to_send (&line_coding, sizeof (line_coding));
 	  return USB_SUCCESS;
 	}
     }
   else  /* USB_SETUP_SET (req) */
     {
-      if (req_no == USB_CDC_REQ_SET_LINE_CODING)
+      if (req_no == USB_CDC_REQ_SET_LINE_CODING
+	  && len == sizeof (line_coding))
 	{
-	  usb_lld_set_data_to_recv (&line_coding, sizeof(line_coding));
+	  usb_lld_set_data_to_recv (&line_coding, sizeof (line_coding));
 	  return USB_SUCCESS;
 	}
       else if (req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
-	{
-	  uint8_t connected_saved = connected;
-
-	  if (value != 0)
-	    {
-	      if (connected == 0)
-		/* It's Open call */
-		connected++;
-	    }
-	  else
-	    {
-	      if (connected)
-		/* Close call */
-		connected = 0;
-	    }
-
-	  chopstx_mutex_lock (&usb_mtx);
-	  if (connected != connected_saved)
-	    chopstx_cond_signal (&cnd_usb);
-	  chopstx_mutex_unlock (&usb_mtx);
-
-	  return USB_SUCCESS;
-	}
+	return USB_SUCCESS;
     }
 
   return USB_UNSUPPORT;
@@ -390,8 +394,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 
 	  if (req_no == USB_FSIJ_DOWNLOAD)
 	    {
+	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
-		return USB_UNSUPPORT;
+		{
+		  chopstx_mutex_unlock (&usb_mtx);
+		  return USB_UNSUPPORT;
+		}
+	      chopstx_mutex_unlock (&usb_mtx);
 
 	      if (addr < &_regnual_start || addr + len > &__heap_end__)
 		return USB_UNSUPPORT;
@@ -404,8 +413,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	    }
 	  else if (req_no == USB_FSIJ_EXEC && len == 0)
 	    {
+	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
-		return USB_UNSUPPORT;
+		{
+		  chopstx_mutex_unlock (&usb_mtx);
+		  return USB_UNSUPPORT;
+		}
+	      chopstx_mutex_unlock (&usb_mtx);
 
 	      if (((uint32_t)addr & 0x03))
 		return USB_UNSUPPORT;
@@ -414,11 +428,16 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	    }
 	  else if (req_no == USB_NEUG_EXIT && len == 0)
 	    {
+	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
-		return USB_UNSUPPORT;
+		{
+		  chopstx_mutex_unlock (&usb_mtx);
+		  return USB_UNSUPPORT;
+		}
 
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
 	      chopstx_wakeup_usec_wait (main_thd);
+	      chopstx_mutex_unlock (&usb_mtx);
 
 	      return USB_SUCCESS;
 	    }
@@ -426,7 +445,7 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT))
     if (index == 0)
-      return vcom_port_data_setup (req, req_no, value);
+      return vcom_port_data_setup (req, req_no, value, len);
 
   return USB_UNSUPPORT;
 }
@@ -526,7 +545,9 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
   switch (event_type)
     {
     case USB_EVENT_ADDRESS:
+      chopstx_mutex_lock (&usb_mtx);
       bDeviceState = ADDRESSED;
+      chopstx_mutex_unlock (&usb_mtx);
       return USB_SUCCESS;
     case USB_EVENT_CONFIG:
       current_conf = usb_lld_current_configuration ();
@@ -538,7 +559,9 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 	  usb_lld_set_configuration (1);
 	  for (i = 0; i < NUM_INTERFACES; i++)
 	    neug_setup_endpoints_for_interface (i, 0);
+	  chopstx_mutex_lock (&usb_mtx);
 	  bDeviceState = CONFIGURED;
+	  chopstx_mutex_unlock (&usb_mtx);
 	}
       else if (current_conf != value)
 	{
@@ -548,7 +571,9 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 	  usb_lld_set_configuration (0);
 	  for (i = 0; i < NUM_INTERFACES; i++)
 	    neug_setup_endpoints_for_interface (i, 1);
+	  chopstx_mutex_lock (&usb_mtx);
 	  bDeviceState = ADDRESSED;
+	  chopstx_mutex_unlock (&usb_mtx);
 	}
       /* Do nothing when current_conf == value */
       return USB_SUCCESS;
@@ -726,7 +751,7 @@ led_blinker (void *arg)
       eventmask_t m;
 
       m = event_flag_waitone (&led_event, ALL_EVENTS);
-      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+      if (fsij_device_state != FSIJ_DEVICE_RUNNING) /* No usb_mtx lock.  */
 	break;
 
       set_led (1);
@@ -784,6 +809,7 @@ main (int argc, char **argv)
 {
   uint32_t entry;
   chopstx_t led_thread, usb_thd;
+  unsigned int count;
 
   (void)argc;
   (void)argv;
@@ -805,42 +831,49 @@ main (int argc, char **argv)
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
 
+  chopstx_mutex_lock (&usb_mtx);
+
+ not_configured:
+  count = 0;
+  /* A run-up */
+  while (count < NEUG_PRE_LOOP || bDeviceState != CONFIGURED)
+    {
+      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	break;
+
+      chopstx_mutex_unlock (&usb_mtx);
+      neug_wait_full ();
+      neug_flush ();
+
+      if ((count & 0x0007) == 0)
+	event_flag_signal (&led_event, LED_ONESHOT_SHORT);
+      chopstx_usec_wait (25*1000);
+      count++;
+      chopstx_mutex_lock (&usb_mtx);
+    }
+
+  /* Holding USB_MTX.  */
   while (1)
     {
-      unsigned int count = 0;
       int last_was_fullsizepacket = 0;
 
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
 
-      while (count < NEUG_PRE_LOOP || bDeviceState != CONFIGURED)
+      while (1)
 	{
-	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
+	  wait_usb_connection = 5000*1000;
+	  if (connected || bDeviceState != CONFIGURED
+	      || fsij_device_state != FSIJ_DEVICE_RUNNING)
 	    break;
 
-	  neug_wait_full ();
+	  chopstx_mutex_unlock (&usb_mtx);
 	  neug_flush ();
-
-	  if ((count & 0x0007) == 0)
-	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
-	  chopstx_usec_wait (25*1000);
-	  count++;
-	}
-
-    waiting_connection:
-      while (connected == 0)
-	{
-	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
-	    break;
-
-	  neug_flush ();
-	  event_flag_signal (&led_event, LED_TWOSHOTS);
-	  chopstx_usec_wait (5000*1000);
 	  neug_mode_select (line_coding.paritytype);
+	  event_flag_signal (&led_event, LED_TWOSHOTS);
+	  chopstx_usec_wait_var (&wait_usb_connection);
+	  chopstx_mutex_lock (&usb_mtx);
 	}
-
-      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
-	break;
 
       /* The connection opened.  */
       count = 0;
@@ -849,6 +882,7 @@ main (int argc, char **argv)
 	{
 	  int i;
 
+	  chopstx_mutex_unlock (&usb_mtx);
 	  /*
 	   * No parity is standard.  It means providing conditioned output.
 	   * When parity enabled, it means to provide raw output
@@ -859,12 +893,6 @@ main (int argc, char **argv)
 	   */
 	  neug_mode_select (line_coding.paritytype);
 
-	  if (fsij_device_state != FSIJ_DEVICE_RUNNING)
-	    break;
-
-	  if (bDeviceState != CONFIGURED)
-	    break;
-
 	  if ((count & 0x03ff) == 0)
 	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
 
@@ -873,6 +901,13 @@ main (int argc, char **argv)
 	  if (i == 0 && !last_was_fullsizepacket)
 	    {	 /* Only send ZLP when the last packet was fullsize.  */
 	      neug_wait_full ();
+
+	      if (bDeviceState != CONFIGURED)
+		goto not_configured;
+
+	      if (!connected || fsij_device_state != FSIJ_DEVICE_RUNNING)
+		break;
+
 	      continue;
 	    }
 
@@ -882,21 +917,20 @@ main (int argc, char **argv)
 	    last_was_fullsizepacket = 0;
 
 	  chopstx_mutex_lock (&usb_mtx);
-	  if (connected == 0)
-	    {
-	      chopstx_mutex_unlock (&usb_mtx);
-	      goto waiting_connection;
-	    }
-	  else
-	    {
-	      usb_lld_tx_enable (ENDP1, i * 4);
-	      chopstx_cond_wait (&cnd_usb, &usb_mtx);
-	    }
-	  chopstx_mutex_unlock (&usb_mtx);
+	  if (bDeviceState != CONFIGURED)
+	    goto not_configured;
 
+	  if (!connected || fsij_device_state != FSIJ_DEVICE_RUNNING)
+	    break;
+
+	  /* Send random data.  */
+	  usb_lld_tx_enable (ENDP1, i * 4);
+	  chopstx_cond_wait (&cnd_usb, &usb_mtx);
 	  count++;
 	}
     }
+
+  chopstx_mutex_unlock (&usb_mtx);
 
   chopstx_cancel (led_thread);
   chopstx_join (led_thread, NULL);
@@ -906,10 +940,16 @@ main (int argc, char **argv)
    */
   neug_fini ();
 
+  chopstx_mutex_lock (&usb_mtx);
   fsij_device_state = FSIJ_DEVICE_EXITED;
 
   while (fsij_device_state == FSIJ_DEVICE_EXITED)
-    chopstx_usec_wait (500*1000);
+    {
+      chopstx_mutex_unlock (&usb_mtx);
+      chopstx_usec_wait (500*1000);
+      chopstx_mutex_lock (&usb_mtx);
+    }
+  chopstx_mutex_unlock (&usb_mtx);
 
   flash_unlock ();		/* Flash unlock should be done here */
   set_led (1);
