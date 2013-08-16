@@ -1,3 +1,17 @@
+2013-08-16  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/usb_lld.h (bDeviceState): Remove.
+
+	* src/adc_stm32f103.c (NEUG_DMA_MODE): Merge NEUG_DMA_MODE_SAMPLE
+	and NEUG_DMA_MODE_CRC32 which are same value now.
+	(adc_start_conversion_internal): Remove.
+	(adc_start_conversion): Remove MODE, it's not SIZE but COUNT now.
+
+	* src/neug.c (ep_init, ep_process): Follow the change of
+	adc_start_conversion.
+
+	* chopstx: New version of Chopstx.
+
 2013-08-13  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (struct line_coding): Add packed attribute.

@@ -121,18 +121,18 @@ static void ep_init (int mode)
   if (mode == NEUG_MODE_RAW)
     {
       ep_round = EP_ROUND_RAW;
-      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_RAW_INPUTS);
+      adc_start_conversion (0, EP_ROUND_RAW_INPUTS);
     }
   else if (mode == NEUG_MODE_RAW_DATA)
     {
       ep_round = EP_ROUND_RAW_DATA;
-      adc_start_conversion (ADC_SAMPLE_MODE, 0, EP_ROUND_RAW_DATA_INPUTS);
+      adc_start_conversion (0, EP_ROUND_RAW_DATA_INPUTS / 4);
     }
   else
     {
       ep_round = EP_ROUND_0;
       ep_fill_initial_string ();
-      adc_start_conversion (ADC_CRC32_MODE, 2, EP_ROUND_0_INPUTS);
+      adc_start_conversion (2, EP_ROUND_0_INPUTS);
     }
 }
 
@@ -205,7 +205,7 @@ static int ep_process (int mode)
 	  ep_fill_wbuf_v (i+2, 1, v);
 	}
 
-      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_1_INPUTS);
+      adc_start_conversion (0, EP_ROUND_1_INPUTS);
       sha256_process (&sha256_ctx_data);
       ep_round++;
       return 0;
@@ -222,7 +222,7 @@ static int ep_process (int mode)
 	  ep_fill_wbuf_v (i, 1, v);
 	}
 
-      adc_start_conversion (ADC_CRC32_MODE, 0, EP_ROUND_2_INPUTS + 3);
+      adc_start_conversion (0, EP_ROUND_2_INPUTS + 3);
       sha256_process (&sha256_ctx_data);
       ep_round++;
       return 0;

@@ -75,17 +75,11 @@
 #endif
 
 #define NEUG_DMA_CHANNEL STM32_DMA1_STREAM1
-#define NEUG_DMA_MODE_SAMPLE                                            \
+#define NEUG_DMA_MODE							\
   (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
      | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
      | STM32_DMA_CR_MINC       | STM32_DMA_CR_TCIE			\
-     | STM32_DMA_CR_TEIE)
-
-#define NEUG_DMA_MODE_CRC32                                             \
-  (  STM32_DMA_CR_PL (STM32_ADC_ADC1_DMA_PRIORITY)			\
-     | STM32_DMA_CR_MSIZE_WORD | STM32_DMA_CR_PSIZE_WORD		\
-     | STM32_DMA_CR_MINC       						\
-     | STM32_DMA_CR_TCIE       | STM32_DMA_CR_TEIE)
+     | STM32_DMA_CR_TEIE  )
 
 #define NEUG_ADC_SETTING1_SMPR1 ADC_SMPR1_SMP_VREF(ADC_SAMPLE_VREF)     \
                               | ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_SENSOR)
@@ -174,8 +168,13 @@ void adc_start (void)
 
 uint32_t adc_buf[64];
 
-static void adc_start_conversion_internal (void)
+void adc_start_conversion (int offset, int count)
 {
+  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR;        /* SetPeripheral */
+  DMA1_Channel1->CMAR = (uint32_t)&adc_buf[offset]; /* SetMemory0    */
+  DMA1_Channel1->CNDTR = count;                     /* Counter       */
+  DMA1_Channel1->CCR = NEUG_DMA_MODE | DMA_CCR1_EN; /* Mode   */
+
 #ifdef DELIBARATELY_DO_IT_WRONG_START_STOP
   /* Power on */
   ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
@@ -190,25 +189,6 @@ static void adc_start_conversion_internal (void)
   ADC1->CR2 = (ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG | ADC_CR2_SWSTART
 	       | ADC_CR2_EXTSEL | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 #endif
-}
-
-void adc_start_conversion (int mode, int offset, int size)
-{
-  DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR; /* SetPeripheral */
-  DMA1_Channel1->CMAR = (uint32_t)&adc_buf[offset]; /* SetMemory0 */
- if (mode == ADC_SAMPLE_MODE)
-    {
-      DMA1_Channel1->CNDTR = (uint32_t)size / 4; /* counter */
-      DMA1_Channel1->CCR = NEUG_DMA_MODE_SAMPLE; /*mode*/
-    }
-  else
-    {
-      DMA1_Channel1->CNDTR = size; /* counter */
-      DMA1_Channel1->CCR = NEUG_DMA_MODE_CRC32; /*mode*/
-    }
- DMA1_Channel1->CCR |= DMA_CCR1_EN;		    /* Enable */
-
- adc_start_conversion_internal ();
 }
 
 
@@ -238,6 +218,8 @@ void adc_stop (void)
 }
 
 
+static uint32_t adc_err;
+
 /*
  * Return 0 on success.
  * Return 1 on error.
@@ -256,6 +238,7 @@ int adc_wait_completion (chopstx_intr_t *intr)
 	{
 	  /* Should never happened.  If any, it's coding error. */
 	  /* Access an unmapped address space or alignment violation.  */
+	  adc_err++;
 	  adc_stop_conversion ();
 	  return 1;
 	}
@@ -264,5 +247,11 @@ int adc_wait_completion (chopstx_intr_t *intr)
 	  adc_stop_conversion ();
 	  return 0;
 	}
+
+      /*
+       * Even if STM32_DMA_CR_HTIE is unset, we come here with HTIF=1,
+       * with unknown reason.  Just ignore the interrupt by HTIF to
+       * continue more data.
+       */
     }
 }
