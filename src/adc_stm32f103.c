@@ -232,7 +232,13 @@ int adc_wait_completion (chopstx_intr_t *intr)
     {
       chopstx_intr_wait (intr);
       flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
-      DMA1->IFCR = flags; /* Clear interrupt of channel 1.  */
+      /*
+       * Clear interrupt cause of channel 1.
+       *
+       * Note that CGIFx=0, as CGIFx=1 clears all of GIF, HTIF, TCIF
+       * and TEIF.
+       */
+      DMA1->IFCR = (flags & ~1);
 
       if ((flags & STM32_DMA_ISR_TEIF) != 0)  /* DMA errors  */
 	{

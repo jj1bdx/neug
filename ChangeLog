@@ -1,3 +1,8 @@
+2013-08-17  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/adc_stm32f103.c (adc_wait_completion): Fix race condition.
+	Clear (FLAGS & ~1) only, not all of possible interrupts.
+
 2013-08-16  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (bDeviceState, fsij_device_state, connected): Protect
@@ -9,9 +14,6 @@
 	(usb_cb_setup): Use USB_MTX to access protected vars.
 	(usb_cb_handle_event): Likewise.
 	(main): Mutual exclusion by USB_MTX.
-
-	* src/adc_stm32f103.c (adc_wait_completion): Fix race condition.
-	Clear FLAGS only, not all of possible interrupts.
 
 	* src/usb_lld.h (bDeviceState): Remove.
 
