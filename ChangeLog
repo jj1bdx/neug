@@ -1,5 +1,7 @@
 2013-08-17  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (main): Fix locking of USB_MTX.
+
 	* src/adc_stm32f103.c (adc_wait_completion): Fix race condition.
 	Clear (FLAGS & ~1) only, not all of possible interrupts.
 

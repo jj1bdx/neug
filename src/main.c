@@ -875,6 +875,9 @@ main (int argc, char **argv)
 	  chopstx_mutex_lock (&usb_mtx);
 	}
 
+      if (bDeviceState != CONFIGURED)
+	goto not_configured;
+
       /* The connection opened.  */
       count = 0;
 
@@ -902,31 +905,28 @@ main (int argc, char **argv)
 	    {	 /* Only send ZLP when the last packet was fullsize.  */
 	      neug_wait_full ();
 
-	      if (bDeviceState != CONFIGURED)
-		goto not_configured;
+	      chopstx_mutex_lock (&usb_mtx);
+	      if (bDeviceState != CONFIGURED || !connected
+		  || fsij_device_state != FSIJ_DEVICE_RUNNING)
+		break;
+	    }
+	  else
+	    {
+	      if (i == 64/4)
+		last_was_fullsizepacket = 1;
+	      else
+		last_was_fullsizepacket = 0;
 
-	      if (!connected || fsij_device_state != FSIJ_DEVICE_RUNNING)
+	      chopstx_mutex_lock (&usb_mtx);
+	      if (bDeviceState != CONFIGURED || !connected
+		  || fsij_device_state != FSIJ_DEVICE_RUNNING)
 		break;
 
-	      continue;
+	      /* Prepare sending random data.  */
+	      usb_lld_tx_enable (ENDP1, i * 4);
+	      chopstx_cond_wait (&cnd_usb, &usb_mtx);
+	      count++;
 	    }
-
-	  if (i == 64/4)
-	    last_was_fullsizepacket = 1;
-	  else
-	    last_was_fullsizepacket = 0;
-
-	  chopstx_mutex_lock (&usb_mtx);
-	  if (bDeviceState != CONFIGURED)
-	    goto not_configured;
-
-	  if (!connected || fsij_device_state != FSIJ_DEVICE_RUNNING)
-	    break;
-
-	  /* Send random data.  */
-	  usb_lld_tx_enable (ENDP1, i * 4);
-	  chopstx_cond_wait (&cnd_usb, &usb_mtx);
-	  count++;
 	}
     }
 
