@@ -86,6 +86,8 @@ static uint32_t sha256_output[SHA256_DIGEST_SIZE/sizeof (uint32_t)];
 static uint8_t ep_round;
 
 static void noise_source_continuous_test (uint8_t noise);
+static void noise_source_continuous_test_word (uint8_t b0, uint8_t b1,
+					       uint8_t b2, uint8_t b3);
 
 /*
  * Hash_df initial string:
@@ -148,47 +150,17 @@ static void ep_fill_wbuf_v (int i, int test, uint32_t v)
       b1 = v >> 8;
       b0 = v;
 
-      noise_source_continuous_test (b0);
-      noise_source_continuous_test (b1);
-      noise_source_continuous_test (b2);
-      noise_source_continuous_test (b3);
+      noise_source_continuous_test_word (b0, b1, b2, b3);
     }
 
   sha256_ctx_data.wbuf[i] = v;
 }
 
-/* Here assumes little endian architecture.  */
+/* Here, we assume a little endian architecture.  */
 static int ep_process (int mode)
 {
   int i, n;
   uint32_t v;
-
-  if (ep_round == EP_ROUND_RAW)
-    {
-      for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
-	{
-	  CRC->DR = adc_buf[i*4];
-	  CRC->DR = adc_buf[i*4 + 1];
-	  CRC->DR = adc_buf[i*4 + 2];
-	  CRC->DR = adc_buf[i*4 + 3];
-	  v = CRC->DR;
-	  ep_fill_wbuf_v (i, 1, v);
-	}
-
-      ep_init (mode);
-      return EP_ROUND_RAW_INPUTS / 4;
-    }
-  else if (ep_round == EP_ROUND_RAW_DATA)
-    {
-      for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
-	{
-	  v = adc_buf[i];
-	  ep_fill_wbuf_v (i, 0, v);
-	}
-
-      ep_init (mode);
-      return EP_ROUND_RAW_DATA_INPUTS / 4;
-    }
 
   if (ep_round == EP_ROUND_0)
     {
@@ -227,7 +199,7 @@ static int ep_process (int mode)
       ep_round++;
       return 0;
     }
-  else
+  else if (ep_round == EP_ROUND_2)
     {
       for (i = 0; i < EP_ROUND_2_INPUTS / 4; i++)
 	{
@@ -255,6 +227,34 @@ static int ep_process (int mode)
       sha256_finish (&sha256_ctx_data, (uint8_t *)sha256_output);
       return SHA256_DIGEST_SIZE / sizeof (uint32_t);
     }
+  else if (ep_round == EP_ROUND_RAW)
+    {
+      for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
+	{
+	  CRC->DR = adc_buf[i*4];
+	  CRC->DR = adc_buf[i*4 + 1];
+	  CRC->DR = adc_buf[i*4 + 2];
+	  CRC->DR = adc_buf[i*4 + 3];
+	  v = CRC->DR;
+	  ep_fill_wbuf_v (i, 1, v);
+	}
+
+      ep_init (mode);
+      return EP_ROUND_RAW_INPUTS / 4;
+    }
+  else if (ep_round == EP_ROUND_RAW_DATA)
+    {
+      for (i = 0; i < EP_ROUND_RAW_DATA_INPUTS / 4; i++)
+	{
+	  v = adc_buf[i];
+	  ep_fill_wbuf_v (i, 0, v);
+	}
+
+      ep_init (mode);
+      return EP_ROUND_RAW_DATA_INPUTS / 4;
+    }
+
+  return 0;
 }
 
 
@@ -340,6 +340,47 @@ static void repetition_count_test (uint8_t sample)
     }
 }
 
+static void repetition_count_test_word (uint8_t b0, uint8_t b1,
+					uint8_t b2, uint8_t b3)
+{
+  if (rct_a == b0)
+    rct_b++;
+  else
+    {
+      rct_a = b0;
+      rct_b = 1;
+    }
+
+  if (rct_a == b1)
+    rct_b++;
+  else
+    {
+      rct_a = b1;
+      rct_b = 1;
+    }
+
+  if (rct_a == b2)
+    rct_b++;
+  else
+    {
+      rct_a = b2;
+      rct_b = 1;
+    }
+
+  if (rct_a == b3)
+    rct_b++;
+  else
+    {
+      rct_a = b3;
+      rct_b = 1;
+    }
+
+  if (rct_b >= REPITITION_COUNT_TEST_CUTOFF)
+    noise_source_error (REPETITION_COUNT);
+  if (rct_b > neug_rc_max)
+    neug_rc_max = rct_b;
+}
+
 /* Cuttoff = 18, when min-entropy = 4.2, W= 2^-30 */
 /* With R, qbinom(1-2^-30,64,2^-4.2) */
 #define ADAPTIVE_PROPORTION_64_TEST_CUTOFF 18
@@ -350,24 +391,53 @@ static uint8_t ap64t_s;
 
 static void adaptive_proportion_64_test (uint8_t sample)
 {
-  if (ap64t_s >= 64)
+  if (ap64t_s++ >= 64)
     {
       ap64t_a = sample;
-      ap64t_s = 0;
+      ap64t_s = 1;
+      ap64t_b = 0;
+    }
+  else
+    if (ap64t_a == sample)
+      {
+	ap64t_b++;
+	if (ap64t_b > ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
+	  noise_source_error (ADAPTIVE_PROPORTION_64);
+	if (ap64t_b > neug_p64_max)
+	  neug_p64_max = ap64t_b;
+      }
+}
+
+static void adaptive_proportion_64_test_word (uint8_t b0, uint8_t b1,
+					      uint8_t b2, uint8_t b3)
+{
+  if (ap64t_s >= 64)
+    {
+      ap64t_a = b0;
+      ap64t_s = 4;
       ap64t_b = 0;
     }
   else
     {
-      ap64t_s++;
-      if (ap64t_a == sample)
-	{
-	  ap64t_b++;
-	  if (ap64t_b > ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
-	    noise_source_error (ADAPTIVE_PROPORTION_64);
-	  if (ap64t_b > neug_p64_max)
-	    neug_p64_max = ap64t_b;
-	}
+      ap64t_s += 4;
+
+      if (ap64t_a == b0)
+	ap64t_b++;
     }
+
+  if (ap64t_a == b1)
+    ap64t_b++;
+
+  if (ap64t_a == b2)
+    ap64t_b++;
+
+  if (ap64t_a == b3)
+    ap64t_b++;
+
+  if (ap64t_b > ADAPTIVE_PROPORTION_64_TEST_CUTOFF)
+    noise_source_error (ADAPTIVE_PROPORTION_64);
+  if (ap64t_b > neug_p64_max)
+    neug_p64_max = ap64t_b;
 }
 
 /* Cuttoff = 315, when min-entropy = 4.2, W= 2^-30 */
@@ -380,31 +450,69 @@ static uint16_t ap4096t_s;
 
 static void adaptive_proportion_4096_test (uint8_t sample)
 {
-  if (ap4096t_s >= 4096)
+  if (ap4096t_s++ >= 4096)
     {
       ap4096t_a = sample;
-      ap4096t_s = 0;
+      ap4096t_s = 1;
+      ap4096t_b = 0;
+    }
+  else
+    if (ap4096t_a == sample)
+      {
+	ap4096t_b++;
+	if (ap4096t_b > ADAPTIVE_PROPORTION_4096_TEST_CUTOFF)
+	  noise_source_error (ADAPTIVE_PROPORTION_4096);
+	if (ap4096t_b > neug_p4k_max)
+	  neug_p4k_max = ap4096t_b;
+      }
+}
+
+static void adaptive_proportion_4096_test_word (uint8_t b0, uint8_t b1,
+						uint8_t b2, uint8_t b3)
+{
+  if (ap4096t_s >= 4096)
+    {
+      ap4096t_a = b0;
+      ap4096t_s = 4;
       ap4096t_b = 0;
     }
   else
     {
-      ap4096t_s++;
-      if (ap4096t_a == sample)
-	{
-	  ap4096t_b++;
-	  if (ap4096t_b > ADAPTIVE_PROPORTION_4096_TEST_CUTOFF)
-	    noise_source_error (ADAPTIVE_PROPORTION_4096);
-	  if (ap4096t_b > neug_p4k_max)
-	    neug_p4k_max = ap4096t_b;
-	}
+      ap4096t_s += 4;
+
+      if (ap4096t_a == b0)
+	ap4096t_b++;
     }
+
+  if (ap4096t_a == b1)
+    ap4096t_b++;
+
+  if (ap4096t_a == b2)
+	ap4096t_b++;
+
+  if (ap4096t_a == b3)
+    ap4096t_b++;
+
+  if (ap4096t_b > ADAPTIVE_PROPORTION_4096_TEST_CUTOFF)
+    noise_source_error (ADAPTIVE_PROPORTION_4096);
+  if (ap4096t_b > neug_p4k_max)
+    neug_p4k_max = ap4096t_b;
 }
+
 
 static void noise_source_continuous_test (uint8_t noise)
 {
   repetition_count_test (noise);
   adaptive_proportion_64_test (noise);
   adaptive_proportion_4096_test (noise);
+}
+
+static void noise_source_continuous_test_word (uint8_t b0, uint8_t b1,
+					       uint8_t b2, uint8_t b3)
+{
+  repetition_count_test_word (b0, b1, b2, b3);
+  adaptive_proportion_64_test_word (b0, b1, b2, b3);
+  adaptive_proportion_4096_test_word (b0, b1, b2, b3);
 }
 
 /*
