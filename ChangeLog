@@ -1,6 +1,7 @@
 2013-08-19  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (vcom_string3): Updated.
+	[DFU_SUPPORT] (main): Fix calling flash_erase_all_and_exec.
 
 	* src/neug.c (repetition_count_test_word)
 	(adaptive_proportion_64_test_word)
