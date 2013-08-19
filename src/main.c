@@ -181,9 +181,9 @@ static const uint8_t vcom_string0[4] = {
  * Serial Number string.  NOTE: This does not have CONST qualifier.
  */
 static uint8_t vcom_string3[28] = {
-  28,                    /* bLength.                         */
-  USB_STRING_DESCRIPTOR_TYPE, /* bDescriptorType.                 */
-  '0', 0,  '.', 0,  '0', 0, '6', 0,    /* Version number of NeuG.          */
+  28,                               /* bLength.                         */
+  USB_STRING_DESCRIPTOR_TYPE,       /* bDescriptorType.                 */
+  '0', 0,  '.', 0,  '1', 0, '1', 0, /* Version number of NeuG.          */
   '-', 0,
   0, 0, 0, 0,	/* Filled by Unique device ID.      */
   0, 0, 0, 0,

@@ -1,5 +1,7 @@
 2013-08-19  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (vcom_string3): Updated.
+
 	* src/neug.c (repetition_count_test_word)
 	(adaptive_proportion_64_test_word)
 	(adaptive_proportion_4096_test_word)
