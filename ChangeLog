@@ -1,5 +1,7 @@
 2013-08-19  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/sha256.h: Remove extern from function prototypes.
+
 	* src/main.c (vcom_string3): Updated.
 	[DFU_SUPPORT] (main): Fix calling flash_erase_all_and_exec.
 
