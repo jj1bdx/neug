@@ -1,6 +1,6 @@
 /*
  * adc_stm32f103.c - ADC driver for STM32F103
- *                   In this ADC driver, but there are NeuG specific parts.
+ *                   In this ADC driver, there are NeuG specific parts.
  *                   You need to modify to use this as generic ADC driver.
  *
  * Copyright (C) 2011, 2012, 2013 Free Software Initiative of Japan
@@ -164,13 +164,18 @@ void adc_start (void)
 
 #ifdef DELIBARATELY_DO_IT_WRONG_START_STOP
   /*
-   * We could just let ADC run always continuously and enable/disable
-   * DMA to receive data from ADC, and it is good to get stable data.
-   * Our purpose is not to get correct data but noise. 
-   * In fact, we can get more noise when we start/stop ADC each time.
+   * We could just let ADC run continuously always and only enable DMA
+   * to receive stable data from ADC.  But our purpose is not to get
+   * correct data but noise.  In fact, we can get more noise when we
+   * start/stop ADC each time.
    */
   ADC2->CR2 = 0;
   ADC1->CR2 = 0;
+#else
+  /* Start conversion.  */
+  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
+  ADC1->CR2 = (ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG | ADC_CR2_SWSTART
+	       | ADC_CR2_EXTSEL | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 #endif
 }
 
@@ -195,10 +200,6 @@ void adc_start_conversion (int offset, int count)
   ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
   ADC1->CR2 = (ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG | ADC_CR2_SWSTART
 	       | ADC_CR2_EXTSEL | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
-#else
-  ADC2->CR2 = ADC_CR2_EXTTRIG | ADC_CR2_CONT | ADC_CR2_ADON;
-  ADC1->CR2 = (ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG | ADC_CR2_SWSTART
-	       | ADC_CR2_EXTSEL | ADC_CR2_DMA | ADC_CR2_CONT | ADC_CR2_ADON);
 #endif
 }
 
@@ -208,11 +209,8 @@ static void adc_stop_conversion (void)
   DMA1_Channel1->CCR &= ~DMA_CCR1_EN;
 
 #ifdef DELIBARATELY_DO_IT_WRONG_START_STOP
-  ADC1->CR2 = 0;
   ADC2->CR2 = 0;
-#else
-  ADC2->CR2 &= ~ADC_CR2_CONT;
-  ADC1->CR2 &= ~ADC_CR2_CONT;
+  ADC1->CR2 = 0;
 #endif
 }
 
