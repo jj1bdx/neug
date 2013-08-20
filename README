@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							   Version 0.10
-							     2013-06-XX
+							   Version 0.11
+							     2013-08-XX
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,8 +28,8 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the seventh release of NeuG, which is still experimental.  Basic
-features (generating random numbers) are stable, but newly added
+This is the eighth release of NeuG, which is still experimental.
+Basic features (generating random numbers) are stable, but newly added
 things like reGNUal support should be considered unstable.  Note that
 you need Chopstx as external source code.
 
@@ -55,7 +55,7 @@ Q2: Should we check condition of noise sources?
 A2: Yes, we should.  Three continuous tests are implemented, following
     (Draft of) NIST SP 800-90B.  Those are Repetition Count Test,
     Adaptive Proportion Test (for 64 samples), and another Adaptive
-    Proportion Test (for 4096 samples).  When it detect an error (it
+    Proportion Test (for 4096 samples).  When it detects an error (it
     is really rare, but it could occur even for normal condition), the
     generation of random bits restart again.
 
@@ -63,10 +63,11 @@ Q3: Conditioning with SHA-256 sounds over-kill.  Why not simpler?
 A3: It is because NIST SP 800-90B mandates something like that for
     "full entropy source".  If your usage is as an entropy source for
     RNG-tools to feed entropy to your kernel, or use for computer
-    simulations, I think that CRC32 filter would be good enough.  You
-    can configure NeuG device by "stty -F /dev/ttyACM0 parenb parodd"
-    to get raw data before SHA-256 conditioning component.  With
-    high speed hub, you'll get more than 240 Ki-byte/second .
+    simulations, I think that CRC32 filtered output would be good
+    enough.  You can configure NeuG device by "stty -F /dev/ttyACM0
+    parenb parodd" to get raw data before SHA-256 conditioning
+    component.  With high speed hub, you'll get more than 240
+    Ki-byte/second .
 
 
 Targets
