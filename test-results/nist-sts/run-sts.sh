@@ -1,5 +1,8 @@
 #! /bin/bash
 
+NUM_START=${1:-0}
+NUM_END=${2:-9}
+
 cd $HOME/rng/sts-2.1.1
 for i in $(seq --format="%03g" 0 9); do
   ./assess 1000000 <<EOF
