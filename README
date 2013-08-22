@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
 							   Version 0.11
-							     2013-08-XX
+							     2013-08-22
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,10 +28,15 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the eighth release of NeuG, which is still experimental.
-Basic features (generating random numbers) are stable, but newly added
-things like reGNUal support should be considered unstable.  Note that
-you need Chopstx as external source code.
+This is new release of NeuG with Chopstx, version number bumped to
+0.11.  Basic features (generating random numbers) are stable, but
+newly added things like reGNUal support should be considered unstable.
+
+Note that you need Chopstx (the thread library) as external source
+code (instead of ChibiOS/RT).
+
+The "boards" directory is obsolete one for old versions of NeuG with
+ChibiOS/RT.  We leave it to port new NeuG to other boards.
 
 
 FAQ
@@ -74,7 +79,8 @@ Targets
 =======
 
 FST-01, Olimex STM32-H103, and STM32 part of STM8S Discovery Kit are
-supported.  CQ-STARM, STBee Mini, and STBee will be supported.
+supported.  Porting to CQ-STARM, STBee Mini, and STBee is not that
+hard.
 
 
 Souce code
@@ -124,11 +130,7 @@ with standalone NeuG under one of following conditions:
       that "Distributing binary" includes distributing a device which
       holds the binary.
 
-  * For general individuals:
-
-    - No additional conditions.
-
-  * For individuals with explicit permission from FSIJ.
+  * For individuals:
 
     - No additional conditions.
 
@@ -157,29 +159,22 @@ Change directory to `src':
 
 Then, run `configure':
 
-  $ ./configure
+  $ ./configure --vidpid=<VID:PID>
+
+Here, you need to specify USB vendor ID and product ID.  For FSIJ's,
+it's: --vidpid=234b:0001 .  Please read section 'USB vendor ID and
+product ID' above.
+
 
 Type:
 
   $ make
 
-Then, we will have "neug.elf".
+Then, we will have "neug.elf" under the "build" directory.
 
 
 How to install
 ==============
-
-STBee Mini and STBee
---------------------
-
-Reset the board with "USER" switch pushed.  Type following to write
-to flash:
-
-  # cd ../tool
-  # ./dfuse.py ../src/neug.hex
-
-Then, reset the board.
-
 
 Olimex STM32-H103 board
 -----------------------
@@ -197,6 +192,28 @@ Then, with another terminal, type following to write "neug.elf" to Flash ROM:
   > exit
   $ 
 
+
+Flying Stone Tiny 01 and STM8S Discovery Kit
+--------------------------------------------
+
+If you are using Flying Stone Tiny 01, you need a SWD writer.
+
+OpenOCD 0.6.1 or newer supports ST-Link/V2.  With that we can do:
+
+  $ openocd -f interface/stlink-v2.cfg -f target/stm32f1x_stlink.cfg
+
+Then, with another terminal, type following to write "neug.elf" to Flash ROM:
+
+  $ telnet localhost 4444
+  > reset halt
+  > flash write_image erase neug.elf
+  > reset
+  > exit
+  $ 
+
+Note that OpenOCD (as of 0.7.0) doesn't support option bytes handling yet.
+
+You can also use tool/stlinkv2.py in Gnuk.
 
 
 Use of NeuG device
@@ -328,18 +345,16 @@ dieharder and rngtest.  Collecting 110 files, it took three days.
 For NIST STS 2.1.1, I used only 10 files of size 125MB.
 
 
-Read-only Git Repository
-========================
+Git Repository
+==============
 
-You can browse at http://www.gniibe.org/gitweb?p=neug.git
+NeuG is available in the Gnuk repository at Gitorious.org:
+
+    http://gitorious.org/gnuk/neug
 
 You can get it by:
 
-  $ git clone git://www.gniibe.org/neug.git/
-
-or
-
-  $ git clone http://www.gniibe.org/git/neug.git/
+    $ git clone git://gitorious.org/gnuk/neug.git
 
 
 I put Chopstx as a submodule of Git.  Please do this:

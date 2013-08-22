@@ -1,5 +1,21 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 0.11
+
+  Released 2013-08-22, by NIIBE Yutaka
+
+** Replacement of kernel (thread library)
+Instead of ChibiOS/RT, we now use Chopstx.
+
+** Improved performance
+The output of random numbers got faster than the previous
+implementation by 30% or so.
+
+** Unsupported targets
+CQ_STARM, STBEE, STBEE Mini, and STM32_PRIMER2 are not
+supported in this release, but porting should be easy.
+
+
 * Major changes in NeuG 0.06
 
   Released 2013-03-15, by NIIBE Yutaka
