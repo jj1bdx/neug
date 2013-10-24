@@ -437,6 +437,7 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
 	      chopstx_wakeup_usec_wait (main_thd);
+	      chopstx_cond_signal (&cnd_usb);
 	      chopstx_mutex_unlock (&usb_mtx);
 
 	      return USB_SUCCESS;

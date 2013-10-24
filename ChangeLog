@@ -1,3 +1,8 @@
+2013-10-24  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (usb_cb_setup): Signal CND_USB, so that
+	neug_upgrade.py works better.
+
 2013-08-22  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 0.11.
