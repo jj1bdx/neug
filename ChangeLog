@@ -1,3 +1,10 @@
+2013-11-02  Niibe Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update.
+	* src/sys.c, src/usb_lld.h, src/usb_stm32f103.c: Update from
+	Chopstx.
+	* src/main.c (usb_cb_get_descriptor): Follow the change.
+
 2013-10-24  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (usb_cb_setup): Signal CND_USB, so that
