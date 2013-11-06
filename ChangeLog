@@ -1,5 +1,12 @@
 2013-11-06  Niibe Yutaka  <gniibe@fsij.org>
 
+	* fraucheky: New submodule.
+	* .gitignore: Add generated files by Fraucheky.
+	* NEUG_USB_DEVICE_ID: Add USB id of Fraucheky.
+	* src/Makefile.in, src/config.h.in, src/configure: Support
+	Fraucheky.
+	*src/main.c: Likewise.
+
 	* vender/flying-stone-technology: New.
 
 2013-11-05  Niibe Yutaka  <gniibe@fsij.org>

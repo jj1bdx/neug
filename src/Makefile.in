@@ -4,6 +4,7 @@
 PROJECT = neug
 
 CHOPSTX = ../chopstx
+FRAUCHEKY = ../fraucheky
 
 # Define linker script file here
 LDSCRIPT= neug.ld
@@ -11,6 +12,7 @@ LDSCRIPT= neug.ld
 CSRC = sys.c aes-constant-ft.c \
        main.c sha256.c neug.c usb_stm32f103.c adc_stm32f103.c
 
+@ENABLE_FRAUCHEKY@include $(FRAUCHEKY)/src.mk
 ###################################
 CROSS = arm-none-eabi-
 CC   = $(CROSS)gcc
@@ -27,12 +29,15 @@ LIBS  =
 #######################
 include $(CHOPSTX)/rules.mk
 
+@ENABLE_FRAUCHEKY@include $(FRAUCHEKY)/build.mk
+###################################
+
 board.h:
 	@echo Please run configure to have a symbolic link \'board.h\'
 	@exit 1
 
 sys.c: board.h
 
-distclean: clean
+distclean:: clean
 	-rm -f neug.ld config.h board.h Makefile \
 	       usb-strings.c.inc usb-vid-pid-ver.c.inc

@@ -29,6 +29,7 @@ with_dfu=default
 debug=no
 sys1_compat=yes
 with_fraucheky=no
+with_index=none
 
 # Process each option
 for option; do
@@ -58,6 +59,8 @@ for option; do
     with_fraucheky=$optarg ;;
   --without-fraucheky)
     with_fraucheky=no ;;
+  --with-index=*)
+    with_index=$optarg ;;
   *)
     echo "Unrecognized option \`$option'" >&2
     echo "Try \`$0 --help' for more information." >&2
@@ -90,7 +93,7 @@ Configuration:
 
   --with-fraucheky=VID:PID
 			include fraucheky support	[no]
-  --with-index=INDEX	specify INDEX file		[INDEX.HTM]
+  --with-index=INDEX	specify INDEX file		[none]
 EOF
   exit 0
 fi
@@ -98,6 +101,16 @@ fi
 if test "$vidpid" = "none"; then
   echo "Please specify Vendor ID and Product ID by --vidpid option." 
   exit 1
+fi
+
+if ! test "$with_fraucheky" = "no"; then
+  ../fraucheky/configure $with_fraucheky $with_index
+  ENABLE_FRAUCHEKY=""
+  FRAUCHEKY_DEFINE="#define FRAUCHEKY_SUPPORT 1"
+  FRAUCHEKY_MSC_DEFINE="#define MSC_INTERFACE_NO    2"
+else
+  FRAUCHEKY_DEFINE="#undef FRAUCHEKY_SUPPORT"
+  FRAUCHEKY_MSC_DEFINE="#undef MSC_INTERFACE_NO"
 fi
 
 TARGET_DEFINE="#define BOARD_$target 1"
@@ -163,36 +176,47 @@ SERIALNO_STR_LEN_DEFINE="#define SERIALNO_STR_LEN ${#SERIALNO}"
 
 CONFIG="$target:dfu=$with_dfu"
 
+output_vid_pid_version () {
+  echo $VIDPID | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\):\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* idVendor  */\n  0x\4, 0x\3, /* idProduct */%p"
+  echo $VERSION | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* bcdDevice  */%p"
+}
+
+output_vendor_product_serial_strings () {
+  prefix=$1
+
+  echo "static const uint8_t ${prefix}string_vendor[] = {"
+  echo "  ${#VENDOR}*2+2,			/* bLength */"
+  echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
+  echo "  /* Manufacturer: \"$VENDOR\" */"
+  echo $VENDOR | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
+  echo '};'
+  echo
+  echo "static const uint8_t ${prefix}string_product[] = {"
+  echo "  ${#PRODUCT}*2+2,			/* bLength */"
+  echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
+  echo "  /* Product name: \"$PRODUCT\" */"
+  echo $PRODUCT | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
+  echo '};'
+
+  if test -n "$prefix"; then
+  echo
+  echo "static uint8_t ${prefix}string_serial[] = {"
+  echo "  ${#SERIALNO}*2+2+16,			/* bLength */"
+  echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
+  echo "  /* Serial number: \"$SERIALNO\" */"
+  echo $SERIALNO | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
+  echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
+  echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
+  echo '};'
+  fi
+}
+
 if !(IFS="	"
   while read VIDPID VERSION PRODUCT VENDOR; do
     if test "$vidpid" = "$VIDPID"; then
-      (echo $VIDPID | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\):\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* idVendor  */\n  0x\4, 0x\3, /* idProduct */%p"
-       echo $VERSION | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* bcdDevice  */%p"
-      ) > usb-vid-pid-ver.c.inc
-      (echo 'static const uint8_t neug_string_vendor[] = {'
-       echo "  ${#VENDOR}*2+2,			/* bLength */"
-       echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
-       echo "  /* Manufacturer: \"$VENDOR\" */"
-       echo $VENDOR | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
-       echo '};'
+      output_vid_pid_version > usb-vid-pid-ver.c.inc
+      (output_vendor_product_serial_strings neug_
        echo
-       echo 'static const uint8_t neug_string_product[] = {'
-       echo "  ${#PRODUCT}*2+2,			/* bLength */"
-       echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
-       echo "  /* Product name: \"$PRODUCT\" */"
-       echo $PRODUCT | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
-       echo '};'
-       echo
-       echo 'static uint8_t neug_string_serial[] = {'
-       echo "  ${#SERIALNO}*2+2+16,			/* bLength */"
-       echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
-       echo "  /* Serial number: \"$SERIALNO\" */"
-       echo $SERIALNO | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
-       echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
-       echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
-       echo '};'
-       echo
-       echo '#ifdef USB_STRINGS_FOR_NEUG'
        echo 'static const uint8_t neug_revision_detail[] = {'
        echo "  ${#REVISION}*2+2,			/* bLength */"
        echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
@@ -206,9 +230,11 @@ if !(IFS="	"
        echo "  /* configure options: \"$CONFIG\" */"
        echo $CONFIG | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
        echo '};'
-       echo '#endif'
        ) >usb-strings.c.inc
       exit 0
+    elif test "$with_fraucheky" = "$VIDPID"; then
+      output_vid_pid_version > fraucheky-vid-pid-ver.c.inc
+      output_vendor_product_serial_strings >fraucheky-usb-strings.c.inc
     fi
   done; exit 1) < ../NEUG_USB_DEVICE_ID
 then
@@ -229,6 +255,7 @@ fi
 
 
 sed -e "s%@HAVE_SYS_H@%$have_sys_h%" \
+    -e "s%@ENABLE_FRAUCHEKY@%$ENABLE_FRAUCHEKY%" \
 	< Makefile.in > Makefile
 sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
     -e "s/@MEMORY_SIZE@/$MEMORY_SIZE/" \
@@ -237,5 +264,7 @@ sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
 sed -e "s/@DFU_DEFINE@/$DFU_DEFINE/" \
     -e "s/@TARGET_DEFINE@/$TARGET_DEFINE/" \
     -e "s/@SERIALNO_STR_LEN@/$SERIALNO_STR_LEN_DEFINE/" \
+    -e "s/@FRAUCHEKY_DEFINE@/$FRAUCHEKY_DEFINE/" \
+    -e "s/@FRAUCHEKY_MSC_DEFINE@/$FRAUCHEKY_MSC_DEFINE/" \
 	< config.h.in > config.h
 exit 0

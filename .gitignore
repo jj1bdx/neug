@@ -2,3 +2,6 @@
 *.lst
 *.pyc
 src/board.h
+src/INDEX
+src/README
+src/*.inc

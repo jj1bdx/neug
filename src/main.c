@@ -43,6 +43,8 @@ enum {
   FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
 }; 
 
+static uint8_t running_neug;
+
 static chopstx_mutex_t usb_mtx;
 static chopstx_cond_t cnd_usb;
 static uint32_t bDeviceState = UNCONNECTED; /* USB device status */
@@ -174,11 +176,20 @@ static const uint8_t vcom_string0[4] = {
   0x09, 0x04			/* LangID = 0x0409: US-English */
 };
 
-#define USB_STRINGS_FOR_NEUG 1
 #include "usb-strings.c.inc"
 
-#define NUM_INTERFACES 2
+#ifdef FRAUCHEKY_SUPPORT
+extern int fraucheky_enabled (void);
+extern void fraucheky_main (void);
 
+extern void fraucheky_setup_endpoints_for_interface (int stop);
+extern int fraucheky_setup (uint8_t req, uint8_t req_no, uint16_t value,
+			    uint16_t len);
+extern int fraucheky_get_descriptor (uint8_t rcp, uint8_t desc_type,
+				     uint8_t desc_index, uint16_t index);
+#endif
+
+#define NUM_INTERFACES 2
 
 void
 usb_cb_device_reset (void)
@@ -430,8 +441,20 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT))
-    if (index == 0)
-      return vcom_port_data_setup (req, req_no, value, len);
+    {
+      if (index == 0)
+	{
+#ifdef FRAUCHEKY_SUPPORT
+	  if (running_neug)
+	    return vcom_port_data_setup (req, req_no, value, len);
+	  else
+	    fraucheky_setup (req, req_no, value, len);
+#else
+	  return vcom_port_data_setup (req, req_no, value, len);
+#endif
+	}
+    }
+
 
   return USB_UNSUPPORT;
 }
@@ -440,7 +463,13 @@ int
 usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 		       uint16_t index)
 {
+#ifdef FRAUCHEKY_SUPPORT
+  if (!running_neug)
+    return fraucheky_get_descriptor (rcp, desc_type, desc_index, index);
+#else
   (void)index;
+#endif
+
   if (rcp != DEVICE_RECIPIENT)
     return USB_UNSUPPORT;
 
@@ -506,10 +535,14 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
 {
   if (interface == 0)
     {
+#ifdef FRAUCHEKY_SUPPORT
+      fraucheky_setup_endpoints_for_interface (stop);
+#else
       if (!stop)
 	usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
       else
 	usb_lld_stall_tx (ENDP2);
+#endif
     }
   else if (interface == 1)
     {
@@ -644,9 +677,11 @@ static void fill_serial_no_by_unique_id (void)
       nibble = (b >> 4);
       nibble += (nibble >= 10 ? ('A' - 10) : '0');
       p[i*4] = nibble;
+      p[i*4+1] = 0;
       nibble = (b & 0x0f);
       nibble += (nibble >= 10 ? ('A' - 10) : '0');
       p[i*4+2] = nibble;
+      p[i*4+3] = 0;
     }
 }
 
@@ -809,12 +844,25 @@ main (int argc, char **argv)
 
   event_flag_init (&led_event);
   
-  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
-			       led_blinker, NULL);
-
   chopstx_mutex_init (&usb_mtx);
   chopstx_cond_init (&cnd_usb);
 
+  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
+			       led_blinker, NULL);
+
+#ifdef FRAUCHEKY_SUPPORT
+  if (fraucheky_enabled ())
+    {
+      usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+				usb_intr, NULL);
+      fraucheky_main ();
+      chopstx_cancel (usb_thd);
+      chopstx_join (usb_thd, NULL);
+      usb_lld_shutdown ();
+    }
+#endif
+
+  running_neug = 1;
   usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
 			    usb_intr, NULL);
 
