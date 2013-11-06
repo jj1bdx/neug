@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							   Version 0.11
-							     2013-08-22
+							    Version 1.0
+							     2013-11-xx
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -29,14 +29,16 @@ Release notes
 =============
 
 This is new release of NeuG with Chopstx, version number bumped to
-0.11.  Basic features (generating random numbers) are stable, but
-newly added things like reGNUal support should be considered unstable.
+1.0.  Basic features (generating random numbers) are stable, but newly
+added things like fraucheky (USB Mass Storage Class) support and
+reGNUal (firmware upgrad) support should be considered experimental.
 
 Note that you need Chopstx (the thread library) as external source
 code (instead of ChibiOS/RT).
 
-The "boards" directory is obsolete one for old versions of NeuG with
-ChibiOS/RT.  We leave it to port new NeuG to other boards.
+The "boards" directory is now obsolete, it's for old versions of NeuG
+with ChibiOS/RT.  When you find a board under this directory, it means
+it doesn't work.  We leave them to port new NeuG.
 
 
 FAQ
@@ -88,6 +90,11 @@ Souce code
 
 NeuG source code is under src/ directory.
 
+Note that SHA-2 hash function implementation, src/sha256.c, is based
+on the original implementation by Dr. Brian Gladman.  See:
+
+  http://gladman.plushost.co.uk/oldsite/cryptography_technology/sha/index.php
+
 
 License
 =======
@@ -102,6 +109,8 @@ External source code
 To build NeuG device, you need external source code.
 
 * chopstx/ -- Chopstx, the RT Thread Library
+
+* [optional] fraucheky/ -- Fraucheky, the GPL container
 
 It is available at:
 
