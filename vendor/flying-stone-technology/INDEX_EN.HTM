@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>How to use this device</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<h1>How to use this device</h1>
+<h2>Introduction</h2>
+<p>NeuG, the true random nunber generator, is installed on this device.</p>
+<p>Now, you are accessing this file.
+   It means that the device is running as USB memory
+   (USB Mass Storage Class device).</p>
+<p>By your action of "eject"-ing USB memory on your desktop, the device
+   will become a different device, starting NeuG.</p>
+<p>If you want to let start NeuG from the beginning
+   when you plug in the device, please follow the instruction below titled: 
+   "Let start NeuG from the beginning".</p>
+
+<h2>Let start NeuG from the beginning</h2>
+<ol>
+  <li>Save INDEX.HTM, README and COPYING files onto your PC.</li>
+  <li>Write something to the folder "DROPHERE".  For example,
+      drag&amp;drop README to DROPHERE.</li>
+  <li>By doing this, from next time, it will start NeuG from the beginning
+      (instead of USB memory).</li>
+</ol>
+
+<h2>How to use NeuG</h2>
+<p>NeuG runs as USB CDC/ACM 
+  (Communication Device Class / Abstract Control Model) device.</p>
+<p>The USB CDC/ACM (Communication Device Class / Abstract Control Model)
+   is used primarily for modems.
+   If you are using some control program for your modems,
+   you need to configure it, so that it won't interfere NeuG device.
+   If you are not using modems with such a control program, simply,
+   you may remove modem management package from your system
+   to avoid interference.  For example, remove the package "modemmanager",
+   when you are using Debian GNU/Linux.</p>
+<p>No special driver is required on GNU/Linux.
+   You can just access /dev/ttyACM? (e.g., /dev/ttyACM0)
+   to get random byte stream.</p>
+
+<h3>Configuration of tty line discipline</h3>
+<p>Don't forget to configure tty line disciple to get correct data.
+Between the device and application, there is "tty line discipline"
+which might interpret and translate the stream (newline, eof, etc.).
+This functionality should be disabled.</p>
+<p>Using stty command, please configure the line discipline
+with no echo and raw mode.</p>
+<blockquote>
+  <pre>
+  $ stty -F /dev/ttyACM0 -echo raw -parenb
+  </pre>
+</blockquote>
+
+<p>You can select filter by parity settings.</p>
+  <ul>
+    <li>Even parity (parenb -parodd) means: Raw ADC sample data</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 parenb -parodd
+      </pre>
+    </blockquote>
+    <li>Odd parity (parenb parodd) means: Only CRC32 filter</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 parenb parodd
+      </pre>
+    </blockquote>
+    <li>No parity (-parenb): CRC32 filter + SHA256 filter</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 -parenb
+      </pre>
+    </blockquote>
+  </ul>
+
+<h3>Example command to get random output</h3>
+<p>For example, you can get random bytes of 1MiB to the file "output"
+   by typing:</p>
+<blockquote>
+  <pre>
+  $ dd bs=1024 if=/dev/ttyACM0 iflag=fullblock count=1024 of=output
+  </pre>
+</blockquote>
+
+<h3>Use the NeuG device with rng-tools</h3>
+<p>Usually, you would like to use NeuG device under control of rng-tools,
+to feed entropy to /dev/random, the random device in kernel.</p>
+
+<p>Please see <a href="http://no-passwd.net/askbot/question/45/how-can-i-use-neug-standalone-device-on-my-debian/">Debian usage</a> for detail.</p>
+
+<h2>README, GNU GPL and Corresponding Source code</h2>
+<p>In this product, it contains copyrighted software that is licensed under
+   the GPLv3.  Please see README for the explanation of the software and see
+   GNU GPLv3 for terms and conditions.</p>
+<p>You may obtain the complete Corresponding Source code from git repositories.
+   In the Gnuk repository, we have sub-repository named "neug", which 
+   contains the source code of NeuG.
+   NeuG uses external source code of Chopstx for RTOS, and Fraucheky for
+   GPL container.  Those code are availabe in the Chopstx repository.</p>
+<p>In the git repositories, we have release tags.
+   You may examine the release tag of the product by the command,
+   tool/neug_check.py which is available in the NeuG repository.</p>
+</p>
+<ul>
+  <li><a href=README>README</a></li>
+  <li><a href=COPYING>GNU GPLv3</a></li>
+  <li><a href="https://gitorious.org/gnuk/">Gnuk Repository</a></li>
+  <li><a href="https://gitorious.org/chopstx/">Chopstx Repository</a></li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+  <li><a href="http://no-passwd.net/askbot/">FST-01 Q&amp;A site</a></li>
+  <li><a href="https://no-passwd.net/wws/info/fst-01">
+      Mailing list: FST-01 discussion</a></li>
+  <li><a href="http://www.gniibe.org/">gniib.org home page</a></li>
+  <li><a href="http://www.gnu.org/gnu/manifesto.ja.html">
+      GNU Manifesto (Japanese Translation)</a></li>
+</ul>
+
+<h2>Concluding remarks</h2>
+<p>I wish you enjoy your freedom on computing with NeuG.
+   Thank you for your cooperation.</p>
+
+
+</body>
+</html>

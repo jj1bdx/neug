@@ -1,3 +1,17 @@
+2013-11-06  Niibe Yutaka  <gniibe@fsij.org>
+
+	* vender/flying-stone-technology: New.
+
+2013-11-05  Niibe Yutaka  <gniibe@fsij.org>
+
+	* VERSION: New file.
+
+	* src/configure (SERIALNO, SERIALNO_STR_LEN_DEFINE): New.
+	(REVISION): Use the file VERSION if it doesn't have .git.
+	* src/config.h.in (SERIALNO_STR_LEN_DEFINE): New.
+	* src/main.c (vcom_string3): Removed.
+	(ID_OFFSET): New, using SERIALNO_STR_LEN.
+
 2013-11-03  Niibe Yutaka  <gniibe@fsij.org>
 
 	* chopstx: Update to 0.01.

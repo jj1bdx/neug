@@ -28,6 +28,7 @@ vidpid=none
 with_dfu=default
 debug=no
 sys1_compat=yes
+with_fraucheky=no
 
 # Process each option
 for option; do
@@ -53,6 +54,10 @@ for option; do
     with_dfu=yes ;;
   --without-dfu)
     with_dfu=no ;;
+  --with-fraucheky=*)
+    with_fraucheky=$optarg ;;
+  --without-fraucheky)
+    with_fraucheky=no ;;
   *)
     echo "Unrecognized option \`$option'" >&2
     echo "Try \`$0 --help' for more information." >&2
@@ -82,6 +87,10 @@ Configuration:
 			   executable is target independent
 			   but requires SYS 2.0 or newer
   --with-dfu		build image for DFU 		[<target specific>]
+
+  --with-fraucheky=VID:PID
+			include fraucheky support	[no]
+  --with-index=INDEX	specify INDEX file		[INDEX.HTM]
 EOF
   exit 0
 fi
@@ -140,7 +149,18 @@ else
   DFU_DEFINE="#undef DFU_SUPPORT"
 fi
 
-REVISION=`git describe --dirty="-modified"` 
+if test -d ../.git; then
+  REVISION=`git describe --dirty="-modified"` 
+else
+  REVISION=`cat ../VERSION`
+fi
+
+### !!! Replace following string of "FSIJ" to yours !!! ####
+SERIALNO="FSIJ-`cat ../VERSION | sed -e 's%^[^/]*/%%'`-"
+
+SERIALNO_STR_LEN_DEFINE="#define SERIALNO_STR_LEN ${#SERIALNO}"
+
+
 CONFIG="$target:dfu=$with_dfu"
 
 if !(IFS="	"
@@ -161,6 +181,15 @@ if !(IFS="	"
        echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
        echo "  /* Product name: \"$PRODUCT\" */"
        echo $PRODUCT | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
+       echo '};'
+       echo
+       echo 'static uint8_t neug_string_serial[] = {'
+       echo "  ${#SERIALNO}*2+2+16,			/* bLength */"
+       echo "  USB_STRING_DESCRIPTOR_TYPE,	/* bDescriptorType */"
+       echo "  /* Serial number: \"$SERIALNO\" */"
+       echo $SERIALNO | sed -n -e "s/\(........\)/\1\n/gp" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "s/ $//p"
+       echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
+       echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
        echo '};'
        echo
        echo '#ifdef USB_STRINGS_FOR_NEUG'
@@ -207,5 +236,6 @@ sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
 	< neug.ld.in > neug.ld
 sed -e "s/@DFU_DEFINE@/$DFU_DEFINE/" \
     -e "s/@TARGET_DEFINE@/$TARGET_DEFINE/" \
+    -e "s/@SERIALNO_STR_LEN@/$SERIALNO_STR_LEN_DEFINE/" \
 	< config.h.in > config.h
 exit 0

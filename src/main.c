@@ -177,21 +177,6 @@ static const uint8_t vcom_string0[4] = {
 #define USB_STRINGS_FOR_NEUG 1
 #include "usb-strings.c.inc"
 
-/*
- * Serial Number string.  NOTE: This does not have CONST qualifier.
- */
-static uint8_t vcom_string3[28] = {
-  28,                               /* bLength.                         */
-  USB_STRING_DESCRIPTOR_TYPE,       /* bDescriptorType.                 */
-  '0', 0,  '.', 0,  '1', 0, '1', 0, /* Version number of NeuG.          */
-  '-', 0,
-  0, 0, 0, 0,	/* Filled by Unique device ID.      */
-  0, 0, 0, 0,
-  0, 0, 0, 0,
-  0, 0, 0, 0,
-};
-
-
 #define NUM_INTERFACES 2
 
 
@@ -490,8 +475,8 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	  size = sizeof (neug_string_product);
 	  break;
 	case 3:
-	  str = vcom_string3;
-	  size = sizeof (vcom_string3);
+	  str = neug_string_serial;
+	  size = sizeof (neug_string_serial);
 	  break;
 	case 4:
 	  str = neug_revision_detail;
@@ -643,11 +628,11 @@ usb_intr (void *arg)
   return NULL;
 }
 
-
+#define ID_OFFSET (2+SERIALNO_STR_LEN*2)
 static void fill_serial_no_by_unique_id (void)
 {
   extern const uint8_t * unique_device_id (void);
-  uint8_t *p = &vcom_string3[12];
+  uint8_t *p = &neug_string_serial[ID_OFFSET];
   const uint8_t *u = unique_device_id ();
   int i;
 

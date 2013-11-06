@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head><title>このデバイスの使い方</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h1>このデバイスの使い方</h1>
+<h2>はじめに</h2>
+<p>このデバイスには乱数生成器の実装NeuGがインストールされています。</p>
+<p>このファイルをアクセスしている現在、デバイスはUSBメモリとして動いています。</p>
+<p>USBメモリを「取り出す」動作で、異なるUSBデバイスとしてNeuGが起動されます。</p>
+<p>デバイスを挿入した起動時からNeuGを動かしたい場合、「起動時からNeuGを動かす」の操作を行ってください。</p>
+
+<h2>起動時からNeuGを動かす</h2>
+<ol>
+  <li>このファイル(INDEX.HTM), README, COPYING (GNU GPL)をPC上に保存してください。</li>
+  <li>フォルダDROPHEREになにか書き込んでください。たとえばREADMEをドラッグ&amp;ドロップしてください。</li>
+  <li>上記の操作で、次回以降の起動では(USBメモリとしてではなく)、NeuGが起動します。</li>
+</ol>
+
+<h2>NeuGの使い方</h2>
+<p>NeuGはUSB CDC/ACMデバイスとして動作します。</p>
+<p>このデバイスはモデムに使われるものです。モデム管理ソフトウェアは外します。
+たとえばDebian GNU/Linuxでは、パッケージmodemmanagerをインストールしないでください。</p>
+<p>GNU/Linuxでは特別なドライバは必要なく、/dev/ttyACM? (たとえば /dev/ttyACM0)としてアクセスします。</p>
+
+<h3>端末(TTYラインディシプリン)の設定</h3>
+<p>正しい出力を受けとるには、端末(TTYラインディシプリン)の設定を忘れずに行ってください。
+次のように stty コマンドで、エコー処理なしとし、raw モードを指定します。</p>
+<blockquote>
+  <pre>
+  $ stty -F /dev/ttyACM0 -echo raw -parenb
+  </pre>
+</blockquote>
+
+<p>パリティ指定で乱数生成のフィルタの選択が行えます。</p>
+  <ul>
+    <li>偶パリティ指定 (parenb -parodd): ADCの生サンプルデータ</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 parenb -parodd
+      </pre>
+    </blockquote>
+    <li>奇パリティ指定 (parenb parodd): CRC32フィルタのみ</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 parenb parodd
+      </pre>
+    </blockquote>
+    <li>パリティなし指定 (-parenb): CRC32フィルタ+SHA256フィルタ</li>
+    <blockquote>
+      <pre>
+  $ stty -F /dev/ttyACM0 -parenb
+      </pre>
+    </blockquote>
+  </ul>
+
+<h3>出力を受け取る例</h3>
+<p>たとえば、1MiBをファイルoutputに受け取る場合は次のようにします。</p>
+<blockquote>
+  <pre>
+  $ dd bs=1024 if=/dev/ttyACM0 iflag=fullblock count=1024 of=output
+  </pre>
+</blockquote>
+
+<h3>rng-toolsで使う</h3>
+<p>システムとして利用ではNeuGの出力をrng-toolsで管理し、カーネルのrandomデバイスに供給するのが一般的でしょう。</p>
+
+<p>これに関しては、<a href="http://no-passwd.net/askbot/question/45/how-can-i-use-neug-standalone-device-on-my-debian/">Debianでの利用例(英語)</a>をご覧ください。</p>
+
+<h2>READMEとGNU GPLおよび完全なソースコード</h2>
+<p>この製品には著作権を主張するソフトウェアが含まれ、GNU GPLv3で配布されています。ソフトウェアの説明の文書README(英語)と、許諾の条件GNU GPLv3(英語)を、それぞれご覧ください。</p>
+<p>この製品にインストールされているソフトウェアに対応する完全なソースコードは、Gnukリポジトリから入手できます。このリポジトリのサブリポジトリneugがNeuGのソースコードリポジトリです。RTOSのChopstxとGPLフロシキのFrauchekyを用いています。これらはChopstxリポジトリから入手できます。</p>
+<p>リポジトリには参照のためのリリースタグがついています。製品に利用されているコードのリリースタグは、NeuGリポジトリにあるコマンドtool/neug_check.pyで確認できます。</p>
+<ul>
+  <li><a href=README>README</a></li>
+  <li><a href=COPYING>GNU GPLv3</a></li>
+  <li><a href="https://gitorious.org/gnuk/">Gnukリポジトリ</a></li>
+  <li><a href="https://gitorious.org/chopstx/">Chopstxリポジトリ</a></li>
+</ul>
+
+<h2>リンク</h2>
+<ul>
+  <li><a href="https://no-passwd.net/wws/info/gnuk-users-ja">
+      メーリングリスト: Gnuk Users in Japanese</a></li>
+  <li><a href="http://no-passwd.net/askbot/">質問(英語): FST-01 Q&amp;A site</a></li>
+  <li><a href="http://www.gniibe.org/">gniib.orgホームページ</a></li>
+</ul>
+
+<h2>おわりに</h2>
+自由なコンピューティングがなんとか生き残ることを望みます。
+皆様のご理解とご協力に感謝します。
+
+</body>
+</html>
