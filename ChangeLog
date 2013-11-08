@@ -1,6 +1,6 @@
 2013-11-08  Niibe Yutaka  <gniibe@fsij.org>
 
-	* chopstx: Update to 0.02.
+	* chopstx: Update to 0.03.
 
 	* src/usb_stm32f103.c (ISTR_OVR): Rename.
 	(usb_handle_transfer): Rewrite control transfer handling, so that

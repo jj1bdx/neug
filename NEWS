@@ -5,7 +5,7 @@ NeuG NEWS - User visible changes
   Released 2013-11-xx, by NIIBE Yutaka
 
 ** Upgrade of Chopstx
-Now, we use Chopstx 0.01.
+Now, we use Chopstx 0.03.
 
 ** Stable upgrade process
 For firmware upgrade, it has been unstable and it has been recommended
