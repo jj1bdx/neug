@@ -1,5 +1,9 @@
 2013-11-08  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/usb_stm32f103.c (ISTR_OVR): Rename.
+	(usb_handle_transfer): Rewrite control transfer handling, so that
+	the case where both of CTR_TX, CTR_RX are 1 is handled correctly.
+
 	* src/main.c (neug_setup_endpoints_for_interface): Fix for ENDP2.
 
 2013-11-06  Niibe Yutaka  <gniibe@fsij.org>
