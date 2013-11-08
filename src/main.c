@@ -43,7 +43,9 @@ enum {
   FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
 }; 
 
+#ifdef FRAUCHEKY_SUPPORT
 static uint8_t running_neug;
+#endif
 
 static chopstx_mutex_t usb_mtx;
 static chopstx_cond_t cnd_usb;
@@ -455,7 +457,6 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	}
     }
 
-
   return USB_UNSUPPORT;
 }
 
@@ -536,7 +537,15 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
   if (interface == 0)
     {
 #ifdef FRAUCHEKY_SUPPORT
-      fraucheky_setup_endpoints_for_interface (stop);
+      if (running_neug)
+	{
+	  if (!stop)
+	    usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
+	  else
+	    usb_lld_stall_tx (ENDP2);
+	}
+      else
+	fraucheky_setup_endpoints_for_interface (stop);
 #else
       if (!stop)
 	usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
@@ -860,9 +869,10 @@ main (int argc, char **argv)
       chopstx_join (usb_thd, NULL);
       usb_lld_shutdown ();
     }
-#endif
 
   running_neug = 1;
+#endif
+
   usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
 			    usb_intr, NULL);
 

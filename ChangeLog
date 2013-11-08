@@ -1,3 +1,7 @@
+2013-11-08  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (neug_setup_endpoints_for_interface): Fix for ENDP2.
+
 2013-11-06  Niibe Yutaka  <gniibe@fsij.org>
 
 	* fraucheky: New submodule.
