@@ -2,14 +2,14 @@ NeuG NEWS - User visible changes
 
 * Major changes in NeuG 1.0
 
-  Released 2013-11-xx, by NIIBE Yutaka
+  Released 2013-11-11, by NIIBE Yutaka
 
 ** Upgrade of Chopstx
 Now, we use Chopstx 0.03.
 
-** Stable upgrade process
-For firmware upgrade, it has been unstable and it has been recommended
-not to access its stream (/dev/ttyACM0) before running
+** Stabilize the upgrade process
+For firmware upgrade, it has been unstable somehow and it has been
+recommended not to access its stream (/dev/ttyACM0) before running
 neug_upgrade.py.  This bug was fixed in 1.0, and it's more stable.
 
 ** Add support of Fraucheky
