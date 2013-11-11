@@ -1,3 +1,9 @@
+2013-11-09  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/adc_stm32f103.c (adc_wait_completion): Remove comment about
+	spurious interrupt, as we knew that it's because of the bug of
+	Chopstx 0.00.
+
 2013-11-08  Niibe Yutaka  <gniibe@fsij.org>
 
 	* chopstx: Update to 0.03.
