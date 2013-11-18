@@ -390,9 +390,6 @@ usb_interrupt_handler (void)
 {
   uint16_t istr_value = st103_get_istr ();
 
-  if ((istr_value & ISTR_CTR))
-    usb_handle_transfer ();
-
   if ((istr_value & ISTR_RESET))
     {
       st103_set_istr (CLR_RESET);
@@ -404,6 +401,9 @@ usb_interrupt_handler (void)
 
   if ((istr_value & ISTR_ERR))
     st103_set_istr (CLR_ERR);
+
+  if ((istr_value & ISTR_CTR))
+    usb_handle_transfer ();
 }
 
 static void handle_datastage_out (void)

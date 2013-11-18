@@ -1,3 +1,8 @@
+2013-11-18  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/usb_stm32f103.c (usb_interrupt_handler): Change the order of
+	calling handler.
+
 2013-11-11  Niibe Yutaka  <gniibe@fsij.org>
 
 	* Version 1.0.
