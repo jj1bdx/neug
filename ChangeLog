@@ -1,3 +1,8 @@
+2013-11-21  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/usb_stm32f103.c (usb_handle_transfer): Incorporate changes
+	from Gnuk.
+
 2013-11-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/usb_stm32f103.c (usb_interrupt_handler): Change the order of
