@@ -1,3 +1,7 @@
+2014-05-22  Niibe Yutaka  <gniibe@fsij.org>
+
+	* Update to newer Chopstx and Fraucheky.
+
 2013-11-21  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/usb_stm32f103.c (usb_handle_transfer): Incorporate changes
