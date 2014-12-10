@@ -1,6 +1,13 @@
+2014-12-10  Niibe Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update to 0.04.
+
+	* src/sys.c: Update from chopstx.
+
 2014-05-22  Niibe Yutaka  <gniibe@fsij.org>
 
-	* Update to newer Chopstx and Fraucheky.
+	* chopstx: Update.
+	* fraucheky: Update.
 
 2013-11-21  Niibe Yutaka  <gniibe@fsij.org>
 
