@@ -38,6 +38,9 @@ board.h:
 
 sys.c: board.h
 
+build/sha256.o: OPT = -O3 -g
+build/neug.o: OPT = -O3 -g
+
 distclean:: clean
 	-rm -f neug.ld config.h board.h Makefile \
 	       usb-strings.c.inc usb-vid-pid-ver.c.inc
