@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							    Version 1.0
-							     2013-11-11
+							  Version 1.0.1
+							     2015-02-??
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,10 +28,11 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is new release of NeuG with Chopstx, version number bumped to
-1.0.  Basic features (generating random numbers) are stable, but newly
-added things like fraucheky (USB Mass Storage Class) support and
-reGNUal (firmware upgrad) support should be considered experimental.
+This is the first minor release of NeuG, after 1.0.
+
+Basic features (generating random numbers) are stable, but newly added
+things like fraucheky (USB Mass Storage Class) support and reGNUal
+(firmware upgrad) support should be considered experimental.
 
 Note that you need Chopstx (the thread library) as external source
 code (instead of ChibiOS/RT).
