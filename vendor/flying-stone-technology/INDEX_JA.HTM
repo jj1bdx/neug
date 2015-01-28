@@ -9,7 +9,13 @@
 <h2>はじめに</h2>
 <p>このデバイスには乱数生成器の実装NeuGがインストールされています。</p>
 <p>このファイルをアクセスしている現在、デバイスはUSBメモリとして動いています。</p>
-<p>USBメモリを「取り出す」動作で、異なるUSBデバイスとしてNeuGが起動されます。</p>
+<p>USBメモリを「取り出す」操作で、その後、異なるUSBデバイスとしてNeuGが起動されます。
+   以下のいずれかの操作を行います。
+   <ul>
+     <li>コマンドラインで<tt>eject /dev/sda</tt>というように(<tt>sda</tt>のところを環境に合わせて変更してください)実行する。</li>
+     <li>GUIのファイルマネージャで"Fraucheky"を「取り出す」操作を行う。</li>
+   </ul>
+</p>
 <p>デバイスを挿入した起動時からNeuGを動かしたい場合、「起動時からNeuGを動かす」の操作を行ってください。</p>
 
 <h2>起動時からNeuGを動かす</h2>
@@ -67,7 +73,7 @@
 <h3>rng-toolsで使う</h3>
 <p>システムとして利用ではNeuGの出力をrng-toolsで管理し、カーネルのrandomデバイスに供給するのが一般的でしょう。</p>
 
-<p>これに関しては、<a href="http://no-passwd.net/askbot/question/45/how-can-i-use-neug-standalone-device-on-my-debian/">Debianでの利用例(英語)</a>をご覧ください。</p>
+<p>これに関しては、<a href="http://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debianでの利用例(英語)</a>をご覧ください。</p>
 
 <h2>READMEとGNU GPLおよび完全なソースコード</h2>
 <p>この製品には著作権を主張するソフトウェアが含まれ、GNU GPLv3で配布されています。ソフトウェアの説明の文書README(英語)と、許諾の条件GNU GPLv3(英語)を、それぞれご覧ください。</p>
@@ -82,10 +88,11 @@
 
 <h2>リンク</h2>
 <ul>
-  <li><a href="https://no-passwd.net/wws/info/gnuk-users-ja">
-      メーリングリスト: Gnuk Users in Japanese</a></li>
-  <li><a href="http://no-passwd.net/askbot/">質問(英語): FST-01 Q&amp;A site</a></li>
-  <li><a href="http://www.gniibe.org/">gniib.orgホームページ</a></li>
+  <li><a href="http://www.gniibe.org/category/fst-01.html">
+      FST-01 support pages (英語) </a></li>
+  <li><a href="https://lists.alioth.debian.org/mailman/listinfo/gnuk-users">
+      メーリングリスト: Gnuk Users (英語) </a></li>
+  <li><a href="http://www.gnu.org/gnu/manifesto.ja.html">GNU宣言</a></li>
 </ul>
 
 <h2>おわりに</h2>

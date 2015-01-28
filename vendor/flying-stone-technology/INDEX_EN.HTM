@@ -13,7 +13,13 @@
    It means that the device is running as USB memory
    (USB Mass Storage Class device).</p>
 <p>By your action of "eject"-ing USB memory on your desktop, the device
-   will become a different device, starting NeuG.</p>
+   will become a different USB device, starting NeuG.
+   Your action may be one of following actions:
+   <ul>
+     <li>In your shell command line, type <tt>eject /dev/sda</tt>(change <tt>sda</tt> to match your environment).</li>
+     <li>By GUI file manager, eject the disk named "Fraucheky".</li>
+   </ul>
+</p>
 <p>If you want to let start NeuG from the beginning
    when you plug in the device, please follow the instruction below titled: 
    "Let start NeuG from the beginning".</p>
@@ -90,7 +96,7 @@ with no echo and raw mode.</p>
 <p>Usually, you would like to use NeuG device under control of rng-tools,
 to feed entropy to /dev/random, the random device in kernel.</p>
 
-<p>Please see <a href="http://no-passwd.net/askbot/question/45/how-can-i-use-neug-standalone-device-on-my-debian/">Debian usage</a> for detail.</p>
+<p>Please see <a href="http://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debian usage</a> for detail.</p>
 
 <h2>README, GNU GPL and Corresponding Source code</h2>
 <p>In this product, it contains copyrighted software that is licensed under
@@ -114,10 +120,10 @@ to feed entropy to /dev/random, the random device in kernel.</p>
 
 <h2>Links</h2>
 <ul>
-  <li><a href="http://no-passwd.net/askbot/">FST-01 Q&amp;A site</a></li>
-  <li><a href="https://no-passwd.net/wws/info/fst-01">
-      Mailing list: FST-01 discussion</a></li>
-  <li><a href="http://www.gniibe.org/">gniib.org home page</a></li>
+  <li><a href="http://www.gniibe.org/category/fst-01.html">
+      FST-01 support pages</a></li>
+  <li><a href="https://lists.alioth.debian.org/mailman/listinfo/gnuk-users">
+      Mailing list: Gnuk Users</a></li>
   <li><a href="http://www.gnu.org/gnu/manifesto.ja.html">
       GNU Manifesto (Japanese Translation)</a></li>
 </ul>
@@ -125,7 +131,6 @@ to feed entropy to /dev/random, the random device in kernel.</p>
 <h2>Concluding remarks</h2>
 <p>I wish you enjoy your freedom on computing with NeuG.
    Thank you for your cooperation.</p>
-
 
 </body>
 </html>
