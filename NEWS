@@ -1,5 +1,19 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 1.0.1
+
+  Released 2015-01-29, by NIIBE Yutaka
+
+** Upgrade of Chopstx
+We use Chopstx 0.04.
+
+** Upgrade of Fraucheky
+We use Fraucheky 0.1.
+
+** Compile options
+We use -O3 (with no -Os) for neug.o and sha256.o.
+
+
 * Major changes in NeuG 1.0
 
   Released 2013-11-11, by NIIBE Yutaka
