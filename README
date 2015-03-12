@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							  Version 1.0.1
-							     2015-01-29
+							 Version 1.0.1a
+							     2015-03-12
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -103,15 +103,15 @@ It is distributed under GNU General Public Licence version 3 or later
 External source code
 ====================
 
-To build NeuG device, you need external source code.
+NeuG is distributed with external source code.
 
 * chopstx/ -- Chopstx, the RT Thread Library
 
 * [optional] fraucheky/ -- Fraucheky, the GPL container
 
-It is available at:
+Those are available at:
 
-  http://gitorious.org/chopstx/chopstx
+  https://anonscm.debian.org/cgit/gnuk/chopstx/
 
 
 USB vendor ID and product ID (USB device ID)
@@ -354,16 +354,16 @@ For NIST STS 2.1.1, I used only 10 files of size 125MB.
 Git Repository
 ==============
 
-NeuG is available in the Gnuk repository at Gitorious.org:
+NeuG is available in the Gnuk repository at:
 
-    http://gitorious.org/gnuk/neug
+    https://anonscm.debian.org/cgit/gnuk/gnuk/
 
 You can get it by:
 
-    $ git clone git://gitorious.org/gnuk/neug.git
+    $ git clone git://anonscm.debian.org/gnuk/gnuk/neug.git
 
 
-I put Chopstx as a submodule of Git.  Please do this:
+I put Chopstx and Fraucheky as a submodules of Git.  Please do this:
 
   $ git submodule init
   $ git submodule update
@@ -388,4 +388,10 @@ Your Contributions
 
 FSIJ welcomes your contributions.  Please assign your copyright
 to FSIJ (if possible).
+
+
+Foot note
+==========
+
+If NeuG had a family name, it must be Kunisada.
 -- 

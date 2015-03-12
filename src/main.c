@@ -675,12 +675,12 @@ static void fill_serial_no_by_unique_id (void)
 {
   extern const uint8_t * unique_device_id (void);
   uint8_t *p = &neug_string_serial[ID_OFFSET];
-  const uint8_t *u = unique_device_id ();
+  const uint8_t *u = unique_device_id () + 8;
   int i;
 
   for (i = 0; i < 4; i++)
     {
-      uint8_t b = u[i];
+      uint8_t b = u[3-i];
       uint8_t nibble; 
 
       nibble = (b >> 4);

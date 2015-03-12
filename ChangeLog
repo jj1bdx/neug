@@ -1,6 +1,13 @@
+2015-03-12  Niibe Yutaka  <gniibe@fsij.org>
+
+	* VERSION: 1.0.1a.
+
+	* src/main.c (fill_serial_no_by_unique_id): Use bits in higher
+	address.
+
 2015-01-29  Niibe Yutaka  <gniibe@fsij.org>
 
-	* VERSION: 1.0.1
+	* VERSION: 1.0.1.
 
 2015-01-28  Niibe Yutaka  <gniibe@fsij.org>
 
