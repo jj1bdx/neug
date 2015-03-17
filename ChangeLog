@@ -1,5 +1,9 @@
 2015-03-17  Niibe Yutaka  <gniibe@fsij.org>
 
+	* VERSION: 1.0.1c.
+
+2015-03-17  Niibe Yutaka  <gniibe@fsij.org>
+
 	* VERSION: 1.0.1b.
 
 	* src/configure: Call configure of Fraucheky with REVISION,
