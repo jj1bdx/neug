@@ -272,7 +272,7 @@ sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
 	< neug.ld.in > neug.ld
 sed -e "s/@DFU_DEFINE@/$DFU_DEFINE/" \
     -e "s/@TARGET_DEFINE@/$TARGET_DEFINE/" \
-    -e "s/@SERIALNO_STR_LEN@/$SERIALNO_STR_LEN_DEFINE/" \
+    -e "s/@SERIALNO_STR_LEN_DEFINE@/$SERIALNO_STR_LEN_DEFINE/" \
     -e "s/@FRAUCHEKY_DEFINE@/$FRAUCHEKY_DEFINE/" \
     -e "s/@FRAUCHEKY_MSC_DEFINE@/$FRAUCHEKY_MSC_DEFINE/" \
 	< config.h.in > config.h

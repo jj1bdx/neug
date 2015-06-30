@@ -1,5 +1,8 @@
 2015-06-30  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/config.h.in (@SERIALNO_STR_LEN_DEFINE@): Rename.
+	* src/configure (SERIALNO_STR_LEN_DEFINE): Rename.
+
 	* src/configure (help): Add CQ_STARM.
 
 2015-06-22  Niibe Yutaka  <gniibe@fsij.org>
