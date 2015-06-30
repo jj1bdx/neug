@@ -97,6 +97,7 @@ Configuration:
 			   STM8S_DISCOVERY
 			   OLIMEX_STM32_H103
 			   STM32_PRIMER2
+			   CQ_STARM
   --enable-sys1-compat	enable SYS 1.0 compatibility	[yes]
 			   executable is target dependent
   --disable-sys1-compat	disable SYS 1.0 compatibility	[no]
