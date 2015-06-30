@@ -140,6 +140,7 @@ SECTIONS
     .fill_ffff :
     {
         . = ALIGN (@FLASH_PAGE_SIZE@);
+	*(.passwd)
     } > flash =0xffffffff
 }
 

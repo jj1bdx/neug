@@ -1,5 +1,17 @@
 2015-06-30  Niibe Yutaka  <gniibe@fsij.org>
 
+	* tool/neug_check.py: Fix raise and print statements.
+
+	* tool/neug_upgrade.py: Support upgrade with passwd.
+	(neug.set_passwd): New.
+
+	* src/main.c (USB_NEUG_SET_PASSWD): New.
+	(set_passwd): New.
+	(usb_cb_ctrl_write_finish, usb_cb_setup): Handle
+	USB_NEUG_SET_PASSWD and USB_NEUG_EXIT with passwd.
+
+	* src/neug.ld.in (flash): A page for passwd.
+
 	* src/config.h.in (@SERIALNO_STR_LEN_DEFINE@): Rename.
 	* src/configure (SERIALNO_STR_LEN_DEFINE): Rename.
 

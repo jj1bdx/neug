@@ -1,5 +1,16 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 1.0.2
+
+  Released 2015-09-XX, by NIIBE Yutaka
+
+** Upgrade of firmware enhancement
+The process is protected by password.
+
+** Upgrade of Chopstx
+We use Chopstx 0.06.
+
+
 * Major changes in NeuG 1.0.1
 
   Released 2015-01-29, by NIIBE Yutaka

@@ -216,9 +216,31 @@ static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 #define USB_FSIJ_MEMINFO	  0
 #define USB_FSIJ_DOWNLOAD	  1
 #define USB_FSIJ_EXEC		  2
+#define USB_NEUG_SET_PASSWD	253
 #define USB_NEUG_GET_INFO	254
 #define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
 
+uint8_t neug_passwd[33] __attribute__ ((section(".passwd"))) = {
+  0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+};
+static uint8_t passwd_data[33];
+
+#define DEFAULT_PASSWD "12345678"
+#define DEFAULT_PASSWD_LEN 8
+
+static void set_passwd (void)
+{
+  flash_unlock ();
+  if (neug_passwd[0] != 0xff)
+    flash_erase_page ((uint32_t)neug_passwd);
+  if (passwd_data[0] == DEFAULT_PASSWD_LEN
+      && !memcmp (passwd_data + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
+    return;
+  flash_write ((uint32_t)neug_passwd, passwd_data, passwd_data[0] + 1);
+}
 
 static uint32_t rbit (uint32_t v)
 {
@@ -252,10 +274,9 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
-  if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT)
-      && USB_SETUP_SET (req) && len == 0)
+  if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT) && USB_SETUP_SET (req))
     {
-      if (req_no == USB_FSIJ_EXEC)
+      if (req_no == USB_FSIJ_EXEC && len == 0)
 	{
 	  chopstx_mutex_lock (&usb_mtx);
 	  if (fsij_device_state == FSIJ_DEVICE_EXITED)
@@ -265,17 +286,18 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	    }
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
+      else if (req_no == USB_NEUG_SET_PASSWD)
+	set_passwd ();
       else if (req_no == USB_NEUG_EXIT)
 	{
-	  /* Force exit from the main loop.  */
-	  if (wait_usb_connection)
-	    {
-	      wait_usb_connection = 0;
-	      chopstx_wakeup_usec_wait (main_thd);
-	    }
-	  else
+	  if ((neug_passwd[0] == 0xff && passwd_data[0] == DEFAULT_PASSWD_LEN
+	       && !memcmp (passwd_data + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
+	      || (neug_passwd[0] == passwd_data[0]
+		  && !memcmp (neug_passwd+1, passwd_data+1, neug_passwd[0])))
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
+	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
+	      chopstx_wakeup_usec_wait (main_thd);
 	      chopstx_cond_signal (&cnd_usb);
 	      chopstx_mutex_unlock (&usb_mtx);
 	    }
@@ -291,10 +313,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
       if (wait_usb_connection)
 	{			/* It is waiting a connection.  */
 	  if (connected)	/* It's now connected.  */
-	    {
-	      wait_usb_connection = 0;
-	      chopstx_wakeup_usec_wait (main_thd);
-	    }
+	    chopstx_wakeup_usec_wait (main_thd);
 	}
       else
 	chopstx_cond_signal (&cnd_usb);
@@ -359,6 +378,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	{
 	  if (req_no == USB_FSIJ_MEMINFO)
 	    {
+	      chopstx_mutex_lock (&usb_mtx);
+	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
+		{
+		  chopstx_mutex_unlock (&usb_mtx);
+		  return USB_UNSUPPORT;
+		}
+	      chopstx_mutex_unlock (&usb_mtx);
 	      usb_lld_set_data_to_send (mem_info, sizeof (mem_info));
 	      return USB_SUCCESS;
 	    }
@@ -424,7 +450,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 
 	      return download_check_crc32 ((uint32_t *)addr);
 	    }
-	  else if (req_no == USB_NEUG_EXIT && len == 0)
+	  else if (req_no == USB_NEUG_SET_PASSWD && len <= 32)
+	    {
+	      passwd_data[0] = len;
+	      usb_lld_set_data_to_recv (passwd_data + 1, len);
+	      return USB_SUCCESS;
+	    }
+	  else if (req_no == USB_NEUG_EXIT && len <= 32)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -432,12 +464,10 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		  chopstx_mutex_unlock (&usb_mtx);
 		  return USB_UNSUPPORT;
 		}
-
-	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
-	      chopstx_wakeup_usec_wait (main_thd);
-	      chopstx_cond_signal (&cnd_usb);
 	      chopstx_mutex_unlock (&usb_mtx);
 
+	      passwd_data[0] = len;
+	      usb_lld_set_data_to_recv (passwd_data + 1, len);
 	      return USB_SUCCESS;
 	    }
 	}

@@ -44,9 +44,9 @@ class neug(object):
         interface: usb.Interface object representing the interface and altenate setting.
         """
         if interface.interfaceClass !=COM_CLASS:
-            raise ValueError, "Wrong interface class"
+            raise ValueError("Wrong interface class")
         if interface.interfaceSubClass != COM_SUBCLASS:
-            raise ValueError, "Wrong interface sub class"
+            raise ValueError("Wrong interface sub class")
         self.__devhandle = device.open()
         # self.__devhandle.claimInterface(interface)
         # self.__devhandle.setAltInterface(interface)
@@ -97,27 +97,27 @@ def main():
     for (dev, config, intf) in com_devices():
         try:
             com = neug(dev, config, intf)
-            print "Device: ", dev.filename
-            print "Configuration: ", config.value
-            print "Interface: ", intf.interfaceNumber
+            print("Device: %s" % dev.filename)
+            print("Configuration: %d" % config.value)
+            print("Interface: %d" % intf.interfaceNumber)
             break
         except:
             pass
     if not com:
-        raise ValueError, "No NeuG Device Present"
-    print
+        raise ValueError("No NeuG Device Present")
+    print("")
     for i in range(1,7):
         s = com.get_string(i, 512)
-        print "%9s: %s" % (field[i], s)
-    print
-    print "mode: %s" % com.get_mode()
-    print "Repeat errors: %d" % com.get_info(2)
-    print "PP 64  errors: %d" % com.get_info(3)
-    print "PP 4k  errors: %d" % com.get_info(4)
-    print "Total  errors: %d" % com.get_info(1)
-    print "Repeat max counts: %d" % com.get_info(5)
-    print "PP 64  max counts: %d" % com.get_info(6)
-    print "PP 4k  max counts: %d" % com.get_info(7)
+        print("%9s: %s" % (field[i], s))
+    print("")
+    print("mode: %s" % com.get_mode()
+    print("Repeat errors: %d" % com.get_info(2))
+    print("PP 64  errors: %d" % com.get_info(3))
+    print("PP 4k  errors: %d" % com.get_info(4))
+    print("Total  errors: %d" % com.get_info(1))
+    print("Repeat max counts: %d" % com.get_info(5))
+    print("PP 64  max counts: %d" % com.get_info(6))
+    print("PP 4k  max counts: %d" % com.get_info(7))
     return 0
 
 
