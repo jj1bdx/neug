@@ -1,3 +1,9 @@
+2015-07-08  Niibe Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update to 0.06.
+
+	* src/configure (help): Add other boards.
+
 2015-06-30  Niibe Yutaka  <gniibe@fsij.org>
 
 	* tool/neug_check.py: Fix raise and print statements.

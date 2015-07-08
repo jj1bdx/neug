@@ -8,7 +8,7 @@ NeuG NEWS - User visible changes
 The process is protected by password.
 
 ** Upgrade of Chopstx
-We use Chopstx 0.06.
+We use Chopstx 0.06, which supports STM32 Primer2, CQ STARM.
 
 
 * Major changes in NeuG 1.0.1
