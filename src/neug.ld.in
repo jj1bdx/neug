@@ -141,6 +141,7 @@ SECTIONS
     {
         . = ALIGN (@FLASH_PAGE_SIZE@);
 	*(.passwd)
+        . = ALIGN(2);
     } > flash =0xffffffff
 }
 

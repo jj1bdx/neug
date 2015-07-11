@@ -1,3 +1,7 @@
+2015-07-11  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/neug.ld.in (.fill_ffff): Add ALIGN 2.
+
 2015-07-08  Niibe Yutaka  <gniibe@fsij.org>
 
 	* chopstx: Update to 0.06.
