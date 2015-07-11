@@ -110,7 +110,7 @@ def main():
         s = com.get_string(i, 512)
         print("%9s: %s" % (field[i], s))
     print("")
-    print("mode: %s" % com.get_mode()
+    print("mode: %s" % com.get_mode())
     print("Repeat errors: %d" % com.get_info(2))
     print("PP 64  errors: %d" % com.get_info(3))
     print("PP 4k  errors: %d" % com.get_info(4))
