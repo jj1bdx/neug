@@ -280,8 +280,6 @@ uint16_t neug_rc_max;
 uint16_t neug_p64_max;
 uint16_t neug_p4k_max;
 
-#include "board.h"
-
 static void noise_source_cnt_max_reset (void)
 {
   neug_err_cnt = neug_err_cnt_rc = neug_err_cnt_p64 = neug_err_cnt_p4k = 0;

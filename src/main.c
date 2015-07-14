@@ -226,7 +226,7 @@ uint8_t neug_passwd[33] __attribute__ ((section(".passwd"))) = {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 };
-static uint8_t passwd_data[33];
+static uint8_t usbbuf[64];
 
 #define DEFAULT_PASSWD "12345678"
 #define DEFAULT_PASSWD_LEN 8
@@ -236,10 +236,10 @@ static void set_passwd (void)
   flash_unlock ();
   if (neug_passwd[0] != 0xff)
     flash_erase_page ((uint32_t)neug_passwd);
-  if (passwd_data[0] == DEFAULT_PASSWD_LEN
-      && !memcmp (passwd_data + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
+  if (usbbuf[0] == DEFAULT_PASSWD_LEN
+      && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
     return;
-  flash_write ((uint32_t)neug_passwd, passwd_data, passwd_data[0] + 1);
+  flash_write ((uint32_t)neug_passwd, usbbuf, usbbuf[0] + 1);
 }
 
 static uint32_t rbit (uint32_t v)
@@ -290,10 +290,10 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	set_passwd ();
       else if (req_no == USB_NEUG_EXIT)
 	{
-	  if ((neug_passwd[0] == 0xff && passwd_data[0] == DEFAULT_PASSWD_LEN
-	       && !memcmp (passwd_data + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
-	      || (neug_passwd[0] == passwd_data[0]
-		  && !memcmp (neug_passwd+1, passwd_data+1, neug_passwd[0])))
+	  if ((neug_passwd[0] == 0xff && usbbuf[0] == DEFAULT_PASSWD_LEN
+	       && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
+	      || (neug_passwd[0] == usbbuf[0]
+		  && !memcmp (neug_passwd+1, usbbuf+1, neug_passwd[0])))
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
@@ -452,8 +452,8 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	    }
 	  else if (req_no == USB_NEUG_SET_PASSWD && len <= 32)
 	    {
-	      passwd_data[0] = len;
-	      usb_lld_set_data_to_recv (passwd_data + 1, len);
+	      usbbuf[0] = len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, len);
 	      return USB_SUCCESS;
 	    }
 	  else if (req_no == USB_NEUG_EXIT && len <= 32)
@@ -466,8 +466,8 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      passwd_data[0] = len;
-	      usb_lld_set_data_to_recv (passwd_data + 1, len);
+	      usbbuf[0] = len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, len);
 	      return USB_SUCCESS;
 	    }
 	}
@@ -549,6 +549,23 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	case 6:
 	  str = sys_version;
 	  size = sizeof (sys_version);
+	  break;
+	case 7:
+	  {
+	    int i;
+	    str = usbbuf;
+	    for (i = 0; i < (int)sizeof (usbbuf)/2 - 2; i++)
+	      {
+		if (sys_board_name[i] == 0)
+		  break;
+
+		usbbuf[i*2+2] = sys_board_name[i];
+		usbbuf[i*2+3] = 0;
+	      }
+	    usbbuf[0] = i*2 + 2;
+	    usbbuf[1] = USB_STRING_DESCRIPTOR_TYPE;
+	    size = i*2 + 2;
+	  }
 	  break;
 	default:
 	  return USB_UNSUPPORT;

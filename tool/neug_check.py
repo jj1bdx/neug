@@ -3,7 +3,7 @@
 """
 neug_check.py - a tool to check NeuG device
 
-Copyright (C) 2012 Free Software Initiative of Japan
+Copyright (C) 2012, 2015 Free Software Initiative of Japan
 Author: NIIBE Yutaka <gniibe@fsij.org>
 
 This file is a part of NeuG, a TRNG implementation.
@@ -90,7 +90,7 @@ def com_devices():
                                 alt.interfaceProtocol == COM_PROTOCOL_0:
                             yield dev, config, alt
 
-field = [ '', 'Vendor', 'Product', 'Serial', 'Revision', 'Config', 'Sys' ]
+field = ['', 'Vendor', 'Product', 'Serial', 'Revision', 'Config', 'Sys', 'Board']
 
 def main():
     com = None
@@ -106,7 +106,7 @@ def main():
     if not com:
         raise ValueError("No NeuG Device Present")
     print("")
-    for i in range(1,7):
+    for i in range(1,8):
         s = com.get_string(i, 512)
         print("%9s: %s" % (field[i], s))
     print("")
