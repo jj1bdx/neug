@@ -14,10 +14,6 @@ MEMORY
     ram : org = 0x20000000, len = @MEMORY_SIZE@k
 }
 
-/* __flash_start__: flash ROM start address regardless of DFU_SUPPORT */
-__flash_start__         = 0x08001000;
-__flash_end__           = ORIGIN(flash) + LENGTH(flash);
-
 __ram_start__           = ORIGIN(ram);
 __ram_size__            = LENGTH(ram);
 __ram_end__             = __ram_start__ + __ram_size__;
@@ -28,18 +24,20 @@ SECTIONS
 
     .sys : ALIGN(4) SUBALIGN(4)
     {
-        _sys = .;
-        KEEP(*(.vectors))
-        . = ALIGN(16);
-        *(.sys.version)
-        build/sys.o(.text)
-        build/sys.o(.text.*)
-        build/sys.o(.rodata)
-        build/sys.o(.rodata.*)
-        . = ALIGN(1024);
-        *(.sys.0)
-        *(.sys.1)
-        *(.sys.2)
+	_sys = .;
+	KEEP(*(.vectors))
+	. = ALIGN(16);
+	KEEP(*(.sys.version))
+	KEEP(*(.sys.board_id))
+	KEEP(*(.sys.board_name))
+	build/sys.o(.text)
+	build/sys.o(.text.*)
+	build/sys.o(.rodata)
+	build/sys.o(.rodata.*)
+	. = ALIGN(1024);
+	*(.sys.0)
+	*(.sys.1)
+	*(.sys.2)
     } > flash0
 
     _text = .;
@@ -131,6 +129,7 @@ SECTIONS
         PROVIDE(_bss_end = .);
     } > ram
 
+    . = ALIGN(16);
     PROVIDE(end = .);
     _end            = .;
     . = ALIGN(512);
@@ -141,7 +140,7 @@ SECTIONS
     {
         . = ALIGN (@FLASH_PAGE_SIZE@);
 	*(.passwd)
-        . = ALIGN(2);
+        . = ALIGN(4);
     } > flash =0xffffffff
 }
 

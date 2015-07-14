@@ -1,3 +1,8 @@
+2015-07-14  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/{sys.c,sys.h}: Update to 2.1 from chopstx.
+	* src/main.c (main): Determine flash page size at runtime.
+
 2015-07-11  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/neug.ld.in (.fill_ffff): Add ALIGN 2.
