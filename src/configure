@@ -60,9 +60,9 @@ for option; do
   --vidpid=*)
     vidpid=$optarg ;;
   --enable-sys1-compat)
-    sys1_compat = yes ;;
+    sys1_compat=yes ;;
   --disable-sys1-compat)
-    sys1_compat = no ;;
+    sys1_compat=no ;;
   --with-dfu)
     with_dfu=yes ;;
   --without-dfu)
@@ -256,7 +256,7 @@ then
 fi
 
 if test "$sys1_compat" = "no"; then
-   # Disable when you are sure that it's sys version 2.0.
+   # Disable when you are sure that it's sys version 2.1.
    # Note that Gnuk 1.0 and NeuG (until 0.06) uses sys version 1.0.
    # Disabling the compatibility, executable will be target independent,
    # assuming the clock initialization will be done by SYS (before entry).

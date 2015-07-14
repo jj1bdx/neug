@@ -1,5 +1,10 @@
 2015-07-14  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/configurew (sys1_compat): Fix assignment syntax.
+
+	* src/adc_stm32f103.c (get_adc_config): New.  Consolidate knowlege
+	of boards for ADC usage.
+
 	* src/neug.c: Remove inclusion of "board.h".
 
 	* tool/neug_check.py (field): New field 'Board'.
