@@ -1,7 +1,13 @@
 2015-07-14  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/neug.c: Remove inclusion of "board.h".
+
+	* tool/neug_check.py (field): New field 'Board'.
 	* src/{sys.c,sys.h}: Update to 2.1 from chopstx.
 	* src/main.c (main): Determine flash page size at runtime.
+	(usbbuf): New.  Use for passwd and string transfer.
+	(usb_cb_get_descriptor): Support sys_board_name.
+	* src/neug.ld.in: Update for sys 2.1.
 
 2015-07-11  Niibe Yutaka  <gniibe@fsij.org>
 
