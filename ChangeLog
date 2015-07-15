@@ -1,6 +1,13 @@
+2015-07-15  Niibe Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update to 0.07.
+	* src/sys.c: Update to 2.1 from chopstx.
+	* src/sys.h: Likewise.
+	* tool/openocd-script: Fix for newer OpenOCD.
+
 2015-07-14  Niibe Yutaka  <gniibe@fsij.org>
 
-	* src/configurew (sys1_compat): Fix assignment syntax.
+	* src/configure (sys1_compat): Fix assignment syntax.
 
 	* src/adc_stm32f103.c (get_adc_config): New.  Consolidate knowlege
 	of boards for ADC usage.
@@ -8,7 +15,6 @@
 	* src/neug.c: Remove inclusion of "board.h".
 
 	* tool/neug_check.py (field): New field 'Board'.
-	* src/{sys.c,sys.h}: Update to 2.1 from chopstx.
 	* src/main.c (main): Determine flash page size at runtime.
 	(usbbuf): New.  Use for passwd and string transfer.
 	(usb_cb_get_descriptor): Support sys_board_name.
@@ -16,7 +22,7 @@
 
 2015-07-11  Niibe Yutaka  <gniibe@fsij.org>
 
-	* src/neug.ld.in (.fill_ffff): Add ALIGN 2.
+	* src/neug.ld.in (.fill_ffff): Add ALIGN 4.
 
 2015-07-08  Niibe Yutaka  <gniibe@fsij.org>
 
