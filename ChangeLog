@@ -1,5 +1,9 @@
 2015-07-15  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/usb_lld.h: Update from Gnuk.
+	* src/usb_stm32f103.c: Likewise.
+	* src/main.c (usb_cb_get_descriptor): Follow the change.
+
 	* chopstx: Update to 0.07.
 	* src/sys.c: Update to 2.1 from chopstx.
 	* src/sys.h: Likewise.

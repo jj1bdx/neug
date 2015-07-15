@@ -2,13 +2,13 @@ NeuG NEWS - User visible changes
 
 * Major changes in NeuG 1.0.2
 
-  Released 2015-09-XX, by NIIBE Yutaka
+  Released 2015-07-17, by NIIBE Yutaka
 
 ** Upgrade of firmware enhancement
 The process is protected by password.
 
 ** Upgrade of Chopstx
-We use Chopstx 0.06, which supports STM32 Primer2, CQ STARM.
+We use Chopstx 0.07, which supports STM32 Primer2, CQ STARM.
 
 
 * Major changes in NeuG 1.0.1
