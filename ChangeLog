@@ -1,3 +1,9 @@
+2015-07-16  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/config.h.in (@TARGET_DEFINE@): Remove.
+	* src/configure [--with-dfu] (HEXOUTPUT_MAKE_OPTION): Enable .hex
+	output.
+
 2015-07-15  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/usb_lld.h: Update from Gnuk.
