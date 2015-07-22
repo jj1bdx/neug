@@ -1,6 +1,6 @@
 [submodule "chopstx"]
 	path = chopstx
-	url = ../../chopstx/chopstx.git
+	url = git://git.gniibe.org/chopstx/chopstx.git
 [submodule "fraucheky"]
 	path = fraucheky
-	url = ../../chopstx/fraucheky.git
+	url = git://git.gniibe.org/chopstx/fraucheky.git
