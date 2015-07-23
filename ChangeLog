@@ -1,3 +1,9 @@
+2015-07-23  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/configure (nl): New.  '\n' in sed replacement text is not
+	portable and break FreeBSD or MacOS X built.
+	Reported by Kanji Rikitake.
+
 2015-07-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* VERSION: 1.0.2.
