@@ -1,7 +1,7 @@
 [submodule "chopstx"]
     path = chopstx
     url = ssh://git@github.com/jj1bdx/chopstx.git
-    branch = jj1bdx-dev-0.07
+	branch = jj1bdx-dev-0.07
 [submodule "fraucheky"]
     path = fraucheky
     url = ssh://git@github.com/jj1bdx/fraucheky.git
