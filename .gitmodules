@@ -5,4 +5,4 @@
 [submodule "fraucheky"]
     path = fraucheky
     url = ssh://git@github.com/jj1bdx/fraucheky.git
-    branch = jj1bdx-dev-0.02
+    branch = jj1bdx-dev-0.2
