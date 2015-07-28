@@ -5,6 +5,10 @@
 	* src/main.c (usb_cb_ctrl_write_finish, vcom_port_data_setup)
 	(usb_cb_setup, usb_cb_get_descriptor, usb_cb_interface): Follow
 	the API change of USB driver.
+	(FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED): New.
+	(NEUG_SPECIAL_BITRATE): New.
+	(usb_cb_ctrl_write_finish, main): Special bitrate to invoke
+	Fraucheky manually.
 
 2015-07-23  Niibe Yutaka  <gniibe@fsij.org>
 

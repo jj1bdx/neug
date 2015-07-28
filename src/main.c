@@ -41,6 +41,7 @@ enum {
   FSIJ_DEVICE_EXITED,
   FSIJ_DEVICE_EXEC_REQUESTED,
   /**/
+  FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED = 254,
   FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
 }; 
 
@@ -270,6 +271,24 @@ static int download_check_crc32 (const uint32_t *end_p)
   return USB_UNSUPPORT;
 }
 
+
+#define NEUG_SPECIAL_BITRATE 110
+
+struct line_coding
+{
+  uint32_t bitrate;
+  uint8_t format;
+  uint8_t paritytype;
+  uint8_t datatype;
+} __attribute__((packed));
+
+static struct line_coding line_coding = {
+  115200, /* baud rate: 115200    */
+  0x00,   /* stop bits: 1         */
+  0x00,   /* parity:    none      */
+  0x08    /* bits:      8         */
+};
+
 void
 usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 {
@@ -305,37 +324,39 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
-	   && USB_SETUP_SET (req)
-	   && req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
+	   && USB_SETUP_SET (req))
     {
-      /* Open/close the connection.  */
-      chopstx_mutex_lock (&usb_mtx);
-      connected = (value != 0)? 1 : 0;
-      if (wait_usb_connection)
-	{			/* It is waiting a connection.  */
-	  if (connected)	/* It's now connected.  */
-	    chopstx_wakeup_usec_wait (main_thd);
+      if (req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
+	{
+	  /* Open/close the connection.  */
+	  chopstx_mutex_lock (&usb_mtx);
+	  connected = (value != 0)? 1 : 0;
+	  if (wait_usb_connection)
+	    {			/* It is waiting a connection.  */
+	      if (connected)	/* It's now connected.  */
+		chopstx_wakeup_usec_wait (main_thd);
+	    }
+	  else
+	    chopstx_cond_signal (&cnd_usb);
+	  chopstx_mutex_unlock (&usb_mtx);
 	}
-      else
-	chopstx_cond_signal (&cnd_usb);
-      chopstx_mutex_unlock (&usb_mtx);
+#ifdef FRAUCHEKY_SUPPORT
+      else if (req_no == USB_CDC_REQ_SET_LINE_CODING)
+	{
+	  chopstx_mutex_lock (&usb_mtx);
+	  if (line_coding.bitrate == NEUG_SPECIAL_BITRATE)
+	    {
+	      fsij_device_state = FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED;
+	      chopstx_wakeup_usec_wait (main_thd);
+	      chopstx_cond_signal (&cnd_usb);
+	    }
+	  else if (fsij_device_state == FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED)
+	    fsij_device_state = FSIJ_DEVICE_RUNNING;
+	  chopstx_mutex_unlock (&usb_mtx);
+	}
+#endif
     }
 }
-
-struct line_coding
-{
-  uint32_t bitrate;
-  uint8_t format;
-  uint8_t paritytype;
-  uint8_t datatype;
-} __attribute__((packed));
-
-static struct line_coding line_coding = {
-  115200, /* baud rate: 115200    */
-  0x00,   /* stop bits: 1         */
-  0x00,   /* parity:    none      */
-  0x08    /* bits:      8         */
-};
 
 
 static int
@@ -817,8 +838,6 @@ led_blinker (void *arg)
       eventmask_t m;
 
       m = event_flag_waitone (&led_event, ALL_EVENTS);
-      if (fsij_device_state != FSIJ_DEVICE_RUNNING) /* No usb_mtx lock.  */
-	break;
 
       set_led (1);
       if (m == LED_ONESHOT_SHORT)
@@ -889,14 +908,14 @@ main (int argc, char **argv)
   chopstx_mutex_init (&usb_mtx);
   chopstx_cond_init (&cnd_usb);
 
-  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
-			       led_blinker, NULL);
-
 #ifdef FRAUCHEKY_SUPPORT
   if (fraucheky_enabled ())
     {
+    go_fraucheky:
+      running_neug = 0;
       usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
 				usb_intr, NULL);
+      set_led (1);
       fraucheky_main ();
       chopstx_cancel (usb_thd);
       chopstx_join (usb_thd, NULL);
@@ -905,6 +924,9 @@ main (int argc, char **argv)
 
   running_neug = 1;
 #endif
+
+  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
+			       led_blinker, NULL);
 
   usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
 			    usb_intr, NULL);
@@ -1016,11 +1038,34 @@ main (int argc, char **argv)
   chopstx_join (led_thread, NULL);
 
   /*
-   * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED.
+   * We come here, because of FSIJ_DEVICE_NEUG_EXIT_REQUESTED
+   * or FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED.
    */
   neug_fini ();
 
   chopstx_mutex_lock (&usb_mtx);
+#ifdef FRAUCHEKY_SUPPORT
+  if (line_coding.bitrate == NEUG_SPECIAL_BITRATE)
+    {
+      while (fsij_device_state == FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED)
+	{
+	  chopstx_mutex_unlock (&usb_mtx);
+	  set_led (1);
+	  chopstx_usec_wait (500*1000);
+	  set_led (0);
+	  chopstx_usec_wait (500*1000);
+	  chopstx_mutex_lock (&usb_mtx);
+	}
+
+      usb_lld_prepare_shutdown ();
+      chopstx_mutex_unlock (&usb_mtx);
+      chopstx_cancel (usb_thd);
+      chopstx_join (usb_thd, NULL);
+      usb_lld_shutdown ();
+      goto go_fraucheky;
+    }
+#endif
+
   fsij_device_state = FSIJ_DEVICE_EXITED;
 
   while (fsij_device_state == FSIJ_DEVICE_EXITED)
