@@ -2,7 +2,8 @@
  * main.c - main routine of neug
  *
  * Main routine:
- * Copyright (C) 2011, 2012, 2013 Free Software Initiative of Japan
+ * Copyright (C) 2011, 2012, 2013, 2015
+ *		 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
  * This file is a part of NeuG, a True Random Number Generator
@@ -86,7 +87,7 @@ static const uint8_t vcom_device_desc[18] = {
 };
 
 /* Configuration Descriptor tree for a CDC.*/
-static const uint8_t vcom_configuration_desc[67] = {
+static const uint8_t vcom_config_desc[67] = {
   9,
   USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
   /* Configuration Descriptor.*/
@@ -185,10 +186,11 @@ extern int fraucheky_enabled (void);
 extern void fraucheky_main (void);
 
 extern void fraucheky_setup_endpoints_for_interface (int stop);
-extern int fraucheky_setup (uint8_t req, uint8_t req_no, uint16_t value,
-			    uint16_t len);
+extern int fraucheky_setup (uint8_t req, uint8_t req_no,
+			    struct control_info *detail);
 extern int fraucheky_get_descriptor (uint8_t rcp, uint8_t desc_type,
-				     uint8_t desc_index, uint16_t index);
+				     uint8_t desc_index,
+				     struct control_info *detail);
 #endif
 
 #define NUM_INTERFACES 2
@@ -200,7 +202,7 @@ usb_cb_device_reset (void)
   usb_lld_set_configuration (0);
 
   /* Current Feature initialization */
-  usb_lld_set_feature (vcom_configuration_desc[7]);
+  usb_lld_set_feature (vcom_config_desc[7]);
 
   usb_lld_reset ();
 
@@ -269,14 +271,13 @@ static int download_check_crc32 (const uint32_t *end_p)
 }
 
 void
-usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
-			  uint16_t index, uint16_t len)
+usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
   if (type_rcp == (VENDOR_REQUEST | DEVICE_RECIPIENT) && USB_SETUP_SET (req))
     {
-      if (req_no == USB_FSIJ_EXEC && len == 0)
+      if (req_no == USB_FSIJ_EXEC)
 	{
 	  chopstx_mutex_lock (&usb_mtx);
 	  if (fsij_device_state == FSIJ_DEVICE_EXITED)
@@ -304,7 +305,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value,
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
-	   && index == 0 && USB_SETUP_SET (req)
+	   && USB_SETUP_SET (req)
 	   && req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
     {
       /* Open/close the connection.  */
@@ -338,23 +339,17 @@ static struct line_coding line_coding = {
 
 
 static int
-vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value,
-		      uint16_t len)
+vcom_port_data_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 {
-  (void)value;
   if (USB_SETUP_GET (req))
     {
-      if (req_no == USB_CDC_REQ_GET_LINE_CODING
-	  && len == sizeof (line_coding))
-	{
-	  usb_lld_set_data_to_send (&line_coding, sizeof (line_coding));
-	  return USB_SUCCESS;
-	}
+      if (req_no == USB_CDC_REQ_GET_LINE_CODING)
+	return usb_lld_reply_request (&line_coding, sizeof(line_coding), detail);
     }
   else  /* USB_SETUP_SET (req) */
     {
       if (req_no == USB_CDC_REQ_SET_LINE_CODING
-	  && len == sizeof (line_coding))
+	  && detail->len == sizeof (line_coding))
 	{
 	  usb_lld_set_data_to_recv (&line_coding, sizeof (line_coding));
 	  return USB_SUCCESS;
@@ -367,8 +362,7 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, uint16_t value,
 }
 
 int
-usb_cb_setup (uint8_t req, uint8_t req_no,
-	       uint16_t value, uint16_t index, uint16_t len)
+usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
@@ -385,27 +379,27 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		  return USB_UNSUPPORT;
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
-	      usb_lld_set_data_to_send (mem_info, sizeof (mem_info));
+	      usb_lld_reply_request (mem_info, sizeof (mem_info), detail);
 	      return USB_SUCCESS;
 	    }
 	  else if (req_no == USB_NEUG_GET_INFO)
 	    {
-	      if (index == 0)
-		usb_lld_set_data_to_send (&neug_mode, sizeof (uint8_t));
-	      else if (index == 1)
-		usb_lld_set_data_to_send (&neug_err_cnt, sizeof (uint16_t));
-	      else if (index == 2)
-		usb_lld_set_data_to_send (&neug_err_cnt_rc, sizeof (uint16_t));
-	      else if (index == 3)
-		usb_lld_set_data_to_send (&neug_err_cnt_p64, sizeof (uint16_t));
-	      else if (index == 4)
-		usb_lld_set_data_to_send (&neug_err_cnt_p4k, sizeof (uint16_t));
-	      else if (index == 5)
-		usb_lld_set_data_to_send (&neug_rc_max, sizeof (uint16_t));
-	      else if (index == 6)
-		usb_lld_set_data_to_send (&neug_p64_max, sizeof (uint16_t));
-	      else if (index == 7)
-		usb_lld_set_data_to_send (&neug_p4k_max, sizeof (uint16_t));
+	      if (detail->index == 0)
+		usb_lld_reply_request (&neug_mode, sizeof (uint8_t), detail);
+	      else if (detail->index == 1)
+		usb_lld_reply_request (&neug_err_cnt, sizeof (uint16_t), detail);
+	      else if (detail->index == 2)
+		usb_lld_reply_request (&neug_err_cnt_rc, sizeof (uint16_t), detail);
+	      else if (detail->index == 3)
+		usb_lld_reply_request (&neug_err_cnt_p64, sizeof (uint16_t), detail);
+	      else if (detail->index == 4)
+		usb_lld_reply_request (&neug_err_cnt_p4k, sizeof (uint16_t), detail);
+	      else if (detail->index == 5)
+		usb_lld_reply_request (&neug_rc_max, sizeof (uint16_t), detail);
+	      else if (detail->index == 6)
+		usb_lld_reply_request (&neug_p64_max, sizeof (uint16_t), detail);
+	      else if (detail->index == 7)
+		usb_lld_reply_request (&neug_p4k_max, sizeof (uint16_t), detail);
 	      else
 		return USB_UNSUPPORT;
 
@@ -414,7 +408,7 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 	}
       else /* SETUP_SET */
 	{
-	  uint8_t *addr = (uint8_t *)(0x20000000 + value * 0x100 + index);
+	  uint8_t *addr = (uint8_t *)(0x20000000 + detail->value * 0x100 + detail->index);
 
 	  if (req_no == USB_FSIJ_DOWNLOAD)
 	    {
@@ -426,16 +420,16 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      if (addr < &_regnual_start || addr + len > &__heap_end__)
+	      if (addr < &_regnual_start || addr + detail->len > &__heap_end__)
 		return USB_UNSUPPORT;
 
-	      if (index + len < 256)
-		memset (addr + index + len, 0, 256 - (index + len));
+	      if (detail->index + detail->len < 256)
+		memset (addr + detail->index + detail->len, 0, 256 - (detail->index + detail->len));
 
-	      usb_lld_set_data_to_recv (addr, len);
+	      usb_lld_set_data_to_recv (addr, detail->len);
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_FSIJ_EXEC && len == 0)
+	  else if (req_no == USB_FSIJ_EXEC && detail->len == 0)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
@@ -450,13 +444,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 
 	      return download_check_crc32 ((uint32_t *)addr);
 	    }
-	  else if (req_no == USB_NEUG_SET_PASSWD && len <= 32)
+	  else if (req_no == USB_NEUG_SET_PASSWD && detail->len <= 32)
 	    {
-	      usbbuf[0] = len;
-	      usb_lld_set_data_to_recv (usbbuf + 1, len);
+	      usbbuf[0] = detail->len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_NEUG_EXIT && len <= 32)
+	  else if (req_no == USB_NEUG_EXIT && detail->len <= 32)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -466,25 +460,23 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      usbbuf[0] = len;
-	      usb_lld_set_data_to_recv (usbbuf + 1, len);
+	      usbbuf[0] = detail->len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
 	      return USB_SUCCESS;
 	    }
 	}
     }
-  else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT))
+  else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
+	   && detail->index == 0)
     {
-      if (index == 0)
-	{
 #ifdef FRAUCHEKY_SUPPORT
-	  if (running_neug)
-	    return vcom_port_data_setup (req, req_no, value, len);
-	  else
-	    fraucheky_setup (req, req_no, value, len);
+      if (running_neug)
+	return vcom_port_data_setup (req, req_no, detail);
+      else
+	fraucheky_setup (req, req_no, detail);
 #else
-	  return vcom_port_data_setup (req, req_no, value, len);
+      return vcom_port_data_setup (req, req_no, detail);
 #endif
-	}
     }
 
   return USB_UNSUPPORT;
@@ -492,30 +484,22 @@ usb_cb_setup (uint8_t req, uint8_t req_no,
 
 int
 usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
-		       uint16_t index, uint16_t length)
+		       struct control_info *detail)
 {
-  (void)length;
 #ifdef FRAUCHEKY_SUPPORT
   if (!running_neug)
-    return fraucheky_get_descriptor (rcp, desc_type, desc_index, index);
-#else
-  (void)index;
+    return fraucheky_get_descriptor (rcp, desc_type, desc_index, detail);
 #endif
 
   if (rcp != DEVICE_RECIPIENT)
     return USB_UNSUPPORT;
 
   if (desc_type == DEVICE_DESCRIPTOR)
-    {
-      usb_lld_set_data_to_send (vcom_device_desc, sizeof (vcom_device_desc));
-      return USB_SUCCESS;
-    }
+    return usb_lld_reply_request (vcom_device_desc, sizeof (vcom_device_desc),
+				  detail);
   else if (desc_type == CONFIG_DESCRIPTOR)
-    {
-      usb_lld_set_data_to_send (vcom_configuration_desc,
-				sizeof (vcom_configuration_desc));
-      return USB_SUCCESS;
-    }
+    return usb_lld_reply_request (vcom_config_desc, sizeof (vcom_config_desc),
+				  detail);
   else if (desc_type == STRING_DESCRIPTOR)
     {
       const uint8_t *str;
@@ -572,8 +556,7 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	  return USB_UNSUPPORT;
 	}
 
-      usb_lld_set_data_to_send (str, size);
-      return USB_SUCCESS;
+      return usb_lld_reply_request (str, size, detail);
     }
 
   return USB_UNSUPPORT;
@@ -666,9 +649,11 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 }
 
 
-int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
+int usb_cb_interface (uint8_t cmd, struct control_info *detail)
 {
-  static uint8_t zero = 0;
+  const uint8_t zero = 0;
+  uint16_t interface = detail->index;
+  uint16_t alt = detail->value;
 
   if (interface >= NUM_INTERFACES)
     return USB_UNSUPPORT;
@@ -685,7 +670,7 @@ int usb_cb_interface (uint8_t cmd, uint16_t interface, uint16_t alt)
 	}
 
     case USB_GET_INTERFACE:
-      usb_lld_set_data_to_send (&zero, 1);
+      usb_lld_reply_request (&zero, 1, detail);
       return USB_SUCCESS;
 
     default:
@@ -703,7 +688,7 @@ usb_intr (void *arg)
   chopstx_intr_t interrupt;
 
   (void)arg;
-  usb_lld_init (vcom_configuration_desc[7]);
+  usb_lld_init (vcom_config_desc[7]);
   chopstx_claim_irq (&interrupt, INTR_REQ_USB);
   usb_interrupt_handler ();
 
