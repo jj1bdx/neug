@@ -1,5 +1,14 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 1.0.3
+
+  Released 2015-0X-XX, by NIIBE Yutaka
+
+** Fraucheky can be manually invoked
+
+** Upgrade of Chopstx
+
+
 * Major changes in NeuG 1.0.2
 
   Released 2015-07-18, by NIIBE Yutaka

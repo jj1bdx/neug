@@ -1,3 +1,9 @@
+2015-07-30  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/sys.h (BOARD_ID_ST_NUCLEO_F103, BOARD_ID_ST_DONGLE): New.
+	* src/adc_stm32f103.c (get_adc_config): Add ST Dongle and ST
+	Nucleo support.
+
 2015-07-28  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/usb_stm32f103.c: Update from Gnuk.
