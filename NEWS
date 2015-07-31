@@ -7,6 +7,10 @@ NeuG NEWS - User visible changes
 ** Fraucheky can be manually invoked
 
 ** Upgrade of Chopstx
+We use Chopstx 0.07, which supports more boards.
+
+** Upgrade of Fraucheky
+We use Fraucheky 0.3, which can work well with FreeBSD.
 
 
 * Major changes in NeuG 1.0.2
