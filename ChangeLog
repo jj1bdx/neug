@@ -1,3 +1,19 @@
+2015-08-03  Niibe Yutaka  <gniibe@fsij.org>
+
+	* VERSION: 1.0.3.
+
+	* tool/neug_upgrade.py (neug.download, neug.execute)
+	(regnual.download): Python3 fix.
+
+	* tool/neug_check.py (main): Python3 fix.
+
+2015-07-31  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/configure (output_vendor_product_serial_strings): Fix sed
+	script when string is short.  Remove empty line.
+	* fraucheky: Update to 0.3.
+	* chopstx: Update to 0.08.
+
 2015-07-30  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/sys.h (BOARD_ID_ST_NUCLEO_F103, BOARD_ID_ST_DONGLE): New.

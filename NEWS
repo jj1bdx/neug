@@ -2,11 +2,17 @@ NeuG NEWS - User visible changes
 
 * Major changes in NeuG 1.0.3
 
-  Released 2015-0X-XX, by NIIBE Yutaka
+  Released 2015-08-03, by NIIBE Yutaka
 
 ** Fraucheky can be manually invoked
+Even if Fraucheky is disabled at start by moving files to DROPHERE,
+a user can invoke Fraucheky to see documents, now.
 
 ** Upgrade of Chopstx
+We use Chopstx 0.08, which supports ST-Dongle and STM32 Nucleo F103.
+
+** Upgrade of Fraucheky
+We use Fraucheky 0.3, which can work well with FreeBSD.
 
 
 * Major changes in NeuG 1.0.2

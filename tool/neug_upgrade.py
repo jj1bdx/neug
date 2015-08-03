@@ -56,7 +56,7 @@ class regnual(object):
 
     def mem_info(self):
         mem = self.__devhandle.controlMsg(requestType = 0xc0, request = 0,
-                                          value = 0, index = 0, buffer = 8,
+                                          buffer = 8, value = 0, index = 0,
                                           timeout = 10000)
         start = ((mem[3]*256 + mem[2])*256 + mem[1])*256 + mem[0]
         end = ((mem[7]*256 + mem[6])*256 + mem[5])*256 + mem[4]
@@ -65,7 +65,7 @@ class regnual(object):
     def download(self, start, data, verbose=False):
         addr = start
         addr_end = (start + len(data)) & 0xffffff00
-        i = (addr - 0x08000000) / 0x100
+        i = int((addr - 0x08000000) / 0x100)
         j = 0
         print("start %08x" % addr)
         print("end   %08x" % addr_end)
@@ -73,23 +73,22 @@ class regnual(object):
             if verbose:
                 print("# %08x: %d: %d : %d" % (addr, i, j, 256))
             self.__devhandle.controlMsg(requestType = 0x40, request = 1,
-                                        value = 0, index = 0,
                                         buffer = data[j*256:j*256+256],
+                                        value = 0, index = 0,
                                         timeout = 10000)
             crc32code = crc32(data[j*256:j*256+256])
             res = self.__devhandle.controlMsg(requestType = 0xc0, request = 2,
-                                              value = 0, index = 0, buffer = 4,
+                                              buffer = 4, value = 0, index = 0,
                                               timeout = 10000)
             r_value = ((res[3]*256 + res[2])*256 + res[1])*256 + res[0]
             if (crc32code ^ r_value) != 0xffffffff:
                 print("failure")
             self.__devhandle.controlMsg(requestType = 0x40, request = 3,
-                                        value = i, index = 0,
-                                        buffer = None,
+                                        buffer = None, value = i, index = 0,
                                         timeout = 10000)
             time.sleep(0.010)
             res = self.__devhandle.controlMsg(requestType = 0xc0, request = 2,
-                                              value = 0, index = 0, buffer = 4,
+                                              buffer = 4, value = 0, index = 0,
                                               timeout = 10000)
             r_value = ((res[3]*256 + res[2])*256 + res[1])*256 + res[0]
             if r_value == 0:
@@ -102,23 +101,21 @@ class regnual(object):
             if verbose:
                 print("# %08x: %d : %d" % (addr, i, residue))
             self.__devhandle.controlMsg(requestType = 0x40, request = 1,
-                                        value = 0, index = 0,
                                         buffer = data[j*256:],
-                                        timeout = 10000)
-            crc32code = crc32(data[j*256:].ljust(256,chr(255)))
+                                        value = 0, index = 0, timeout = 10000)
+            crc32code = crc32(data[j*256:].ljust(256,b'\xff'))
             res = self.__devhandle.controlMsg(requestType = 0xc0, request = 2,
-                                              value = 0, index = 0, buffer = 4,
+                                              buffer = 4, value = 0, index = 0,
                                               timeout = 10000)
             r_value = ((res[3]*256 + res[2])*256 + res[1])*256 + res[0]
             if (crc32code ^ r_value) != 0xffffffff:
                 print("failure")
             self.__devhandle.controlMsg(requestType = 0x40, request = 3,
-                                        value = i, index = 0,
-                                        buffer = None,
+                                        buffer = None, value = i, index = 0,
                                         timeout = 10000)
             time.sleep(0.010)
             res = self.__devhandle.controlMsg(requestType = 0xc0, request = 2,
-                                              value = 0, index = 0, buffer = 4,
+                                              buffer = 4, value = 0, index = 0,
                                               timeout = 10000)
             r_value = ((res[3]*256 + res[2])*256 + res[1])*256 + res[0]
             if r_value == 0:
@@ -126,11 +123,11 @@ class regnual(object):
 
     def protect(self):
         self.__devhandle.controlMsg(requestType = 0x40, request = 4,
-                                    value = 0, index = 0, buffer = None,
+                                    buffer = None, value = 0, index = 0,
                                     timeout = 10000)
         time.sleep(0.100)
         res = self.__devhandle.controlMsg(requestType = 0xc0, request = 2,
-                                          value = 0, index = 0, buffer = 4,
+                                          buffer = 4, value = 0, index = 0,
                                           timeout = 10000)
         r_value = ((res[3]*256 + res[2])*256 + res[1])*256 + res[0]
         if r_value == 0:
@@ -138,7 +135,7 @@ class regnual(object):
 
     def finish(self):
         self.__devhandle.controlMsg(requestType = 0x40, request = 5,
-                                    value = 0, index = 0, buffer = None,
+                                    buffer = None, value = 0, index = 0,
                                     timeout = 10000)
 
     def reset_device(self):
@@ -181,13 +178,13 @@ class neug(object):
 
     def set_passwd(self, passwd):
         self.__devhandle.controlMsg(requestType = 0x40, request = 253,
-                                    value = 0, index = 0, buffer = passwd,
+                                    buffer = passwd, value = 0, index = 0,
                                     timeout = 1000)
         return
 
     def stop_neug(self, passwd):
         self.__devhandle.controlMsg(requestType = 0x40, request = 255,
-                                    value = 0, index = 0, buffer = passwd,
+                                    buffer = passwd, value = 0, index = 0,
                                     timeout = 1000)
         # self.__devhandle.releaseInterface()
         # self.__devhandle.setConfiguration(0)
@@ -195,7 +192,7 @@ class neug(object):
 
     def mem_info(self):
         mem = self.__devhandle.controlMsg(requestType = 0xc0, request = 0,
-                                          value = 0, index = 0, buffer = 8,
+                                          buffer = 8, value = 0, index = 0,
                                           timeout = 1000)
         start = ((mem[3]*256 + mem[2])*256 + mem[1])*256 + mem[0]
         end = ((mem[7]*256 + mem[6])*256 + mem[5])*256 + mem[4]
@@ -204,7 +201,7 @@ class neug(object):
     def download(self, start, data, verbose=False):
         addr = start
         addr_end = (start + len(data)) & 0xffffff00
-        i = (addr - 0x20000000) / 0x100
+        i = int((addr - 0x20000000) / 0x100)
         j = 0
         print("start %08x" % addr)
         print("end   %08x" % addr_end)
@@ -212,9 +209,8 @@ class neug(object):
             if verbose:
                 print("# %08x: %d : %d" % (addr, i, 256))
             self.__devhandle.controlMsg(requestType = 0x40, request = 1,
-                                        value = i, index = 0,
                                         buffer = data[j*256:j*256+256],
-                                        timeout = 10)
+                                        value = i, index = 0, timeout = 10)
             i = i+1
             j = j+1
             addr = addr + 256
@@ -222,15 +218,14 @@ class neug(object):
         if residue != 0:
             print("# %08x: %d : %d" % (addr, i, residue))
             self.__devhandle.controlMsg(requestType = 0x40, request = 1,
-                                        value = i, index = 0,
                                         buffer = data[j*256:],
-                                        timeout = 10)
+                                        value = i, index = 0, timeout = 10)
 
     def execute(self, last_addr):
-        i = (last_addr - 0x20000000) / 0x100
+        i = int((last_addr - 0x20000000) / 0x100)
         o = (last_addr - 0x20000000) % 0x100
         self.__devhandle.controlMsg(requestType = 0x40, request = 2,
-                                    value = i, index = o, buffer = None,
+                                    buffer = None, value = i, index = o,
                                     timeout = 10)
 
 def compare(data_original, data_in_device):
@@ -283,7 +278,7 @@ def crc32(bytestr):
 def main(passwd, data_regnual, data_upgrade):
     l = len(data_regnual)
     if (l & 0x03) != 0:
-        data_regnual = data_regnual.ljust(l + 4 - (l & 0x03), chr(0))
+        data_regnual = data_regnual.ljust(l + 4 - (l & 0x03), b'\x00')
     crc32code = crc32(data_regnual)
     print("CRC32: %04x\n" % crc32code)
     data_regnual += pack('<I', crc32code)
@@ -365,11 +360,11 @@ if __name__ == '__main__':
         passwd = getpass("Admin password: ")
     filename_regnual = sys.argv[1]
     filename_upgrade = sys.argv[2]
-    f = open(filename_regnual)
+    f = open(filename_regnual, "rb")
     data_regnual = f.read()
     f.close()
     print("%s: %d" % (filename_regnual, len(data_regnual)))
-    f = open(filename_upgrade)
+    f = open(filename_upgrade, "rb")
     data_upgrade = f.read()
     f.close()
     print("%s: %d" % (filename_upgrade, len(data_upgrade)))
