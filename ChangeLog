@@ -1,5 +1,7 @@
 2015-08-03  Niibe Yutaka  <gniibe@fsij.org>
 
+	* VERSION: 1.0.3.
+
 	* tool/neug_upgrade.py (neug.download, neug.execute)
 	(regnual.download): Python3 fix.
 
