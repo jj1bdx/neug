@@ -62,8 +62,8 @@ class neug(object):
 
     def get_mode(self):
         mode = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
-                                          value = 0, index = 0, buffer = 1,
-                                          timeout = 1000)
+                                           buffer = 1, value = 0, index = 0,
+                                           timeout = 1000)
         if mode[0] == 0:
             return "Conditioned"
         elif mode[0] == 1:
@@ -73,7 +73,7 @@ class neug(object):
 
     def get_info(self, index):
         err = self.__devhandle.controlMsg(requestType = 0xc0, request = 254,
-                                          value = 0, index = index, buffer = 2,
+                                          buffer = 2, value = 0, index = index,
                                           timeout = 1000)
         return err[1]*256 + err[0]
 
@@ -108,7 +108,7 @@ def main():
     print("")
     for i in range(1,8):
         s = com.get_string(i, 512)
-        print("%9s: %s" % (field[i], s))
+        print("%9s: %s" % (field[i], s.decode('UTF-8')))
     print("")
     print("mode: %s" % com.get_mode())
     print("Repeat errors: %d" % com.get_info(2))

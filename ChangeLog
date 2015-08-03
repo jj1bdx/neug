@@ -1,3 +1,10 @@
+2015-08-03  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/neug_upgrade.py (neug.download, neug.execute)
+	(regnual.download): Python3 fix.
+
+	* tool/neug_check.py (main): Python3 fix.
+
 2015-07-31  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/configure (output_vendor_product_serial_strings): Fix sed
