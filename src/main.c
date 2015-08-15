@@ -998,6 +998,20 @@ main (int argc, char **argv)
 	   */
 	  neug_mode_select (line_coding.paritytype);
 
+      /*
+       * if datatype or bits/word is set to 5 (five),
+       * the system will be forced initial reset
+       */
+
+      if (line_coding.datatype == 0x05) {
+          /* force usb shutdown */
+          chopstx_cancel (usb_thd);
+          chopstx_join (usb_thd, NULL);
+          usb_lld_shutdown ();
+          /* force full reset */
+          force_nvic_system_reset();
+      }
+
 	  if ((count & 0x03ff) == 0)
 	    event_flag_signal (&led_event, LED_ONESHOT_SHORT);
 

@@ -367,6 +367,12 @@ nvic_system_reset (void)
   for (;;);
 }
 
+/* external interface */
+void force_nvic_system_reset (void)
+{
+    nvic_system_reset();
+}
+
 static void __attribute__ ((naked))
 reset (void)
 {
