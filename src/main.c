@@ -289,6 +289,8 @@ static struct line_coding line_coding = {
   0x08    /* bits:      8         */
 };
 
+#define CDC_CTRL_DTR            0x0001
+
 void
 usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 {
@@ -330,7 +332,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	{
 	  /* Open/close the connection.  */
 	  chopstx_mutex_lock (&usb_mtx);
-	  connected = (value != 0)? 1 : 0;
+	  connected = (value & CDC_CTRL_DTR)? 1 : 0;
 	  if (wait_usb_connection)
 	    {			/* It is waiting a connection.  */
 	      if (connected)	/* It's now connected.  */
