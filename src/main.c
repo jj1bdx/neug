@@ -199,16 +199,24 @@ extern int fraucheky_get_descriptor (uint8_t rcp, uint8_t desc_type,
 void
 usb_cb_device_reset (void)
 {
-  /* Set DEVICE as not configured */
+  /* Set DEVICE as not configured.  */
   usb_lld_set_configuration (0);
 
-  /* Current Feature initialization */
+  /* Current Feature initialization.  */
   usb_lld_set_feature (vcom_config_desc[7]);
 
   usb_lld_reset ();
 
-  /* Initialize Endpoint 0 */
+  /* Initialize Endpoint 0.  */
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
+
+  /* Notify upper layer.  */
+  chopstx_mutex_lock (&usb_mtx);
+  bDeviceState = UNCONNECTED;
+  connected = 0;
+  if (!wait_usb_connection)
+    chopstx_cond_signal (&cnd_usb);
+  chopstx_mutex_unlock (&usb_mtx);
 }
 
 extern uint8_t _regnual_start, __heap_end__;
@@ -292,6 +300,8 @@ static struct line_coding line_coding = {
   0x08    /* bits:      8         */
 };
 
+#define CDC_CTRL_DTR            0x0001
+
 void
 usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 {
@@ -339,7 +349,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	{
 	  /* Open/close the connection.  */
 	  chopstx_mutex_lock (&usb_mtx);
-	  connected = (value != 0)? 1 : 0;
+	  connected = (value & CDC_CTRL_DTR)? 1 : 0;
 	  if (wait_usb_connection)
 	    {			/* It is waiting a connection.  */
 	      if (connected)	/* It's now connected.  */
