@@ -1,3 +1,7 @@
+2015-09-04  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (usb_cb_device_reset): Fix bDeviceState on reset.
+
 2015-09-02  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (CDC_CTRL_DTR): New.

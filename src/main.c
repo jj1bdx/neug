@@ -212,7 +212,7 @@ usb_cb_device_reset (void)
 
   /* Notify upper layer.  */
   chopstx_mutex_lock (&usb_mtx);
-  bDeviceState = UNCONNECTED;
+  bDeviceState = ATTACHED;
   connected = 0;
   if (!wait_usb_connection)
     chopstx_cond_signal (&cnd_usb);
