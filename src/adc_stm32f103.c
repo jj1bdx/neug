@@ -171,6 +171,7 @@ get_adc_config (uint32_t config[4])
     case BOARD_ID_STM8S_DISCOVERY:
     case BOARD_ID_ST_DONGLE:
     case BOARD_ID_ST_NUCLEO_F103:
+    case BOARD_ID_NITROKEY_START:
     default:
       config[0] = 0;
       config[1] = ADC_SMPR2_SMP_AN0(ADC_SAMPLE_1P5)
