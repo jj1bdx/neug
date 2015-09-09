@@ -43,7 +43,7 @@ enum {
   /**/
   FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED = 254,
   FSIJ_DEVICE_NEUG_EXIT_REQUESTED = 255
-}; 
+};
 
 #ifdef FRAUCHEKY_SUPPORT
 static uint8_t running_neug;
@@ -745,7 +745,7 @@ static void fill_serial_no_by_unique_id (void)
   for (i = 0; i < 4; i++)
     {
       uint8_t b = u[3-i];
-      uint8_t nibble; 
+      uint8_t nibble;
 
       nibble = (b >> 4);
       nibble += (nibble >= 10 ? ('A' - 10) : '0');
@@ -914,7 +914,7 @@ main (int argc, char **argv)
   adc_init ();
 
   event_flag_init (&led_event);
-  
+
   chopstx_mutex_init (&usb_mtx);
   chopstx_cond_init (&cnd_usb);
 

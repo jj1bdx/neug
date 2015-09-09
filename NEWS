@@ -1,5 +1,16 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 1.0.4
+
+  Released 2015-09-??, by NIIBE Yutaka
+
+** Upgrade of Chopstx
+We use Chopstx 0.09, which supports Nitrokey-Start.
+
+** USB reset handling
+Now, USB reset lets NeuG device restart correctly.
+
+
 * Major changes in NeuG 1.0.3
 
   Released 2015-08-03, by NIIBE Yutaka
