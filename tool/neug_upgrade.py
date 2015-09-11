@@ -311,7 +311,7 @@ def main(wait_e, passwd, data_regnual, data_upgrade):
     com = None
     #
     reg = None
-    while not reg:
+    while reg == None:
         print("Wait %d seconds..." % wait_e)
         time.sleep(wait_e)
         for dev in gnuk_devices_by_vidpid():
@@ -333,7 +333,7 @@ def main(wait_e, passwd, data_regnual, data_upgrade):
 
 
 # This should be event driven, not guessing some period.
-DEFAULT_WAIT_FOR_REENUMERATION=10
+DEFAULT_WAIT_FOR_REENUMERATION=3
 
 if __name__ == '__main__':
     passwd = None
