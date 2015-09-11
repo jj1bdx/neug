@@ -1,3 +1,7 @@
+2015-09-11  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/neug_upgrade.py (main): Loop until finding reGNUal device.
+
 2015-09-08  Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/adc_stm32f103.c (get_adc_config): Add

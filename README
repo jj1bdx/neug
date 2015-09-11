@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							  Version 1.0.3
-							     2015-08-03
+							  Version 1.0.4
+							     2015-09-??
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,7 +28,7 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the third minor release of NeuG, after 1.0.
+This is the fourth minor release of NeuG, after 1.0.
 
 Basic features (generating random numbers) are stable, but newly added
 things like Fraucheky (USB Mass Storage Class) support and reGNUal
@@ -36,7 +36,7 @@ things like Fraucheky (USB Mass Storage Class) support and reGNUal
 
 Note that you need Chopstx (the thread library) as external source
 code (instead of ChibiOS/RT).  If you get the source code by Git,
-Chopstx is submodule of neug.
+Chopstx is submodule of NeuG.
 
 
 FAQ
@@ -75,9 +75,9 @@ A3: It is because NIST SP 800-90B mandates something like that for
 Targets
 =======
 
-FST-01, Olimex STM32-H103, and STM32 part of STM8S Discovery Kit,
-STBee Mini, STBee, STM32 Primer 2, ST Dongle and STM32 Nucleo F103 are
-supported.
+FST-01, Nitrokey-Start, Olimex STM32-H103, STM32 part of STM8S
+Discovery Kit, STBee Mini, STBee, STM32 Primer 2, CQ STARM, ST Dongle
+and STM32 Nucleo F103 are supported.
 
 
 Build system and Host system
@@ -167,8 +167,13 @@ How to compile
 
 You need GNU toolchain and newlib for 'arm-none-eabi' target.
 
-See https://launchpad.net/gcc-arm-embedded for preparation
-of GNU Toolchain for 'arm-none-eabi' target.
+On Debian we can install the packages:
+
+    gcc-arm-none-eabi
+    gdb-arm-none-eabi
+
+Or else, see https://launchpad.net/gcc-arm-embedded for preparation of
+GNU Toolchain for 'arm-none-eabi' target.
 
 Change directory to `src':
 
@@ -198,7 +203,7 @@ Olimex STM32-H103 board
 
 If you are using Olimex JTAG-Tiny, type following to invoke OpenOCD:
 
-  $ openocd -f interface/olimex-jtag-tiny.cfg -f board/olimex_stm32_h103.cfg
+  $ openocd -f interface/ftdi/olimex-jtag-tiny.cfg -f board/olimex_stm32_h103.cfg
 
 Then, with another terminal, type following to write "neug.elf" to Flash ROM:
 
