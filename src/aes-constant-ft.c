@@ -138,7 +138,7 @@ const uint32_t FT1[256] __attribute__((section(".sys.1"))) = { FT };
 const uint32_t FT2[256] __attribute__((section(".sys.2"))) = { FT };
 #undef V
 
-#ifdef ORIGINAL_IMPLEMENTATION 
+#ifdef ORIGINAL_IMPLEMENTATION
 #define V(a,b,c,d) 0x##d##a##b##c
 const uint32_t FT3[256] = { FT };
 #undef V

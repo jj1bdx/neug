@@ -275,7 +275,7 @@ def crc32(bytestr):
     crc = binascii.crc32(bytestr)
     return UNSIGNED(crc)
 
-def main(passwd, data_regnual, data_upgrade):
+def main(wait_e, passwd, data_regnual, data_upgrade):
     l = len(data_regnual)
     if (l & 0x03) != 0:
         data_regnual = data_regnual.ljust(l + 4 - (l & 0x03), b'\x00')
@@ -310,17 +310,18 @@ def main(passwd, data_regnual, data_upgrade):
     del com
     com = None
     #
-    print("Wait 3 seconds...")
-    time.sleep(3)
-    # Then, send upgrade program...
     reg = None
-    for dev in gnuk_devices_by_vidpid():
-        try:
-            reg = regnual(dev)
-            print("Device: %s" % dev.filename)
-            break
-        except:
-            pass
+    while reg == None:
+        print("Wait %d seconds..." % wait_e)
+        time.sleep(wait_e)
+        for dev in gnuk_devices_by_vidpid():
+            try:
+                reg = regnual(dev)
+                print("Device: %s" % dev.filename)
+                break
+            except:
+                pass
+    # Then, send upgrade program...
     mem_info = reg.mem_info()
     print("%08x:%08x" % mem_info)
     print("Downloading the program")
@@ -331,8 +332,12 @@ def main(passwd, data_regnual, data_upgrade):
     return 0
 
 
+# This should be event driven, not guessing some period.
+DEFAULT_WAIT_FOR_REENUMERATION=3
+
 if __name__ == '__main__':
     passwd = None
+    wait_e = DEFAULT_WAIT_FOR_REENUMERATION
     if len(sys.argv) == 2 and sys.argv[1] == '-s': # S for set passwd
         passwd = getpass("Admin password: ")
         com = None
@@ -354,6 +359,9 @@ if __name__ == '__main__':
         sys.argv.pop(1)
         if option == '-f':      # F for Factory setting
             passwd = DEFAULT_PW3
+        elif option == '-e':    # E for Enumeration
+            wait_e = int(sys.argv[1])
+            sys.argv.pop(1)
         else:
             raise ValueError("unknown option", option)
     if not passwd:
@@ -368,4 +376,4 @@ if __name__ == '__main__':
     data_upgrade = f.read()
     f.close()
     print("%s: %d" % (filename_upgrade, len(data_upgrade)))
-    main(passwd, data_regnual, data_upgrade[4096:])
+    main(wait_e, passwd, data_regnual, data_upgrade[4096:])
