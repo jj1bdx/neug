@@ -5,7 +5,7 @@ NeuG NEWS - User visible changes
   Released 2015-09-??, by NIIBE Yutaka
 
 ** Upgrade of Chopstx
-We use Chopstx 0.09, which supports Nitrokey-Start.
+We use Chopstx 0.10, which supports Nitrokey-Start.
 
 ** USB reset handling
 Now, USB reset lets NeuG device restart correctly.
