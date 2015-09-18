@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
 							  Version 1.0.4
-							     2015-09-??
+							     2015-09-18
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -167,10 +167,13 @@ How to compile
 
 You need GNU toolchain and newlib for 'arm-none-eabi' target.
 
-On Debian we can install the packages:
+On Debian we can install the packages of gcc-arm-none-eabi,
+gdb-arm-none-eabi and its friends.  I'm using:
 
-    gcc-arm-none-eabi
-    gdb-arm-none-eabi
+	binutils-arm-none-eabi	2.25-5+5+b1
+	gcc-arm-none-eabi 	15:4.9.3+svn227297-1
+	gdb-arm-none-eabi 	7.7.1+dfsg-5+8
+	libnewlib-arm-none-eabi	2.2.0+git20150830.5a3d536-1
 
 Or else, see https://launchpad.net/gcc-arm-embedded for preparation of
 GNU Toolchain for 'arm-none-eabi' target.
@@ -368,8 +371,8 @@ Test results
 See files under the directory test-results, for test result of
 PractRand 0.92.
 
-I collect 133 files of 125MB (>= 16GiB), and run the test suite of
-PractRand 0.92.  Collecting 133 files, it took more than two days.
+I collect 140 files of 125MB (>= 16GiB), and run the test suite of
+PractRand 0.92.  Collecting 140 files, it took two days and a half.
 
 
 Git Repository

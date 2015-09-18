@@ -2,7 +2,7 @@ NeuG NEWS - User visible changes
 
 * Major changes in NeuG 1.0.4
 
-  Released 2015-09-??, by NIIBE Yutaka
+  Released 2015-09-18, by NIIBE Yutaka
 
 ** Upgrade of Chopstx
 We use Chopstx 0.10, which supports Nitrokey-Start.
