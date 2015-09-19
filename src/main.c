@@ -182,6 +182,7 @@ static const uint8_t vcom_string0[4] = {
 
 #include "usb-strings.c.inc"
 
+static void neug_setup_endpoints_for_interface (uint16_t interface, int stop);
 #ifdef FRAUCHEKY_SUPPORT
 extern int fraucheky_enabled (void);
 extern void fraucheky_main (void);
@@ -199,6 +200,8 @@ extern int fraucheky_get_descriptor (uint8_t rcp, uint8_t desc_type,
 void
 usb_cb_device_reset (void)
 {
+  int i;
+
   /* Set DEVICE as not configured.  */
   usb_lld_set_configuration (0);
 
@@ -209,6 +212,10 @@ usb_cb_device_reset (void)
 
   /* Initialize Endpoint 0.  */
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
+
+  /* Stop the interface */
+  for (i = 0; i < NUM_INTERFACES; i++)
+    neug_setup_endpoints_for_interface (i, 1);
 
   /* Notify upper layer.  */
   chopstx_mutex_lock (&usb_mtx);
