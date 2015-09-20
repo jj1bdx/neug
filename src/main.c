@@ -234,6 +234,9 @@ static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 #define USB_FSIJ_MEMINFO	  0
 #define USB_FSIJ_DOWNLOAD	  1
 #define USB_FSIJ_EXEC		  2
+
+#define USB_NEUG_JJ1BDX_RESET 250 /* force software reset */
+
 #define USB_NEUG_SET_PASSWD	253
 #define USB_NEUG_GET_INFO	254
 #define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
@@ -338,7 +341,13 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	      chopstx_cond_signal (&cnd_usb);
 	      chopstx_mutex_unlock (&usb_mtx);
 	    }
-	}
+	} else if (req_no == USB_NEUG_JJ1BDX_RESET)
+	{
+        /* force usb shutdown */
+        usb_lld_shutdown ();
+        /* force full reset */
+        force_nvic_system_reset();
+    }
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
 	   && USB_SETUP_SET (req))
@@ -498,6 +507,12 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
+	      usbbuf[0] = detail->len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
+	      return USB_SUCCESS;
+	    }
+	  else if (req_no == USB_NEUG_JJ1BDX_RESET && detail->len <= 32)
+	    {
 	      usbbuf[0] = detail->len;
 	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
 	      return USB_SUCCESS;

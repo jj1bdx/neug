@@ -128,3 +128,6 @@ gpio_init (void)
 {
   (*vector[14]) ();
 }
+
+/* prototype */
+void force_nvic_system_reset(void);
