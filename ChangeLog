@@ -1,3 +1,8 @@
+2016-02-05   Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Add submodule check suggested by Elliott
+	Mitchell.
+
 2015-09-18  Niibe Yutaka  <gniibe@fsij.org>
 
 	* VERSION: 1.0.4.
