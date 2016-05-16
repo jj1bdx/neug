@@ -1,10 +1,14 @@
 # Pre-compiled ELF executable images of NeuG 1.0.4
 
-by Kenji Rikitake 1-DEC-2015 
+by Kenji Rikitake 16-MAY-2016
 
 ## LICENSE
 
 GPLv3. See `COPYING` in this directory for the details of the license.
+
+## Note well
+
+Use of USB VID/PID for FSIJ is restricted under their license. In summary: for experimental and individual use only. For production, contact FSIJ. See `README` at the top level of the NeuG distribution for the further details.
 
 ## Compiled source
 
@@ -16,9 +20,10 @@ See Section 15 of the file `COPYING`.
 
 ## Compiled environment
 
-* OS X 10.11.1
+* OS X 10.11.4
 * HomeBrew nitsky/stm32/arm-none-eabi-gcc: stable 20150921
 * The elf code is tested with STM32 ST Dongle and Flying Stone Technology FST-01
+* source code used: tag `jj1bdx-1.0.4-20160516`
 
 ## Commands used
 
@@ -44,7 +49,7 @@ Writing the ELF file to an STM32 ST Dongle without protection:
 openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
 # OpenOCD commands
 reset init
-flash write_image erase neug-st-dongle-1.0.4-20151201.elf
+flash write_image erase neug-st-dongle-1.0.4-20160516.elf
 reset
 ```
 
@@ -56,7 +61,7 @@ openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
 reset init
 stm32f1x unlock 0
 reset init
-sh write_image erase neug-fst-01-1.0.4-20151201.elf
+sh write_image erase neug-fst-01-1.0.4-20160516.elf
 stm32f1x lock 0
 reset
 ```
