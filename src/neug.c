@@ -641,7 +641,7 @@ rng (void *arg)
     }
 
   adc_stop ();
-  chopstx_release_irq (&adc_intr);
+  // chopstx_release_irq (&adc_intr); // See chopstx NEWS
 
   return NULL;
 }
