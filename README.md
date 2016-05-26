@@ -6,7 +6,8 @@
 
 # Note on chopstx
 
-The latest chopstx breaks NeuG build due to the API change. Use the tag "jj1bdx-neug-20160519-stable" for the stable version of chopstx and NeuG.
+As of 26-MAY-2016, NeuG has been updated to use the latest chopstx.
 
 For the further details, see 
-<http://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=commit;h=ee92bb15b361b3daee816a4e930be0032be2d9e7>
+* <http://git.gniibe.org/gitweb/?p=gnuk/neug.git;a=commit;h=abc4fd2461ad03453bc65b95da49fefd02650ab1>
+* <http://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=commit;h=ee92bb15b361b3daee816a4e930be0032be2d9e7>
