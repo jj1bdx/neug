@@ -1,3 +1,20 @@
+2016-05-26  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update.
+	* src/adc.h: Update from Gnuk.
+	* src/neug.c: Update from Gnuk.
+	* src/usb_stm32f103.c: Update from Chopstx.
+	* src/usb_lld.h: Update from Chopstx.
+	* src/sys.c: Update from Chopstx.
+	* src/configure: Follow the change of USB API.
+	* src/main.c (usb_cb_device_reset, usb_cb_ctrl_write_finish)
+	(vcom_port_data_setup, usb_cb_setup, usb_cb_get_descriptor)
+	(usb_cb_interface, usb_intr): Follow the change of USB API.
+	(VCOM_FEATURE_BUS_POWERED): New.
+	(usb_cb_handle_event): Clean up.
+	(usb_cb_tx_done, usb_cb_rx_ready): New.
+	(main): Use chopstx_poll.
+
 2016-02-05   Niibe Yutaka  <gniibe@fsij.org>
 
 	* src/configure: Add submodule check suggested by Elliott
