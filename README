@@ -269,7 +269,7 @@ If your device is configured with Fraucheky, you can invoke Fraucheky
 from NeuG by setting the unusual sequence of configurations:
 
   $ stty -F /dev/ttyACM0 ispeed 110 ospeed 110
-  $ stty -F /dev/ttyACM0 speed 115200 ospeed 115200
+  $ stty -F /dev/ttyACM0 ispeed 115200 ospeed 115200
 
 
 Structure of NeuG

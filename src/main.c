@@ -2,7 +2,7 @@
  * main.c - main routine of neug
  *
  * Main routine:
- * Copyright (C) 2011, 2012, 2013, 2015
+ * Copyright (C) 2011, 2012, 2013, 2015, 2016
  *		 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
@@ -50,15 +50,11 @@ static uint8_t running_neug;
 #endif
 
 static chopstx_mutex_t usb_mtx;
-static chopstx_cond_t cnd_usb;
+static chopstx_cond_t usb_cnd;
 static uint32_t bDeviceState = UNCONNECTED; /* USB device status */
 static uint8_t fsij_device_state = FSIJ_DEVICE_RUNNING;
 static uint8_t connected;
-static uint32_t wait_usb_connection; /* Timer variable.  */
 
-
-extern uint8_t __process0_stack_end__;
-static chopstx_t main_thd = (uint32_t)(&__process0_stack_end__ - 60);
 
 #define ENDP0_RXADDR        (0x40)
 #define ENDP0_TXADDR        (0x80)
@@ -74,7 +70,7 @@ static chopstx_t main_thd = (uint32_t)(&__process0_stack_end__ - 60);
 /* USB Device Descriptor */
 static const uint8_t vcom_device_desc[18] = {
   18,   /* bLength */
-  USB_DEVICE_DESCRIPTOR_TYPE,	/* bDescriptorType */
+  DEVICE_DESCRIPTOR,	        /* bDescriptorType */
   0x10, 0x01,			/* bcdUSB = 1.1 */
   0x02,				/* bDeviceClass (CDC).              */
   0x00,				/* bDeviceSubClass.                 */
@@ -87,20 +83,22 @@ static const uint8_t vcom_device_desc[18] = {
   1				/* bNumConfigurations.              */
 };
 
+#define VCOM_FEATURE_BUS_POWERED	0x80
+
 /* Configuration Descriptor tree for a CDC.*/
 static const uint8_t vcom_config_desc[67] = {
   9,
-  USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
+  CONFIG_DESCRIPTOR,            /* bDescriptorType: Configuration   */
   /* Configuration Descriptor.*/
   67, 0x00,			/* wTotalLength.                    */
   0x02,				/* bNumInterfaces.                  */
   0x01,				/* bConfigurationValue.             */
   0,				/* iConfiguration.                  */
-  0x80,				/* bmAttributes (bus powered).      */
+  VCOM_FEATURE_BUS_POWERED,	/* bmAttributes.                    */
   50,				/* bMaxPower (100mA).               */
   /* Interface Descriptor.*/
   9,
-  USB_INTERFACE_DESCRIPTOR_TYPE,
+  INTERFACE_DESCRIPTOR,
   0x00,		   /* bInterfaceNumber.                */
   0x00,		   /* bAlternateSetting.               */
   0x01,		   /* bNumEndpoints.                   */
@@ -139,14 +137,14 @@ static const uint8_t vcom_config_desc[67] = {
   0x01,         /* bSlaveInterface0 (Data Class Interface).  */
   /* Endpoint 2 Descriptor.*/
   7,
-  USB_ENDPOINT_DESCRIPTOR_TYPE,
+  ENDPOINT_DESCRIPTOR,
   ENDP2|0x80,    /* bEndpointAddress.    */
   0x03,          /* bmAttributes (Interrupt).        */
   0x08, 0x00,	 /* wMaxPacketSize.                  */
   0xFF,		 /* bInterval.                       */
   /* Interface Descriptor.*/
   9,
-  USB_INTERFACE_DESCRIPTOR_TYPE, /* bDescriptorType: */
+  INTERFACE_DESCRIPTOR,          /* bDescriptorType: */
   0x01,          /* bInterfaceNumber.                */
   0x00,          /* bAlternateSetting.               */
   0x02,          /* bNumEndpoints.                   */
@@ -156,14 +154,14 @@ static const uint8_t vcom_config_desc[67] = {
   0x00,		 /* iInterface.                      */
   /* Endpoint 3 Descriptor.*/
   7,
-  USB_ENDPOINT_DESCRIPTOR_TYPE,	/* bDescriptorType: Endpoint */
+  ENDPOINT_DESCRIPTOR,	        /* bDescriptorType: Endpoint */
   ENDP3,    /* bEndpointAddress. */
   0x02,				/* bmAttributes (Bulk).             */
   0x40, 0x00,			/* wMaxPacketSize.                  */
   0x00,				/* bInterval.                       */
   /* Endpoint 1 Descriptor.*/
   7,
-  USB_ENDPOINT_DESCRIPTOR_TYPE,	/* bDescriptorType: Endpoint */
+  ENDPOINT_DESCRIPTOR,	        /* bDescriptorType: Endpoint */
   ENDP1|0x80,			/* bEndpointAddress. */
   0x02,				/* bmAttributes (Bulk).             */
   0x40, 0x00,			/* wMaxPacketSize.                  */
@@ -176,7 +174,7 @@ static const uint8_t vcom_config_desc[67] = {
  */
 static const uint8_t vcom_string0[4] = {
   4,				/* bLength */
-  USB_STRING_DESCRIPTOR_TYPE,
+  STRING_DESCRIPTOR,
   0x09, 0x04			/* LangID = 0x0409: US-English */
 };
 
@@ -189,10 +187,10 @@ extern void fraucheky_main (void);
 
 extern void fraucheky_setup_endpoints_for_interface (int stop);
 extern int fraucheky_setup (uint8_t req, uint8_t req_no,
-			    struct control_info *detail);
+			    struct req_args *detail);
 extern int fraucheky_get_descriptor (uint8_t rcp, uint8_t desc_type,
 				     uint8_t desc_index,
-				     struct control_info *detail);
+				     struct req_args *detail);
 #endif
 
 #define NUM_INTERFACES 2
@@ -202,13 +200,7 @@ usb_cb_device_reset (void)
 {
   int i;
 
-  /* Set DEVICE as not configured.  */
-  usb_lld_set_configuration (0);
-
-  /* Current Feature initialization.  */
-  usb_lld_set_feature (vcom_config_desc[7]);
-
-  usb_lld_reset ();
+  usb_lld_reset (VCOM_FEATURE_BUS_POWERED);
 
   /* Initialize Endpoint 0.  */
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
@@ -221,8 +213,7 @@ usb_cb_device_reset (void)
   chopstx_mutex_lock (&usb_mtx);
   bDeviceState = ATTACHED;
   connected = 0;
-  if (!wait_usb_connection)
-    chopstx_cond_signal (&cnd_usb);
+  chopstx_cond_signal (&usb_cnd);
   chopstx_mutex_unlock (&usb_mtx);
 }
 
@@ -307,7 +298,7 @@ static struct line_coding line_coding = {
 #define CDC_CTRL_DTR            0x0001
 
 void
-usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
+usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, struct req_args *arg)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
@@ -334,27 +325,20 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
-	      chopstx_wakeup_usec_wait (main_thd);
-	      chopstx_cond_signal (&cnd_usb);
+	      chopstx_cond_signal (&usb_cnd);
 	      chopstx_mutex_unlock (&usb_mtx);
 	    }
 	}
     }
-  else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
+  else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT) && arg->index == 0
 	   && USB_SETUP_SET (req))
     {
       if (req_no == USB_CDC_REQ_SET_CONTROL_LINE_STATE)
 	{
 	  /* Open/close the connection.  */
 	  chopstx_mutex_lock (&usb_mtx);
-	  connected = (value & CDC_CTRL_DTR)? 1 : 0;
-	  if (wait_usb_connection)
-	    {			/* It is waiting a connection.  */
-	      if (connected)	/* It's now connected.  */
-		chopstx_wakeup_usec_wait (main_thd);
-	    }
-	  else
-	    chopstx_cond_signal (&cnd_usb);
+	  connected = (arg->value & CDC_CTRL_DTR)? 1 : 0;
+	  chopstx_cond_signal (&usb_cnd);
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
 #ifdef FRAUCHEKY_SUPPORT
@@ -364,8 +348,7 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 	  if (line_coding.bitrate == NEUG_SPECIAL_BITRATE)
 	    {
 	      fsij_device_state = FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED;
-	      chopstx_wakeup_usec_wait (main_thd);
-	      chopstx_cond_signal (&cnd_usb);
+	      chopstx_cond_signal (&usb_cnd);
 	    }
 	  else if (fsij_device_state == FSIJ_DEVICE_NEUG_FRAUCHEKY_REQUESTED)
 	    fsij_device_state = FSIJ_DEVICE_RUNNING;
@@ -377,17 +360,17 @@ usb_cb_ctrl_write_finish (uint8_t req, uint8_t req_no, uint16_t value)
 
 
 static int
-vcom_port_data_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
+vcom_port_data_setup (uint8_t req, uint8_t req_no, struct req_args *arg)
 {
   if (USB_SETUP_GET (req))
     {
       if (req_no == USB_CDC_REQ_GET_LINE_CODING)
-	return usb_lld_reply_request (&line_coding, sizeof(line_coding), detail);
+	return usb_lld_reply_request (&line_coding, sizeof(line_coding), arg);
     }
   else  /* USB_SETUP_SET (req) */
     {
       if (req_no == USB_CDC_REQ_SET_LINE_CODING
-	  && detail->len == sizeof (line_coding))
+	  && arg->len == sizeof (line_coding))
 	{
 	  usb_lld_set_data_to_recv (&line_coding, sizeof (line_coding));
 	  return USB_SUCCESS;
@@ -400,7 +383,7 @@ vcom_port_data_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 }
 
 int
-usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
+usb_cb_setup (uint8_t req, uint8_t req_no, struct req_args *arg)
 {
   uint8_t type_rcp = req & (REQUEST_TYPE|RECIPIENT);
 
@@ -417,27 +400,27 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 		  return USB_UNSUPPORT;
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
-	      usb_lld_reply_request (mem_info, sizeof (mem_info), detail);
+	      usb_lld_reply_request (mem_info, sizeof (mem_info), arg);
 	      return USB_SUCCESS;
 	    }
 	  else if (req_no == USB_NEUG_GET_INFO)
 	    {
-	      if (detail->index == 0)
-		usb_lld_reply_request (&neug_mode, sizeof (uint8_t), detail);
-	      else if (detail->index == 1)
-		usb_lld_reply_request (&neug_err_cnt, sizeof (uint16_t), detail);
-	      else if (detail->index == 2)
-		usb_lld_reply_request (&neug_err_cnt_rc, sizeof (uint16_t), detail);
-	      else if (detail->index == 3)
-		usb_lld_reply_request (&neug_err_cnt_p64, sizeof (uint16_t), detail);
-	      else if (detail->index == 4)
-		usb_lld_reply_request (&neug_err_cnt_p4k, sizeof (uint16_t), detail);
-	      else if (detail->index == 5)
-		usb_lld_reply_request (&neug_rc_max, sizeof (uint16_t), detail);
-	      else if (detail->index == 6)
-		usb_lld_reply_request (&neug_p64_max, sizeof (uint16_t), detail);
-	      else if (detail->index == 7)
-		usb_lld_reply_request (&neug_p4k_max, sizeof (uint16_t), detail);
+	      if (arg->index == 0)
+		usb_lld_reply_request (&neug_mode, sizeof (uint8_t), arg);
+	      else if (arg->index == 1)
+		usb_lld_reply_request (&neug_err_cnt, sizeof (uint16_t), arg);
+	      else if (arg->index == 2)
+		usb_lld_reply_request (&neug_err_cnt_rc, sizeof (uint16_t), arg);
+	      else if (arg->index == 3)
+		usb_lld_reply_request (&neug_err_cnt_p64, sizeof (uint16_t), arg);
+	      else if (arg->index == 4)
+		usb_lld_reply_request (&neug_err_cnt_p4k, sizeof (uint16_t), arg);
+	      else if (arg->index == 5)
+		usb_lld_reply_request (&neug_rc_max, sizeof (uint16_t), arg);
+	      else if (arg->index == 6)
+		usb_lld_reply_request (&neug_p64_max, sizeof (uint16_t), arg);
+	      else if (arg->index == 7)
+		usb_lld_reply_request (&neug_p4k_max, sizeof (uint16_t), arg);
 	      else
 		return USB_UNSUPPORT;
 
@@ -446,7 +429,7 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 	}
       else /* SETUP_SET */
 	{
-	  uint8_t *addr = (uint8_t *)(0x20000000 + detail->value * 0x100 + detail->index);
+	  uint8_t *addr = (uint8_t *)(0x20000000 + arg->value * 0x100 + arg->index);
 
 	  if (req_no == USB_FSIJ_DOWNLOAD)
 	    {
@@ -458,16 +441,16 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      if (addr < &_regnual_start || addr + detail->len > &__heap_end__)
+	      if (addr < &_regnual_start || addr + arg->len > &__heap_end__)
 		return USB_UNSUPPORT;
 
-	      if (detail->index + detail->len < 256)
-		memset (addr + detail->index + detail->len, 0, 256 - (detail->index + detail->len));
+	      if (arg->index + arg->len < 256)
+		memset (addr + arg->index + arg->len, 0, 256 - (arg->index + arg->len));
 
-	      usb_lld_set_data_to_recv (addr, detail->len);
+	      usb_lld_set_data_to_recv (addr, arg->len);
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_FSIJ_EXEC && detail->len == 0)
+	  else if (req_no == USB_FSIJ_EXEC && arg->len == 0)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
@@ -482,13 +465,13 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 
 	      return download_check_crc32 ((uint32_t *)addr);
 	    }
-	  else if (req_no == USB_NEUG_SET_PASSWD && detail->len <= 32)
+	  else if (req_no == USB_NEUG_SET_PASSWD && arg->len <= 32)
 	    {
-	      usbbuf[0] = detail->len;
-	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
+	      usbbuf[0] = arg->len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, arg->len);
 	      return USB_SUCCESS;
 	    }
-	  else if (req_no == USB_NEUG_EXIT && detail->len <= 32)
+	  else if (req_no == USB_NEUG_EXIT && arg->len <= 32)
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -498,22 +481,22 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      usbbuf[0] = detail->len;
-	      usb_lld_set_data_to_recv (usbbuf + 1, detail->len);
+	      usbbuf[0] = arg->len;
+	      usb_lld_set_data_to_recv (usbbuf + 1, arg->len);
 	      return USB_SUCCESS;
 	    }
 	}
     }
   else if (type_rcp == (CLASS_REQUEST | INTERFACE_RECIPIENT)
-	   && detail->index == 0)
+	   && arg->index == 0)
     {
 #ifdef FRAUCHEKY_SUPPORT
       if (running_neug)
-	return vcom_port_data_setup (req, req_no, detail);
+	return vcom_port_data_setup (req, req_no, arg);
       else
-	fraucheky_setup (req, req_no, detail);
+	fraucheky_setup (req, req_no, arg);
 #else
-      return vcom_port_data_setup (req, req_no, detail);
+      return vcom_port_data_setup (req, req_no, arg);
 #endif
     }
 
@@ -522,11 +505,11 @@ usb_cb_setup (uint8_t req, uint8_t req_no, struct control_info *detail)
 
 int
 usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
-		       struct control_info *detail)
+		       struct req_args *arg)
 {
 #ifdef FRAUCHEKY_SUPPORT
   if (!running_neug)
-    return fraucheky_get_descriptor (rcp, desc_type, desc_index, detail);
+    return fraucheky_get_descriptor (rcp, desc_type, desc_index, arg);
 #endif
 
   if (rcp != DEVICE_RECIPIENT)
@@ -534,10 +517,10 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 
   if (desc_type == DEVICE_DESCRIPTOR)
     return usb_lld_reply_request (vcom_device_desc, sizeof (vcom_device_desc),
-				  detail);
+				  arg);
   else if (desc_type == CONFIG_DESCRIPTOR)
     return usb_lld_reply_request (vcom_config_desc, sizeof (vcom_config_desc),
-				  detail);
+				  arg);
   else if (desc_type == STRING_DESCRIPTOR)
     {
       const uint8_t *str;
@@ -586,7 +569,7 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 		usbbuf[i*2+3] = 0;
 	      }
 	    usbbuf[0] = i*2 + 2;
-	    usbbuf[1] = USB_STRING_DESCRIPTOR_TYPE;
+	    usbbuf[1] = STRING_DESCRIPTOR;
 	    size = i*2 + 2;
 	  }
 	  break;
@@ -594,7 +577,7 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	  return USB_UNSUPPORT;
 	}
 
-      return usb_lld_reply_request (str, size, detail);
+      return usb_lld_reply_request (str, size, arg);
     }
 
   return USB_UNSUPPORT;
@@ -628,6 +611,7 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
 	{
 	  usb_lld_setup_endpoint (ENDP1, EP_BULK, 0, 0, ENDP1_TXADDR, 0);
 	  usb_lld_setup_endpoint (ENDP3, EP_BULK, 0, ENDP3_RXADDR, 0, 64);
+	  /* Start with no data receiving (ENDP3 not enabled) */
 	}
       else
 	{
@@ -677,8 +661,6 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 	}
       /* Do nothing when current_conf == value */
       return USB_SUCCESS;
-
-      return USB_SUCCESS;
     default:
       break;
     }
@@ -687,11 +669,11 @@ int usb_cb_handle_event (uint8_t event_type, uint16_t value)
 }
 
 
-int usb_cb_interface (uint8_t cmd, struct control_info *detail)
+int usb_cb_interface (uint8_t cmd, struct req_args *arg)
 {
   const uint8_t zero = 0;
-  uint16_t interface = detail->index;
-  uint16_t alt = detail->value;
+  uint16_t interface = arg->index;
+  uint16_t alt = arg->value;
 
   if (interface >= NUM_INTERFACES)
     return USB_UNSUPPORT;
@@ -708,8 +690,7 @@ int usb_cb_interface (uint8_t cmd, struct control_info *detail)
 	}
 
     case USB_GET_INTERFACE:
-      usb_lld_reply_request (&zero, 1, detail);
-      return USB_SUCCESS;
+      return usb_lld_reply_request (&zero, 1, arg);
 
     default:
     case USB_QUERY_INTERFACE:
@@ -726,13 +707,13 @@ usb_intr (void *arg)
   chopstx_intr_t interrupt;
 
   (void)arg;
-  usb_lld_init (vcom_config_desc[7]);
+  usb_lld_init (VCOM_FEATURE_BUS_POWERED);
   chopstx_claim_irq (&interrupt, INTR_REQ_USB);
-  usb_interrupt_handler ();
+  usb_interrupt_handler ();	/* For old SYS < 3.0 */
 
   while (1)
     {
-      chopstx_intr_wait (&interrupt);
+      chopstx_poll (NULL, 1, &interrupt);
 
       /* Process interrupt. */
       usb_interrupt_handler ();
@@ -764,24 +745,28 @@ static void fill_serial_no_by_unique_id (void)
       p[i*4+3] = 0;
     }
 }
-
+
+
 void
-EP1_IN_Callback (void)
+usb_cb_tx_done (uint8_t ep_num)
 {
-  chopstx_mutex_lock (&usb_mtx);
-  chopstx_cond_signal (&cnd_usb);
-  chopstx_mutex_unlock (&usb_mtx);
+  if (ep_num == ENDP1)
+    {
+      chopstx_mutex_lock (&usb_mtx);
+      chopstx_cond_signal (&usb_cnd);
+      chopstx_mutex_unlock (&usb_mtx);
+    }
+  else if (ep_num == ENDP2)
+    {
+      /* INTERRUPT Transfer done */
+    }
 }
 
 void
-EP2_IN_Callback (void)
+usb_cb_rx_ready (uint8_t ep_num)
 {
-}
-
-void
-EP3_OUT_Callback (void)
-{
-  usb_lld_rx_enable (ENDP3);
+  if (ep_num == ENDP3)
+    usb_lld_rx_enable (ENDP3);
 }
 
 typedef uint32_t eventmask_t;
@@ -901,6 +886,15 @@ calculate_regnual_entry_address (const uint8_t *addr)
 }
 
 
+static int
+check_usb_status (void *arg)
+{
+  (void)arg;
+
+  return (connected || bDeviceState != CONFIGURED
+	  || fsij_device_state != FSIJ_DEVICE_RUNNING);
+}
+
 /*
  * Entry point.
  *
@@ -923,7 +917,7 @@ main (int argc, char **argv)
   event_flag_init (&led_event);
 
   chopstx_mutex_init (&usb_mtx);
-  chopstx_cond_init (&cnd_usb);
+  chopstx_cond_init (&usb_cnd);
 
 #ifdef FRAUCHEKY_SUPPORT
   if (fraucheky_enabled ())
@@ -954,7 +948,7 @@ main (int argc, char **argv)
 
  not_configured:
   count = 0;
-  /* A run-up */
+  /* Initial run-up */
   while (count < NEUG_PRE_LOOP || bDeviceState != CONFIGURED)
     {
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
@@ -971,7 +965,7 @@ main (int argc, char **argv)
       chopstx_mutex_lock (&usb_mtx);
     }
 
-  /* Holding USB_MTX.  */
+  /* Holding USB_MTX...  */
   while (1)
     {
       int last_was_fullsizepacket = 0;
@@ -979,21 +973,29 @@ main (int argc, char **argv)
       if (fsij_device_state != FSIJ_DEVICE_RUNNING)
 	break;
 
+      chopstx_mutex_unlock (&usb_mtx);
       while (1)
 	{
-	  wait_usb_connection = 5000*1000;
-	  if (connected || bDeviceState != CONFIGURED
-	      || fsij_device_state != FSIJ_DEVICE_RUNNING)
+	  chopstx_poll_cond_t poll_desc;
+	  uint32_t usec = 5000*1000;
+
+	  poll_desc.type = CHOPSTX_POLL_COND;
+	  poll_desc.ready = 0;
+	  poll_desc.cond = &usb_cnd;
+	  poll_desc.mutex = &usb_mtx;
+	  poll_desc.check = check_usb_status;
+	  poll_desc.arg = NULL;
+
+	  if (chopstx_poll (&usec, 1, &poll_desc))
 	    break;
 
-	  chopstx_mutex_unlock (&usb_mtx);
+	  /* Timeout */
 	  neug_flush ();
 	  neug_mode_select (line_coding.paritytype);
 	  event_flag_signal (&led_event, LED_TWOSHOTS);
-	  chopstx_usec_wait_var (&wait_usb_connection);
-	  chopstx_mutex_lock (&usb_mtx);
 	}
 
+      chopstx_mutex_lock (&usb_mtx);
       if (bDeviceState != CONFIGURED)
 	goto not_configured;
 
@@ -1043,7 +1045,7 @@ main (int argc, char **argv)
 
 	      /* Prepare sending random data.  */
 	      usb_lld_tx_enable (ENDP1, i * 4);
-	      chopstx_cond_wait (&cnd_usb, &usb_mtx);
+	      chopstx_cond_wait (&usb_cnd, &usb_mtx);
 	      count++;
 	    }
 	}
