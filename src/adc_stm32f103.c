@@ -3,7 +3,7 @@
  *                   In this ADC driver, there are NeuG specific parts.
  *                   You need to modify to use this as generic ADC driver.
  *
- * Copyright (C) 2011, 2012, 2013, 2015
+ * Copyright (C) 2011, 2012, 2013, 2015, 2016
  *               Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
@@ -93,11 +93,18 @@
                               | ADC_SQR3_SQ4_N(ADC_CHANNEL_VREFINT)
 #define NEUG_ADC_SETTING1_NUM_CHANNELS 4
 
+/*
+ * ADC finish interrupt
+ */
+#define INTR_REQ_DMA1_Channel1 11
+
+static chopstx_intr_t adc_intr;
 
 /*
  * Do calibration for both of ADCs.
  */
-void adc_init (void)
+void
+adc_init (void)
 {
   RCC->APB2ENR |= (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
   RCC->APB2RSTR = (RCC_APB2RSTR_ADC1RST | RCC_APB2RSTR_ADC2RST);
@@ -123,6 +130,8 @@ void adc_init (void)
     ;
   ADC2->CR2 = 0;
   RCC->APB2ENR &= ~(RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN);
+
+  chopstx_claim_irq (&adc_intr, INTR_REQ_DMA1_Channel1);
 }
 
 #include "sys.h"
@@ -183,7 +192,8 @@ get_adc_config (uint32_t config[4])
 }
 
 
-void adc_start (void)
+void
+adc_start (void)
 {
   uint32_t config[4];
 
@@ -234,7 +244,8 @@ void adc_start (void)
 
 uint32_t adc_buf[64];
 
-void adc_start_conversion (int offset, int count)
+void
+adc_start_conversion (int offset, int count)
 {
   DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR;        /* SetPeripheral */
   DMA1_Channel1->CMAR = (uint32_t)&adc_buf[offset]; /* SetMemory0    */
@@ -267,7 +278,8 @@ static void adc_stop_conversion (void)
 #endif
 }
 
-void adc_stop (void)
+void
+adc_stop (void)
 {
   ADC1->CR1 = 0;
   ADC1->CR2 = 0;
@@ -286,13 +298,14 @@ static uint32_t adc_err;
  * Return 0 on success.
  * Return 1 on error.
  */
-int adc_wait_completion (chopstx_intr_t *intr)
+int
+adc_wait_completion (void)
 {
   uint32_t flags;
 
   while (1)
     {
-      chopstx_intr_wait (intr);
+      chopstx_poll (NULL, 1, &adc_intr);
       flags = DMA1->ISR & STM32_DMA_ISR_MASK; /* Channel 1 interrupt cause.  */
       /*
        * Clear interrupt cause of channel 1.
