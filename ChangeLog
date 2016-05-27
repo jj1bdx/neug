@@ -1,3 +1,12 @@
+2016-05-27  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/adc_stm32f103.c (adc_intr): Define in this module.
+	(adc_init): Claim IRQ here.
+	(adc_wait_completion): Don't expose INTR.
+
+	* src/neug.c (INTR_REQ_DMA1_Channel1): Remove.
+	(rng): Follow the change of ADC API.
+
 2016-05-26  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* chopstx: Update.
