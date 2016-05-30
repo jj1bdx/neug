@@ -1,3 +1,12 @@
+2016-05-30  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* chopstx: Update.
+
+	* src/stm32f103.h, src/usb_stm32f103.c: Remove.
+	* src/adc_stm32f103.c, src/aes-constant-ft.c: Remove
+	* src/sys.c, src/sys.h: Remove.
+	* neug.ld.in, Makefile.in: Use SYS, USB, ADC in chopstx.
+
 2016-05-27  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/adc_stm32f103.c (adc_intr): Define in this module.

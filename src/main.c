@@ -32,8 +32,8 @@
 #include "config.h"
 #include "neug.h"
 #include "usb_lld.h"
-#include "sys.h"
-#include "stm32f103.h"
+#include "mcu/sys-stm32f103.h"
+#include "mcu/stm32f103.h"
 #include "adc.h"
 
 enum {
