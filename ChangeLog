@@ -1,5 +1,9 @@
 2016-05-30  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (usb_cb_tx_done, usb_cb_rx_ready): Fix for Fraucheky.
+
+	* fraucheky: Update.
+
 	* chopstx: Update.
 
 	* src/stm32f103.h, src/usb_stm32f103.c: Remove.
