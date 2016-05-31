@@ -27,7 +27,7 @@
 #include <string.h>
 #include <chopstx.h>
 
-#include "mcu/sys-stm32f103.h"
+#include "sys.h"
 #include "neug.h"
 #include "mcu/stm32f103.h"
 #include "adc.h"
