@@ -32,8 +32,8 @@
 #include "config.h"
 #include "neug.h"
 #include "usb_lld.h"
-#include "sys.h"
-#include "stm32f103.h"
+#include "mcu/sys-stm32f103.h"
+#include "mcu/stm32f103.h"
 #include "adc.h"
 
 enum {
@@ -47,6 +47,8 @@ enum {
 
 #ifdef FRAUCHEKY_SUPPORT
 static uint8_t running_neug;
+extern void EP6_IN_Callback (uint32_t len);
+extern void EP6_OUT_Callback (void);
 #endif
 
 static chopstx_mutex_t usb_mtx;
@@ -748,8 +750,11 @@ static void fill_serial_no_by_unique_id (void)
 
 
 void
-usb_cb_tx_done (uint8_t ep_num)
+usb_cb_tx_done (uint8_t ep_num, uint32_t len, int success)
 {
+  (void)len;
+  (void)success;
+
   if (ep_num == ENDP1)
     {
       chopstx_mutex_lock (&usb_mtx);
@@ -760,6 +765,10 @@ usb_cb_tx_done (uint8_t ep_num)
     {
       /* INTERRUPT Transfer done */
     }
+#ifdef FRAUCHEKY_SUPPORT
+  else if (ep_num == ENDP6)
+    EP6_IN_Callback (len);
+#endif
 }
 
 void
@@ -767,6 +776,10 @@ usb_cb_rx_ready (uint8_t ep_num)
 {
   if (ep_num == ENDP3)
     usb_lld_rx_enable (ENDP3);
+#ifdef FRAUCHEKY_SUPPORT
+  else if (ep_num == ENDP6)
+    EP6_OUT_Callback ();
+#endif
 }
 
 typedef uint32_t eventmask_t;
