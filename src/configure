@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
+# ^ for Bash 4 and later on OS X and FreeBSD
 
 # This is bash which supports ANSI-C Quoting
 nl=$'\n'
