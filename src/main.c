@@ -32,7 +32,7 @@
 #include "config.h"
 #include "neug.h"
 #include "usb_lld.h"
-#include "mcu/sys-stm32f103.h"
+#include "sys.h"
 #include "mcu/stm32f103.h"
 #include "adc.h"
 
@@ -558,6 +558,7 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	  str = sys_version;
 	  size = sizeof (sys_version);
 	  break;
+#ifdef USE_SYS3
 	case 7:
 	  {
 	    int i;
@@ -575,6 +576,7 @@ usb_cb_get_descriptor (uint8_t rcp, uint8_t desc_type, uint8_t desc_index,
 	    size = i*2 + 2;
 	  }
 	  break;
+#endif
 	default:
 	  return USB_UNSUPPORT;
 	}

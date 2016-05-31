@@ -1,3 +1,8 @@
+2016-05-31  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (usb_cb_get_descriptor): sys_board_name is only
+	available in newer SYS.
+
 2016-05-30  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (usb_cb_tx_done, usb_cb_rx_ready): Fix for Fraucheky.
@@ -9,7 +14,7 @@
 	* src/stm32f103.h, src/usb_stm32f103.c: Remove.
 	* src/adc_stm32f103.c, src/aes-constant-ft.c: Remove
 	* src/sys.c, src/sys.h: Remove.
-	* neug.ld.in, Makefile.in: Use SYS, USB, ADC in chopstx.
+	* neug.ld.in, Makefile.in: Use SYS, USB, ADC in Chopstx.
 
 2016-05-27  NIIBE Yutaka  <gniibe@fsij.org>
 
