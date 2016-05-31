@@ -1,5 +1,7 @@
 2016-05-31  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* src/main.c (main): Don't call fraucheky_main until configured.
+
 	* chopstx: Update to 0.12.
 
 	* src/main.c (usb_cb_get_descriptor): sys_board_name is only
