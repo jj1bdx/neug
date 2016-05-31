@@ -752,10 +752,9 @@ static void fill_serial_no_by_unique_id (void)
 
 
 void
-usb_cb_tx_done (uint8_t ep_num, uint32_t len, int success)
+usb_cb_tx_done (uint8_t ep_num, uint32_t len)
 {
   (void)len;
-  (void)success;
 
   if (ep_num == ENDP1)
     {
@@ -938,14 +937,18 @@ main (int argc, char **argv)
   if (fraucheky_enabled ())
     {
     go_fraucheky:
+      bDeviceState = UNCONNECTED;
       running_neug = 0;
       usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
 				usb_intr, NULL);
+      while (bDeviceState != CONFIGURED)
+	chopstx_usec_wait (250*1000);
       set_led (1);
       fraucheky_main ();
       chopstx_cancel (usb_thd);
       chopstx_join (usb_thd, NULL);
       usb_lld_shutdown ();
+      bDeviceState = UNCONNECTED;
     }
 
   running_neug = 1;
