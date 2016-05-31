@@ -1,5 +1,7 @@
 2016-05-31  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* chopstx: Update to 0.12.
+
 	* src/main.c (usb_cb_get_descriptor): sys_board_name is only
 	available in newer SYS.
 

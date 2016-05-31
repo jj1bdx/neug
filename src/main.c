@@ -752,10 +752,9 @@ static void fill_serial_no_by_unique_id (void)
 
 
 void
-usb_cb_tx_done (uint8_t ep_num, uint32_t len, int success)
+usb_cb_tx_done (uint8_t ep_num, uint32_t len)
 {
   (void)len;
-  (void)success;
 
   if (ep_num == ENDP1)
     {
