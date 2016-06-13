@@ -1,3 +1,7 @@
+2016-06-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* src/main.c: Update with new USB API.
+
 2016-06-01  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* tool/neug_upgrade.py (regnual.__init__): Don't call
