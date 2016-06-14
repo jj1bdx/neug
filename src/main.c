@@ -659,8 +659,7 @@ usb_set_configuration (struct usb_dev *dev)
     }
 
   /* Do nothing when current_conf == value */
-  usb_lld_ctrl_ack (dev);
-  return 0;
+  return usb_lld_ctrl_ack (dev);
 }
 
 
@@ -678,8 +677,7 @@ usb_set_interface (struct usb_dev *dev)
   else
     {
       neug_setup_endpoints_for_interface (interface, 0);
-      usb_lld_ctrl_ack (dev);
-      return 0;
+      return usb_lld_ctrl_ack (dev);
     }
 }
 
