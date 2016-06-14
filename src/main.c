@@ -184,6 +184,7 @@ static const uint8_t vcom_string0[4] = {
 
 static void neug_setup_endpoints_for_interface (uint16_t interface, int stop);
 #ifdef FRAUCHEKY_SUPPORT
+#define MSC_MASS_STORAGE_RESET_COMMAND 0xFF
 extern int fraucheky_enabled (void);
 extern void fraucheky_main (void);
 
@@ -343,7 +344,7 @@ usb_ctrl_write_finish (struct usb_dev *dev)
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
 #ifdef FRAUCHEKY_SUPPORT
-      else if (arg->request == USB_CDC_REQ_SET_LINE_CODING)
+      else if (running_neug && arg->request == USB_CDC_REQ_SET_LINE_CODING)
 	{
 	  chopstx_mutex_lock (&usb_mtx);
 	  if (line_coding.bitrate == NEUG_SPECIAL_BITRATE)
@@ -355,6 +356,8 @@ usb_ctrl_write_finish (struct usb_dev *dev)
 	    fsij_device_state = FSIJ_DEVICE_RUNNING;
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
+      else if (!running_neug && arg->request == MSC_MASS_STORAGE_RESET_COMMAND)
+	fraucheky_setup_endpoints_for_interface (0);
 #endif
     }
 }
@@ -839,8 +842,6 @@ static void fill_serial_no_by_unique_id (void)
 static void
 usb_tx_done (uint8_t ep_num, uint16_t len)
 {
-  (void)len;
-
   if (ep_num == ENDP1)
     {
       chopstx_mutex_lock (&usb_mtx);
@@ -854,6 +855,8 @@ usb_tx_done (uint8_t ep_num, uint16_t len)
 #ifdef FRAUCHEKY_SUPPORT
   else if (ep_num == ENDP6)
     EP6_IN_Callback (len);
+#else
+  (void)len;
 #endif
 }
 
@@ -865,6 +868,8 @@ usb_rx_ready (uint8_t ep_num, uint16_t len)
 #ifdef FRAUCHEKY_SUPPORT
   else if (ep_num == ENDP6)
     EP6_OUT_Callback (len);
+#else
+  (void)len;
 #endif
 }
 

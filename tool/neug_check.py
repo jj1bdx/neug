@@ -106,9 +106,14 @@ def main():
     if not com:
         raise ValueError("No NeuG Device Present")
     print("")
-    for i in range(1,8):
+    for i in range(1,7):
         s = com.get_string(i, 512)
         print("%9s: %s" % (field[i], s.decode('UTF-8')))
+    try:
+        s = com.get_string(7, 512)
+        print("%9s: %s" % (field[7], s.decode('UTF-8')))
+    except:
+        pass
     print("")
     print("mode: %s" % com.get_mode())
     print("Repeat errors: %d" % com.get_info(2))
