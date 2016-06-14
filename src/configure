@@ -305,7 +305,7 @@ else
 fi
 
 
-sed -e "s%@USE_SYS3@%$use_sys_3%" \
+sed -e "s%@USE_SYS3@%$use_sys3%" \
     -e "s%@ENABLE_FRAUCHEKY@%$ENABLE_FRAUCHEKY%" \
     -e "s%@HEXOUTPUT_MAKE_OPTION@%$HEXOUTPUT_MAKE_OPTION%" \
 	< Makefile.in > Makefile

@@ -5,7 +5,7 @@ __main_stack_size__      = 0x0080;      /* Exception handlers     */
 __process0_stack_size__  = 0x0140;      /* main */
 __process1_stack_size__  = 0x00c0;      /* led */
 __process2_stack_size__  = 0x01a0;      /* rng */
-__process3_stack_size__  = 0x0100;      /* intr: usb */
+__process3_stack_size__  = 0x0120;      /* intr: usb */
 
 MEMORY
 {
