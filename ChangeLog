@@ -1,5 +1,7 @@
 2016-06-14  Niibe Yutaka  <gniibe@fsij.org>
 
+	* src/neug.ld.in (__process3_stack_size__): Larger value.
+
 	* fraucheky: Update to 0.4.
 
 	* src/main.c (usb_ctrl_write_finish): Support
