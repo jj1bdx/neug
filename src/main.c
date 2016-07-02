@@ -727,7 +727,7 @@ usb_main (void *arg)
 
   while (1)
     {
-      chopstx_poll (NULL, 1, &interrupt);
+      chopstx_intr_wait (&interrupt);
 
       if (interrupt.ready)
 	{
@@ -1083,6 +1083,9 @@ main (int argc, char **argv)
       while (1)
 	{
 	  chopstx_poll_cond_t poll_desc;
+      struct chx_poll_head *pd_array[1] = {
+          (struct chx_poll_head *)&poll_desc
+      };
 	  uint32_t usec = 5000*1000;
 
 	  poll_desc.type = CHOPSTX_POLL_COND;
@@ -1092,7 +1095,7 @@ main (int argc, char **argv)
 	  poll_desc.check = check_usb_status;
 	  poll_desc.arg = NULL;
 
-	  if (chopstx_poll (&usec, 1, &poll_desc))
+	  if (chopstx_poll (&usec, 1, pd_array))
 	    break;
 
 	  /* Timeout */
