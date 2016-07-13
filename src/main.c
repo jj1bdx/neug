@@ -1027,7 +1027,7 @@ main (int argc, char **argv)
     go_fraucheky:
       bDeviceState = UNCONNECTED;
       running_neug = 0;
-      usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+      usb_thd = chopstx_create (PRIO_USB, STACK_ADDR_USB, STACK_SIZE_USB,
 				usb_main, NULL);
       while (bDeviceState != CONFIGURED)
 	chopstx_usec_wait (250*1000);
@@ -1042,10 +1042,10 @@ main (int argc, char **argv)
   running_neug = 1;
 #endif
 
-  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
+  led_thread = chopstx_create (PRIO_LED, STACK_ADDR_LED, STACK_SIZE_LED,
 			       led_blinker, NULL);
 
-  usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+  usb_thd = chopstx_create (PRIO_USB, STACK_ADDR_USB, STACK_SIZE_USB,
 			    usb_main, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
