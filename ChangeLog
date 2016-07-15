@@ -1,3 +1,8 @@
+2016-07-15  Kenji Rikitake  <kenji@k2r.org>
+
+	* src/main.c (main): Fix call of chopstx_poll to follow
+	API change of Chopstx 1.1.
+
 2016-07-13  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/neug.c (neug_init): Apply change for STACK_ADDR_* from Gnuk.
