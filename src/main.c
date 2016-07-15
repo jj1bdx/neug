@@ -911,13 +911,13 @@ static void event_flag_signal (struct event_flag *ev, eventmask_t m)
   chopstx_mutex_unlock (&ev->mutex);
 }
 
-extern uint8_t __process1_stack_base__, __process1_stack_size__;
-extern uint8_t __process3_stack_base__, __process3_stack_size__;
+extern uint8_t __process1_stack_base__[], __process1_stack_size__[];
+extern uint8_t __process3_stack_base__[], __process3_stack_size__[];
 
-const uint32_t __stackaddr_led = (uint32_t)&__process1_stack_base__;
-const size_t __stacksize_led = (size_t)&__process1_stack_size__;
-const uint32_t __stackaddr_usb = (uint32_t)&__process3_stack_base__;
-const size_t __stacksize_usb = (size_t)&__process3_stack_size__;
+#define STACK_ADDR_LED ((uint32_t)__process1_stack_base__)
+#define STACK_SIZE_LED ((uint32_t)__process1_stack_size__)
+#define STACK_ADDR_USB ((uint32_t)__process3_stack_base__)
+#define STACK_SIZE_USB ((uint32_t)__process3_stack_size__)
 
 
 #define PRIO_LED 3
