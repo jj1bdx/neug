@@ -911,13 +911,13 @@ static void event_flag_signal (struct event_flag *ev, eventmask_t m)
   chopstx_mutex_unlock (&ev->mutex);
 }
 
-extern uint8_t __process1_stack_base__, __process1_stack_size__;
-extern uint8_t __process3_stack_base__, __process3_stack_size__;
+extern uint8_t __process1_stack_base__[], __process1_stack_size__[];
+extern uint8_t __process3_stack_base__[], __process3_stack_size__[];
 
-const uint32_t __stackaddr_led = (uint32_t)&__process1_stack_base__;
-const size_t __stacksize_led = (size_t)&__process1_stack_size__;
-const uint32_t __stackaddr_usb = (uint32_t)&__process3_stack_base__;
-const size_t __stacksize_usb = (size_t)&__process3_stack_size__;
+#define STACK_ADDR_LED ((uint32_t)__process1_stack_base__)
+#define STACK_SIZE_LED ((uint32_t)__process1_stack_size__)
+#define STACK_ADDR_USB ((uint32_t)__process3_stack_base__)
+#define STACK_SIZE_USB ((uint32_t)__process3_stack_size__)
 
 
 #define PRIO_LED 3
@@ -1027,7 +1027,7 @@ main (int argc, char **argv)
     go_fraucheky:
       bDeviceState = UNCONNECTED;
       running_neug = 0;
-      usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+      usb_thd = chopstx_create (PRIO_USB, STACK_ADDR_USB, STACK_SIZE_USB,
 				usb_main, NULL);
       while (bDeviceState != CONFIGURED)
 	chopstx_usec_wait (250*1000);
@@ -1042,10 +1042,10 @@ main (int argc, char **argv)
   running_neug = 1;
 #endif
 
-  led_thread = chopstx_create (PRIO_LED, __stackaddr_led, __stacksize_led,
+  led_thread = chopstx_create (PRIO_LED, STACK_ADDR_LED, STACK_SIZE_LED,
 			       led_blinker, NULL);
 
-  usb_thd = chopstx_create (PRIO_USB, __stackaddr_usb, __stacksize_usb,
+  usb_thd = chopstx_create (PRIO_USB, STACK_ADDR_USB, STACK_SIZE_USB,
 			    usb_main, NULL);
 
   neug_init (random_word, RANDOM_BYTES_LENGTH/sizeof (uint32_t));
@@ -1083,9 +1083,9 @@ main (int argc, char **argv)
       while (1)
 	{
 	  chopstx_poll_cond_t poll_desc;
-      struct chx_poll_head *pd_array[1] = {
-          (struct chx_poll_head *)&poll_desc
-      };
+	  struct chx_poll_head *pd_array[1] = {
+	    (struct chx_poll_head *)&poll_desc
+	  };
 	  uint32_t usec = 5000*1000;
 
 	  poll_desc.type = CHOPSTX_POLL_COND;
