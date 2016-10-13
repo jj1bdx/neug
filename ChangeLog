@@ -1,3 +1,9 @@
+2016-10-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/intel_hex.py, tool/hub_ctrl.py: Update from Gnuk.
+
+	* chopstx: Update to 1.2.
+
 2016-07-15  Kenji Rikitake  <kenji@k2r.org>
 
 	* src/main.c (main): Fix call of chopstx_poll to follow

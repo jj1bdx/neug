@@ -1082,11 +1082,11 @@ main (int argc, char **argv)
       chopstx_mutex_unlock (&usb_mtx);
       while (1)
 	{
+	  uint32_t usec = 5000*1000;
 	  chopstx_poll_cond_t poll_desc;
 	  struct chx_poll_head *pd_array[1] = {
 	    (struct chx_poll_head *)&poll_desc
 	  };
-	  uint32_t usec = 5000*1000;
 
 	  poll_desc.type = CHOPSTX_POLL_COND;
 	  poll_desc.ready = 0;
