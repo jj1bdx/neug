@@ -73,27 +73,27 @@
 <h3>rng-toolsで使う</h3>
 <p>システムとして利用ではNeuGの出力をrng-toolsで管理し、カーネルのrandomデバイスに供給するのが一般的でしょう。</p>
 
-<p>これに関しては、<a href="http://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debianでの利用例(英語)</a>をご覧ください。</p>
+<p>これに関しては、<a href="https://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debianでの利用例(英語)</a>をご覧ください。</p>
 
 <h2>READMEとGNU GPLおよび完全なソースコード</h2>
 <p>この製品には著作権を主張するソフトウェアが含まれ、GNU GPLv3で配布されています。ソフトウェアの説明の文書README(英語)と、許諾の条件GNU GPLv3(英語)を、それぞれご覧ください。</p>
 <p>この製品にインストールされているソフトウェアに対応する完全なソースコードは、Gnukリポジトリから入手できます。このリポジトリのサブリポジトリneugがNeuGのソースコードリポジトリです。RTOSのChopstxとGPLフロシキのFrauchekyを用いています。これらはChopstxリポジトリから入手できます。</p>
 <p>リポジトリには参照のためのリリースタグがついています。製品に利用されているコードのリリースタグは、NeuGリポジトリにあるコマンドtool/neug_check.pyで確認できます。それは、@REVISION@ であるはずです。違う場合はバグですのでよかったら報告願います。</p>
-<p>tarballもリポジトリからあわせて利用可能です(すみません https ではありません)。</p>
+<p>tarballもリポジトリからあわせて利用可能です。</p>
 <ul>
   <li><a href="README">README</a></li>
   <li><a href="COPYING">GNU GPLv3</a></li>
   <li><a href="https://anonscm.debian.org/cgit/gnuk/gnuk/">Gnukリポジトリ</a></li>
   <li><a href="https://anonscm.debian.org/cgit/gnuk/chopstx/">Chopstxリポジトリ</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=gnuk/neug.git;a=snapshot;h=@REVISION@;sf=tgz">NeuG tarball</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=snapshot;h=@REVISION_CHOPSTX@;sf=tgz">Chopstx tarball</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=chopstx/fraucheky.git;a=snapshot;h=@REVISION_FRAUCHEKY@;sf=tgz">Fraucheky tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=gnuk/neug.git;a=snapshot;h=@REVISION@;sf=tgz">NeuG tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=snapshot;h=@REVISION_CHOPSTX@;sf=tgz">Chopstx tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=chopstx/fraucheky.git;a=snapshot;h=@REVISION_FRAUCHEKY@;sf=tgz">Fraucheky tarball</a></li>
 </ul>
 
 <h3>物理メディアでのソースコード配布</h3>
 <p>ネットワーク利用ではない形態でソースコードを受け取りたい方には、飛石技術ではgit.gniibe.org のすべてのリポジトリが入ったmicro SDカードを販売しています。</p>
 <p>価格は一枚1000円(税込、国内送料込)です。支払いには下記の郵便振替口座を利用ください。
-郵便振替の払込取扱票に書かれた住所にSDカードを返送します。</p>
+郵便振替の払込取扱票に書かれた住所にメディアを送付します。</p>
 <ul>
   <li>郵便振替口座: 00110-2-346446</li>
   <li>加入者名: 飛石技術</li>
@@ -105,18 +105,25 @@
   <li>飛石技術 g新部 裕</li>
 </ul>
 
-<p>このソースコードの配布の申し出は製品の出荷の後の3年間、少なくとも2020年3月31日まで有効です。</p>
+<p>このソースコードの配布の申し出は製品の出荷の後の3年間、少なくとも2021年3月31日まで有効です。</p>
 
 <h2>リンク</h2>
 <ul>
-  <li><a href="http://www.gniibe.org/category/fst-01.html">
+  <li><a href="https://www.gniibe.org/category/fst-01.html">
       FST-01 support pages (英語) </a></li>
   <li><a href="https://lists.alioth.debian.org/mailman/listinfo/gnuk-users">
       メーリングリスト: Gnuk Users (英語) </a></li>
   <li><a href="https://lists.alioth.debian.org/mailman/listinfo/gnuk-users-ja">
       メーリングリスト: Gnuk ユーザ (日本語) </a></li>
-  <li><a href="http://www.gnu.org/gnu/manifesto.ja.html">GNU宣言</a></li>
+  <li><a href="https://www.gnu.org/gnu/manifesto.ja.html">GNU宣言</a></li>
 </ul>
+
+<h2>自由ソフトウェアとTRNG</h2>
+<p>自由ソフトウェアのTRNGの実装というのは興味深い哲学的問題があることを見つけました。
+自由ソフトウェアは(集団的に)自身でわたしたちのコンピューティングを制御するということですが、
+TRNGの中心的な考えは、だれも(所有者や開発者でさえ)ビットストリームとしての乱数列の生成を制御できないことにあります。
+メタなレベルでは、誰もビットストリームを制御できないように、わたしたちは制御しているわけです。
+</p>
 
 <h2>おわりに</h2>
 自由なコンピューティングがなんとか生き残ることを望みます。
