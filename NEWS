@@ -1,5 +1,13 @@
 NeuG NEWS - User visible changes
 
+* Major changes in NeuG 1.0.5
+
+  Released 2015-10-17, by NIIBE Yutaka
+
+** Upgrade of Chopstx
+We use Chopstx 1.2, which supports FST-01G.
+
+
 * Major changes in NeuG 1.0.4
 
   Released 2015-09-18, by NIIBE Yutaka

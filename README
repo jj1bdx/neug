@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							  Version 1.0.4
-							     2015-09-18
+							  Version 1.0.5
+							     2015-10-17
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,7 +28,7 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the fourth minor release of NeuG, after 1.0.
+This is the fifth minor release of NeuG, after 1.0.
 
 Basic features (generating random numbers) are stable, but newly added
 things like Fraucheky (USB Mass Storage Class) support and reGNUal
@@ -53,8 +53,8 @@ A0-double-dash: STM32F2xx and STM32F4xx have built-in TRNG, it would
                 looks not that good).
 
 Q1: How fast is NeuG device?
-A1: It's more than 80 kB/sec for conditioned output (by SHA-256), and
-    more than 280 kB/sec for CRC-32 filtered output (kB = 1000 byte).
+A1: It's about 80 kB/sec for conditioned output (by SHA-256), and 
+    about 270 kB/sec for CRC-32 filtered output (kB = 1000 byte).
 
 Q2: Should we check condition of noise sources?
 A2: Yes, we should.  Three continuous tests are implemented, following
@@ -70,6 +70,13 @@ A3: It is because NIST SP 800-90B mandates something like that for
     RNG-tools to feed entropy to your kernel, or use for computer
     simulations, I think that CRC-32 filtered output would be good
     enough.
+
+Q4: Configuring by 'stty' doesn't work, what's up?
+A4: Common problem on GNU/Linux is the "modemmanager" try to control
+    /dev/ttyACM0, which interferes.  Please consider removing
+    modemmanager from your system or configure it to ignore NeuG
+    device.  For detail, please see the FST-01 support pages on the
+    web.
 
 
 Targets
@@ -90,7 +97,8 @@ script prepending 'bash' before './configure'.
 
 Some tools are written in Python.  If your Python is not installed as
 /usr/bin/python, please prepend 'python' for your command invocation.
-Python 2.7 and PyUSB 0.4.3 is assumed.
+Python 2.7 and PyUSB 0.4.3 is assumed.  I also use Python 3.5 and
+PyUSB 1.0.0.
 
 
 Souce code
@@ -170,9 +178,9 @@ You need GNU toolchain and newlib for 'arm-none-eabi' target.
 On Debian we can install the packages of gcc-arm-none-eabi,
 gdb-arm-none-eabi and its friends.  I'm using:
 
-	binutils-arm-none-eabi	2.25-5+5+b1
-	gcc-arm-none-eabi 	15:4.9.3+svn227297-1
-	gdb-arm-none-eabi 	7.7.1+dfsg-5+8
+	binutils-arm-none-eabi	2.26-4+8
+	gcc-arm-none-eabi 	15:4.9.3+svn231177-1
+	gdb-arm-none-eabi 	7.10-1+9
 	libnewlib-arm-none-eabi	2.2.0+git20150830.5a3d536-1
 
 Or else, see https://launchpad.net/gcc-arm-embedded for preparation of
