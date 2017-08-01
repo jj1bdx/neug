@@ -1,5 +1,10 @@
 2017-08-01  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* src/Makefile.in: Support GNU/Linux target.
+	* src/configure: Support GNU/Linux target.
+
+2017-08-01  NIIBE Yutaka  <gniibe@fsij.org>
+
 	* src/configure: Support build without git.
 
 2016-10-17  NIIBE Yutaka  <gniibe@fsij.org>

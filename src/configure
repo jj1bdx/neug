@@ -195,6 +195,26 @@ STM8S_DISCOVERY)
   ;;
 esac
 
+if test "$target" = "GNU_LINUX"; then
+  ldscript=""
+  chip="gnu-linux"
+  use_sys=""
+  emulation="yes"
+  cross=""
+  mcu="none"
+  def_emulation="-DGNU_LINUX_EMULATION"
+  libs="-lpthread"
+else
+  ldscript="neug.ld"
+  chip="stm32f103"
+  use_sys="yes"
+  emulation=""
+  cross="arm-none-eabi-"
+  mcu="cortex-m3"
+  def_emulation=""
+  libs=""
+fi
+
 # --with-dfu option
 if test "$with_dfu" = "yes"; then
   if test "$target" = "FST_01" -o "$target" = "FST_01_00"; then
@@ -312,7 +332,15 @@ else
 fi
 
 
-sed -e "s%@USE_SYS3@%$use_sys3%" \
+sed -e "s%@LDSCRIPT@%$ldscript%" \
+    -e "s%@CHIP@%$chip%" \
+    -e "s%@USE_SYS@%$use_sys%" \
+    -e "s%@EMULATION@%$emulation%" \
+    -e "s%@CROSS@%$cross%" \
+    -e "s%@MCU@%$mcu%" \
+    -e "s%@DEF_EMULATION@%$def_emulation%" \
+    -e "s%@LIBS@%$libs%" \
+    -e "s%@USE_SYS3@%$use_sys3%" \
     -e "s%@ENABLE_FRAUCHEKY@%$ENABLE_FRAUCHEKY%" \
     -e "s%@HEXOUTPUT_MAKE_OPTION@%$HEXOUTPUT_MAKE_OPTION%" \
 	< Makefile.in > Makefile
