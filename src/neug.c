@@ -1,7 +1,7 @@
 /*
  * neug.c - true random number generation
  *
- * Copyright (C) 2011, 2012, 2013, 2016
+ * Copyright (C) 2011, 2012, 2013, 2016, 2017
  *               Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
@@ -29,7 +29,9 @@
 
 #include "sys.h"
 #include "neug.h"
+#ifndef GNU_LINUX_EMULATION
 #include "mcu/stm32f103.h"
+#endif
 #include "adc.h"
 #include "sha256.h"
 
@@ -640,9 +642,15 @@ rng (void *arg)
 
 static struct rng_rb the_ring_buffer;
 
+#ifdef GNU_LINUX_EMULATION
+static char __process2_stack_base__[4096];
+#define STACK_SIZE_RNG (sizeof __process2_stack_base__)
+#else
 extern uint8_t __process2_stack_base__[], __process2_stack_size__[];
-#define STACK_ADDR_RNG ((uint32_t)__process2_stack_base__)
-#define STACK_SIZE_RNG ((uint32_t)__process2_stack_size__)
+#define STACK_SIZE_RNG ((uintptr_t)__process2_stack_size__)
+#endif
+
+#define STACK_ADDR_RNG ((uintptr_t)__process2_stack_base__)
 #define PRIO_RNG 2
 
 /**

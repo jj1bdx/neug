@@ -1,3 +1,8 @@
+2017-08-02  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c: Support GNU/Linux target.
+	* src/neug.c: Support GNU/Linux target.
+
 2017-08-01  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/Makefile.in: Support GNU/Linux target.

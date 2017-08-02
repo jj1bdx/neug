@@ -33,7 +33,9 @@
 #include "neug.h"
 #include "usb_lld.h"
 #include "sys.h"
+#ifndef GNU_LINUX_EMULATION
 #include "mcu/stm32f103.h"
+#endif
 #include "adc.h"
 
 enum {
@@ -182,7 +184,8 @@ static const uint8_t vcom_string0[4] = {
 
 #include "usb-strings.c.inc"
 
-static void neug_setup_endpoints_for_interface (uint16_t interface, int stop);
+static void neug_setup_endpoints_for_interface (struct usb_dev *dev,
+						uint16_t interface, int stop);
 #ifdef FRAUCHEKY_SUPPORT
 #define MSC_MASS_STORAGE_RESET_COMMAND 0xFF
 extern int fraucheky_enabled (void);
@@ -203,11 +206,15 @@ usb_device_reset (struct usb_dev *dev)
   usb_lld_reset (dev, VCOM_FEATURE_BUS_POWERED);
 
   /* Initialize Endpoint 0.  */
+#ifdef GNU_LINUX_EMULATION
+  usb_lld_setup_endp (dev, ENDP0, 1, 1);
+#else
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
+#endif
 
   /* Stop the interface */
   for (i = 0; i < NUM_INTERFACES; i++)
-    neug_setup_endpoints_for_interface (i, 1);
+    neug_setup_endpoints_for_interface (dev, i, 1);
 
   /* Notify upper layer.  */
   chopstx_mutex_lock (&usb_mtx);
@@ -244,13 +251,14 @@ static void set_passwd (void)
 {
   flash_unlock ();
   if (neug_passwd[0] != 0xff)
-    flash_erase_page ((uint32_t)neug_passwd);
+    flash_erase_page ((uintptr_t)neug_passwd);
   if (usbbuf[0] == DEFAULT_PASSWD_LEN
       && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
     return;
-  flash_write ((uint32_t)neug_passwd, usbbuf, usbbuf[0] + 1);
+  flash_write ((uintptr_t)neug_passwd, usbbuf, usbbuf[0] + 1);
 }
 
+#ifndef GNU_LINUX_EMULATION
 static uint32_t rbit (uint32_t v)
 {
   uint32_t r;
@@ -258,10 +266,16 @@ static uint32_t rbit (uint32_t v)
   asm ("rbit	%0, %1" : "=r" (r) : "r" (v));
   return r;
 }
+#endif
 
 /* After calling this function, CRC module remain enabled.  */
 static int download_check_crc32 (struct usb_dev *dev, const uint32_t *end_p)
 {
+#ifdef GNU_LINUX_EMULATION
+  /* CRC32 calculation comes here.  */
+  (void)dev;
+  (void)end_p;
+#else
   uint32_t crc32 = *end_p;
   const uint32_t *p;
 
@@ -273,6 +287,7 @@ static int download_check_crc32 (struct usb_dev *dev, const uint32_t *end_p)
 
   if ((rbit (CRC->DR) ^ crc32) == 0xffffffff)
     return usb_lld_ctrl_ack (dev);
+#endif
 
   return -1;
 }
@@ -430,7 +445,7 @@ usb_setup (struct usb_dev *dev)
 	}
       else /* SETUP_SET */
 	{
-	  uint8_t *addr = (uint8_t *)(0x20000000 + arg->value * 0x100 + arg->index);
+	  uint8_t *addr = (uint8_t *)(0x20000000UL + arg->value * 0x100 + arg->index);
 
 	  if (arg->request == USB_FSIJ_DOWNLOAD)
 	    {
@@ -460,7 +475,7 @@ usb_setup (struct usb_dev *dev)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      if (((uint32_t)addr & 0x03))
+	      if (((uintptr_t)addr & 0x03))
 		return -1;
 
 	      return download_check_crc32 (dev, (uint32_t *)addr);
@@ -588,7 +603,8 @@ usb_get_descriptor (struct usb_dev *dev)
 }
 
 static void
-neug_setup_endpoints_for_interface (uint16_t interface, int stop)
+neug_setup_endpoints_for_interface (struct usb_dev *dev,
+				    uint16_t interface, int stop)
 {
   if (interface == 0)
     {
@@ -596,7 +612,11 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
       if (running_neug)
 	{
 	  if (!stop)
+#ifdef GNU_LINUX_EMULATION
+	    usb_lld_setup_endp (dev, ENDP2, 0, 1);
+#else
 	    usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
+#endif
 	  else
 	    usb_lld_stall_tx (ENDP2);
 	}
@@ -604,7 +624,11 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
 	fraucheky_setup_endpoints_for_interface (stop);
 #else
       if (!stop)
+#ifdef GNU_LINUX_EMULATION
+	usb_lld_setup_endp (dev, ENDP2, 0, 1);
+#else
 	usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
+#endif
       else
 	usb_lld_stall_tx (ENDP2);
 #endif
@@ -613,8 +637,13 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
     {
       if (!stop)
 	{
+#ifdef GNU_LINUX_EMULATION
+	  usb_lld_setup_endp (dev, ENDP1, 0, 1);
+	  usb_lld_setup_endp (dev, ENDP3, 1, 0);
+#else
 	  usb_lld_setup_endpoint (ENDP1, EP_BULK, 0, 0, ENDP1_TXADDR, 0);
 	  usb_lld_setup_endpoint (ENDP3, EP_BULK, 0, ENDP3_RXADDR, 0, 64);
+#endif
 	  /* Start with no data receiving (ENDP3 not enabled) */
 	}
       else
@@ -639,7 +668,7 @@ usb_set_configuration (struct usb_dev *dev)
 
       usb_lld_set_configuration (dev, 1);
       for (i = 0; i < NUM_INTERFACES; i++)
-	neug_setup_endpoints_for_interface (i, 0);
+	neug_setup_endpoints_for_interface (dev, i, 0);
       chopstx_mutex_lock (&usb_mtx);
       bDeviceState = CONFIGURED;
       chopstx_mutex_unlock (&usb_mtx);
@@ -651,7 +680,7 @@ usb_set_configuration (struct usb_dev *dev)
 
       usb_lld_set_configuration (dev, 0);
       for (i = 0; i < NUM_INTERFACES; i++)
-	neug_setup_endpoints_for_interface (i, 1);
+	neug_setup_endpoints_for_interface (dev, i, 1);
       chopstx_mutex_lock (&usb_mtx);
       bDeviceState = ADDRESSED;
       chopstx_cond_signal (&usb_cnd);
@@ -676,7 +705,7 @@ usb_set_interface (struct usb_dev *dev)
     return -1;
   else
     {
-      neug_setup_endpoints_for_interface (interface, 0);
+      neug_setup_endpoints_for_interface (dev, interface, 0);
       return usb_lld_ctrl_ack (dev);
     }
 }
@@ -858,11 +887,17 @@ usb_tx_done (uint8_t ep_num, uint16_t len)
 #endif
 }
 
+static uint8_t endp3_buf[64];
+
 static void
 usb_rx_ready (uint8_t ep_num, uint16_t len)
 {
   if (ep_num == ENDP3)
+#ifdef GNU_LINUX_EMULATION
+    usb_lld_rx_enable_buf (ENDP3, endp3_buf, 64);
+#else
     usb_lld_rx_enable (ENDP3);
+#endif
 #ifdef FRAUCHEKY_SUPPORT
   else if (ep_num == ENDP6)
     EP6_OUT_Callback (len);
@@ -911,13 +946,20 @@ static void event_flag_signal (struct event_flag *ev, eventmask_t m)
   chopstx_mutex_unlock (&ev->mutex);
 }
 
+#ifdef GNU_LINUX_EMULATION
+extern char __process1_stack_base__[4096];
+extern char __process3_stack_base__[4096];
+#define STACK_SIZE_LED (sizeof __process1_stack_base__)
+#define STACK_SIZE_USB (sizeof __process3_stack_base__)
+#else
 extern uint8_t __process1_stack_base__[], __process1_stack_size__[];
 extern uint8_t __process3_stack_base__[], __process3_stack_size__[];
+#define STACK_SIZE_LED ((uintptr_t)__process1_stack_size__)
+#define STACK_SIZE_USB ((uintptr_t)__process3_stack_size__)
+#endif
 
-#define STACK_ADDR_LED ((uint32_t)__process1_stack_base__)
-#define STACK_SIZE_LED ((uint32_t)__process1_stack_size__)
-#define STACK_ADDR_USB ((uint32_t)__process3_stack_base__)
-#define STACK_SIZE_USB ((uint32_t)__process3_stack_size__)
+#define STACK_ADDR_LED ((uintptr_t)__process1_stack_base__)
+#define STACK_ADDR_USB ((uintptr_t)__process3_stack_base__)
 
 
 #define PRIO_LED 3
@@ -965,9 +1007,17 @@ led_blinker (void *arg)
 #define RANDOM_BYTES_LENGTH 64
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
+#ifdef GNU_LINUX_EMULATION
+static uint8_t endp1_buf[RANDOM_BYTES_LENGTH];
+#endif
+
 static void copy_to_tx (uint32_t v, int i)
 {
+#ifdef GNU_LINUX_EMULATION
+  memcpy (&endp1_buf[i], &v, 4);
+#else
   usb_lld_txcpy (&v, ENDP1, i * 4, 4);
+#endif
 }
 
 /*
@@ -980,10 +1030,10 @@ static uint32_t
 calculate_regnual_entry_address (const uint8_t *addr)
 {
   const uint8_t *p = addr + 4;
-  uint32_t v = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
+  uintptr_t v = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
 
   v -= REGNUAL_START_ADDRESS_COMPATIBLE;
-  v += (uint32_t)addr;
+  v += (uintptr_t)addr;
   return v;
 }
 
@@ -997,6 +1047,11 @@ check_usb_status (void *arg)
 	  || fsij_device_state != FSIJ_DEVICE_RUNNING);
 }
 
+
+#ifdef GNU_LINUX_EMULATION
+#define main emulated_main
+#endif
+
 /*
  * Entry point.
  *
@@ -1005,7 +1060,7 @@ check_usb_status (void *arg)
 int
 main (int argc, char **argv)
 {
-  uint32_t entry;
+  uintptr_t entry;
   chopstx_t led_thread, usb_thd;
   unsigned int count;
 
@@ -1153,7 +1208,11 @@ main (int argc, char **argv)
 		break;
 
 	      /* Prepare sending random data.  */
+#ifdef GNU_LINUX_EMULATION
+	      usb_lld_tx_enable_buf (ENDP1, endp1_buf, i * 4);
+#else
 	      usb_lld_tx_enable (ENDP1, i * 4);
+#endif
 	      chopstx_cond_wait (&usb_cnd, &usb_mtx);
 	      count++;
 	    }
@@ -1212,8 +1271,10 @@ main (int argc, char **argv)
   chopstx_cancel (usb_thd);
   chopstx_join (usb_thd, NULL);
 
+#ifndef GNU_LINUX_EMULATION
   /* Set vector */
-  SCB->VTOR = (uint32_t)&_regnual_start;
+  SCB->VTOR = (uintptr_t)&_regnual_start;
+#endif
   entry = calculate_regnual_entry_address (&_regnual_start);
 #ifdef DFU_SUPPORT
 #define FLASH_SYS_START_ADDR 0x08000000
