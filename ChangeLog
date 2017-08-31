@@ -1,3 +1,8 @@
+2017-08-31  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (crc32_reset, crc32_step, crc32_get): New.
+	(download_check_crc32): Use new CRC32 routine.
+
 2017-08-02  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c: Support GNU/Linux target.
