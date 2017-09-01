@@ -1,3 +1,9 @@
+2017-09-01  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.c (crc32_reset, crc32_step, crc32_get): Move CRC32
+	routines from main.c.
+	(ep_fill_initial_string, ep_process, neug_init): Use them.
+
 2017-08-31  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (crc32_reset, crc32_step, crc32_get): New.
