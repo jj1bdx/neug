@@ -748,7 +748,13 @@ static void usb_tx_done (uint8_t ep_num, uint16_t len);
 static void usb_rx_ready (uint8_t ep_num, uint16_t len);
 
 
+#ifdef GNU_LINUX_EMULATION
+#include <signal.h>
+#define INTR_REQ_USB SIGUSR1
+#else
 #define INTR_REQ_USB 20
+#endif
+
 #define PRIO_USB 3
 
 static void *
@@ -1025,7 +1031,7 @@ static uint8_t endp1_buf[RANDOM_BYTES_LENGTH];
 static void copy_to_tx (uint32_t v, int i)
 {
 #ifdef GNU_LINUX_EMULATION
-  memcpy (&endp1_buf[i], &v, 4);
+  memcpy (&endp1_buf[i*4], &v, 4);
 #else
   usb_lld_txcpy (&v, ENDP1, i * 4, 4);
 #endif
