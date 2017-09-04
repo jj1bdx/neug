@@ -6,3 +6,4 @@ src/INDEX
 src/README
 src/*.inc
 src/disk-on-rom.h
+src/config.mk

@@ -145,11 +145,11 @@ fi
 
 if ! test "$with_fraucheky" = "no"; then
   ../fraucheky/configure $with_fraucheky $with_index $REVISION $REVISION_CHOPSTX $REVISION_FRAUCHEKY
-  ENABLE_FRAUCHEKY=""
+  enable_fraucheky=yes
   FRAUCHEKY_DEFINE="#define FRAUCHEKY_SUPPORT 1"
   FRAUCHEKY_MSC_DEFINE="#define MSC_INTERFACE_NO    2"
 else
-  ENABLE_FRAUCHEKY="# "
+  enable_fraucheky=""
   FRAUCHEKY_DEFINE="#undef FRAUCHEKY_SUPPORT"
   FRAUCHEKY_MSC_DEFINE="#undef MSC_INTERFACE_NO"
   if ! test -f ../fraucheky/build.mk; then
@@ -198,11 +198,12 @@ esac
 if test "$target" = "GNU_LINUX"; then
   ldscript=""
   chip="gnu-linux"
-  use_sys=""
+  use_sys="yes"
   emulation="yes"
   cross=""
   mcu="none"
   def_emulation="-DGNU_LINUX_EMULATION"
+  enable_hexoutput=""
   libs="-lpthread"
 else
   ldscript="neug.ld"
@@ -212,6 +213,7 @@ else
   cross="arm-none-eabi-"
   mcu="cortex-m3"
   def_emulation=""
+  enable_hexoutput=yes
   libs=""
 fi
 
@@ -225,13 +227,11 @@ if test "$with_dfu" = "yes"; then
   ORIGIN=0x08003000
   FLASH_SIZE=$(expr $FLASH_SIZE - 12)
   DFU_DEFINE="#define DFU_SUPPORT 1"
-  HEXOUTPUT_MAKE_OPTION="ENABLE_OUTPUT_HEX=yes"
 else
   with_dfu=no
   echo "Configured for bare system (no-DFU)"
   ORIGIN=0x08000000
   DFU_DEFINE="#undef DFU_SUPPORT"
-  HEXOUTPUT_MAKE_OPTION=""
 fi
 
 ### !!! Replace following string of "FSIJ" to yours !!! ####
@@ -332,18 +332,17 @@ else
 fi
 
 
-sed -e "s%@LDSCRIPT@%$ldscript%" \
-    -e "s%@CHIP@%$chip%" \
-    -e "s%@USE_SYS@%$use_sys%" \
-    -e "s%@EMULATION@%$emulation%" \
-    -e "s%@CROSS@%$cross%" \
-    -e "s%@MCU@%$mcu%" \
-    -e "s%@DEF_EMULATION@%$def_emulation%" \
-    -e "s%@LIBS@%$libs%" \
-    -e "s%@USE_SYS3@%$use_sys3%" \
-    -e "s%@ENABLE_FRAUCHEKY@%$ENABLE_FRAUCHEKY%" \
-    -e "s%@HEXOUTPUT_MAKE_OPTION@%$HEXOUTPUT_MAKE_OPTION%" \
-	< Makefile.in > Makefile
+(echo "CHIP=$chip";
+ echo "USE_SYS=$use_sys";
+ echo "EMULATION=$emulation";
+ echo "CROSS=$cross";
+ echo "MCU=$mcu";
+ echo "DEFS=$use_sys3 $flash_override $def_emulation";
+ echo "LDSCRIPT=$ldscript";
+ echo "LIBS=$libs";
+ echo "ENABLE_FRAUCHEKY=$enable_fraucheky";
+ echo "ENABLE_OUTPUT_HEX=$enable_hexoutput"
+)	> config.mk
 sed -e "s/@ORIGIN@/$ORIGIN/" -e "s/@FLASH_SIZE@/$FLASH_SIZE/" \
     -e "s/@MEMORY_SIZE@/$MEMORY_SIZE/" \
     -e "s/@FLASH_PAGE_SIZE@/$FLASH_PAGE_SIZE/" \

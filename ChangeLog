@@ -1,6 +1,7 @@
 2017-09-04  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/Makefile: Rename from src/Makefile.in (as done in gnuk).
+	* src/configure: Generate config.mk.
 
 2017-09-01  NIIBE Yutaka  <gniibe@fsij.org>
 
