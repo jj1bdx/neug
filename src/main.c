@@ -265,12 +265,12 @@ static int download_check_crc32 (struct usb_dev *dev, const uint32_t *end_p)
   uint32_t crc32 = *end_p;
   const uint32_t *p;
 
-  crc32_reset ();
+  crc32_rv_reset ();
 
   for (p = (const uint32_t *)&_regnual_start; p < end_p; p++)
-    crc32_step (rbit (*p));
+    crc32_rv_step (rbit (*p));
 
-  if ((rbit (crc32_get ()) ^ crc32) == 0xffffffff)
+  if ((rbit (crc32_rv_get ()) ^ crc32) == 0xffffffff)
     return usb_lld_ctrl_ack (dev);
 
   return -1;

@@ -36,7 +36,7 @@
 #include "sha256.h"
 
 #ifdef GNU_LINUX_EMULATION
-static const uint32_t crc32_table[256] = {
+static const uint32_t crc32_rv_table[256] = {
   0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
   0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
   0x350c9b64, 0x31cd86d3, 0x3c8ea00a, 0x384fbdbd, 0x4c11db70, 0x48d0c6c7,
@@ -85,22 +85,22 @@ static const uint32_t crc32_table[256] = {
 static uint32_t crc;
 
 void
-crc32_reset (void)
+crc32_rv_reset (void)
 {
   crc = 0xffffffff;
 }
 
 void
-crc32_step (uint32_t v)
+crc32_rv_step (uint32_t v)
 {
-  crc = crc32_table[(crc ^ (v << 0))  >> 24] ^ (crc << 8);
-  crc = crc32_table[(crc ^ (v << 8))  >> 24] ^ (crc << 8);
-  crc = crc32_table[(crc ^ (v << 16)) >> 24] ^ (crc << 8);
-  crc = crc32_table[(crc ^ (v << 24)) >> 24] ^ (crc << 8);
+  crc = crc32_rv_table[(crc ^ (v << 0))  >> 24] ^ (crc << 8);
+  crc = crc32_rv_table[(crc ^ (v << 8))  >> 24] ^ (crc << 8);
+  crc = crc32_rv_table[(crc ^ (v << 16)) >> 24] ^ (crc << 8);
+  crc = crc32_rv_table[(crc ^ (v << 24)) >> 24] ^ (crc << 8);
 }
 
 uint32_t
-crc32_get (void)
+crc32_rv_get (void)
 {
   return crc;
 }
@@ -117,20 +117,20 @@ rbit (uint32_t v)
 }
 #else
 void
-crc32_reset (void)
+crc32_rv_reset (void)
 {
   RCC->AHBENR |= RCC_AHBENR_CRCEN;
   CRC->CR = CRC_CR_RESET;
 }
 
 void
-crc32_step (uint32_t v)
+crc32_rv_step (uint32_t v)
 {
   CRC->DR = v;
 }
 
 uint32_t
-crc32_get (void)
+crc32_rv_get (void)
 {
   return CRC->DR;
 }
@@ -210,7 +210,7 @@ static void noise_source_continuous_test_word (uint8_t b0, uint8_t b1,
  */
 static void ep_fill_initial_string (void)
 {
-  uint32_t v = crc32_get ();
+  uint32_t v = crc32_rv_get ();
   uint8_t b1, b2, b3;
 
   b3 = v >> 24;
@@ -276,11 +276,11 @@ static int ep_process (int mode)
       sha256_ctx_data.wbuf[1] = adc_buf[1];
       for (i = 0; i < EP_ROUND_0_INPUTS / 4; i++)
 	{
-	  crc32_step (adc_buf[i*4 + 2]);
-	  crc32_step (adc_buf[i*4 + 3]);
-	  crc32_step (adc_buf[i*4 + 4]);
-	  crc32_step (adc_buf[i*4 + 5]);
-	  v = crc32_get ();
+	  crc32_rv_step (adc_buf[i*4 + 2]);
+	  crc32_rv_step (adc_buf[i*4 + 3]);
+	  crc32_rv_step (adc_buf[i*4 + 4]);
+	  crc32_rv_step (adc_buf[i*4 + 5]);
+	  v = crc32_rv_get ();
 	  ep_fill_wbuf_v (i+2, 1, v);
 	}
 
@@ -293,11 +293,11 @@ static int ep_process (int mode)
     {
       for (i = 0; i < EP_ROUND_1_INPUTS / 4; i++)
 	{
-	  crc32_step (adc_buf[i*4]);
-	  crc32_step (adc_buf[i*4 + 1]);
-	  crc32_step (adc_buf[i*4 + 2]);
-	  crc32_step (adc_buf[i*4 + 3]);
-	  v = crc32_get ();
+	  crc32_rv_step (adc_buf[i*4]);
+	  crc32_rv_step (adc_buf[i*4 + 1]);
+	  crc32_rv_step (adc_buf[i*4 + 2]);
+	  crc32_rv_step (adc_buf[i*4 + 3]);
+	  v = crc32_rv_get ();
 	  ep_fill_wbuf_v (i, 1, v);
 	}
 
@@ -310,19 +310,19 @@ static int ep_process (int mode)
     {
       for (i = 0; i < EP_ROUND_2_INPUTS / 4; i++)
 	{
-	  crc32_step (adc_buf[i*4]);
-	  crc32_step (adc_buf[i*4 + 1]);
-	  crc32_step (adc_buf[i*4 + 2]);
-	  crc32_step (adc_buf[i*4 + 3]);
-	  v = crc32_get ();
+	  crc32_rv_step (adc_buf[i*4]);
+	  crc32_rv_step (adc_buf[i*4 + 1]);
+	  crc32_rv_step (adc_buf[i*4 + 2]);
+	  crc32_rv_step (adc_buf[i*4 + 3]);
+	  v = crc32_rv_get ();
 	  ep_fill_wbuf_v (i, 1, v);
 	}
 
-      crc32_step (adc_buf[i*4]);
-      crc32_step (adc_buf[i*4 + 1]);
-      crc32_step (adc_buf[i*4 + 2]);
-      crc32_step (adc_buf[i*4 + 3]);
-      v = crc32_get () & 0xff;   /* First byte of CRC32 is used here.  */
+      crc32_rv_step (adc_buf[i*4]);
+      crc32_rv_step (adc_buf[i*4 + 1]);
+      crc32_rv_step (adc_buf[i*4 + 2]);
+      crc32_rv_step (adc_buf[i*4 + 3]);
+      v = crc32_rv_get () & 0xff;   /* First byte of CRC32 is used here.  */
       noise_source_continuous_test (v);
       sha256_ctx_data.wbuf[i] = v;
       ep_init (NEUG_MODE_CONDITIONED); /* The rest three-byte of
@@ -338,11 +338,11 @@ static int ep_process (int mode)
     {
       for (i = 0; i < EP_ROUND_RAW_INPUTS / 4; i++)
 	{
-	  crc32_step (adc_buf[i*4]);
-	  crc32_step (adc_buf[i*4 + 1]);
-	  crc32_step (adc_buf[i*4 + 2]);
-	  crc32_step (adc_buf[i*4 + 3]);
-	  v = crc32_get ();
+	  crc32_rv_step (adc_buf[i*4]);
+	  crc32_rv_step (adc_buf[i*4 + 1]);
+	  crc32_rv_step (adc_buf[i*4 + 2]);
+	  crc32_rv_step (adc_buf[i*4 + 3]);
+	  v = crc32_rv_get ();
 	  ep_fill_wbuf_v (i, 1, v);
 	}
 
@@ -773,14 +773,14 @@ neug_init (uint32_t *buf, uint8_t size)
   struct rng_rb *rb = &the_ring_buffer;
   int i;
 
-  crc32_reset ();
+  crc32_rv_reset ();
 
   /*
    * This initialization ensures that it generates different sequence
    * even if all physical conditions are same.
    */
   for (i = 0; i < 3; i++)
-    crc32_step (*u++);
+    crc32_rv_step (*u++);
 
   neug_mode = NEUG_MODE_CONDITIONED;
   rb_init (rb, buf, size);
