@@ -1,3 +1,7 @@
+2017-09-04  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/Makefile: Rename from src/Makefile.in (as done in gnuk).
+
 2017-09-01  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/neug.c (crc32_reset, crc32_step, crc32_get): Move CRC32
