@@ -1,5 +1,7 @@
 2017-09-04  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* src/main.c: Support GNU_LINUX_EMULATION.
+
 	* src/Makefile: Rename from src/Makefile.in (as done in gnuk).
 	* src/configure: Generate config.mk.
 
