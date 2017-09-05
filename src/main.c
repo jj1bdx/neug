@@ -963,20 +963,14 @@ static void event_flag_signal (struct event_flag *ev, eventmask_t m)
   chopstx_mutex_unlock (&ev->mutex);
 }
 
-#ifdef GNU_LINUX_EMULATION
-static char __process1_stack_base__[4096];
-static char __process3_stack_base__[4096];
-#define STACK_SIZE_LED (sizeof __process1_stack_base__)
-#define STACK_SIZE_USB (sizeof __process3_stack_base__)
-#else
-extern uint8_t __process1_stack_base__[], __process1_stack_size__[];
-extern uint8_t __process3_stack_base__[], __process3_stack_size__[];
-#define STACK_SIZE_LED ((uintptr_t)__process1_stack_size__)
-#define STACK_SIZE_USB ((uintptr_t)__process3_stack_size__)
-#endif
-
-#define STACK_ADDR_LED ((uintptr_t)__process1_stack_base__)
-#define STACK_ADDR_USB ((uintptr_t)__process3_stack_base__)
+#define STACK_MAIN
+#define STACK_PROCESS_1
+#define STACK_PROCESS_3
+#include "stack-def.h"
+#define STACK_ADDR_LED ((uintptr_t)process1_base)
+#define STACK_SIZE_LED (sizeof process1_base)
+#define STACK_ADDR_USB ((uintptr_t)process3_base)
+#define STACK_SIZE_USB (sizeof process3_base)
 
 
 #define PRIO_LED 3

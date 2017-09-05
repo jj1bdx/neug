@@ -752,15 +752,11 @@ rng (void *arg)
 
 static struct rng_rb the_ring_buffer;
 
-#ifdef GNU_LINUX_EMULATION
-static char __process2_stack_base__[4096];
-#define STACK_SIZE_RNG (sizeof __process2_stack_base__)
-#else
-extern uint8_t __process2_stack_base__[], __process2_stack_size__[];
-#define STACK_SIZE_RNG ((uintptr_t)__process2_stack_size__)
-#endif
+#define STACK_PROCESS_2
+#include "stack-def.h"
+#define STACK_ADDR_RNG ((uintptr_t)process2_base)
+#define STACK_SIZE_RNG (sizeof process2_base)
 
-#define STACK_ADDR_RNG ((uintptr_t)__process2_stack_base__)
 #define PRIO_RNG 2
 
 /**

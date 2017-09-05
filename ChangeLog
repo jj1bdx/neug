@@ -1,3 +1,12 @@
+2017-09-05  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.c: Use stack-def.h.
+	* src/main.c: Likewise.
+
+	* src/neug.ld.in: Remove stack definitions.
+
+	* src/stack-def.h: New.
+
 2017-09-04  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c: Support GNU_LINUX_EMULATION.
