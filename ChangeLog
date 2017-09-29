@@ -1,3 +1,7 @@
+2017-09-29  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (FLASH_UPGRADE_SUPPORT): New.
+
 2017-09-05  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/neug.c: Use stack-def.h.

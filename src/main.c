@@ -35,6 +35,7 @@
 #include "sys.h"
 #ifndef GNU_LINUX_EMULATION
 #include "mcu/stm32f103.h"
+#define FLASH_UPGRADE_SUPPORT 1
 #endif
 #include "adc.h"
 
@@ -224,7 +225,7 @@ usb_device_reset (struct usb_dev *dev)
   chopstx_mutex_unlock (&usb_mtx);
 }
 
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
 extern uint8_t _regnual_start, __heap_end__;
 
 static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
@@ -249,7 +250,7 @@ uint8_t neug_passwd[33] __attribute__ ((section(".passwd"))) = {
 };
 static uint8_t usbbuf[64];
 
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
 static void set_passwd (void)
 {
   flash_unlock ();
@@ -319,7 +320,7 @@ usb_ctrl_write_finish (struct usb_dev *dev)
 	    }
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
       else if (arg->request == USB_NEUG_SET_PASSWD)
 	set_passwd ();
 #endif
@@ -327,7 +328,7 @@ usb_ctrl_write_finish (struct usb_dev *dev)
 	{
 	  if ((neug_passwd[0] == 0xff && usbbuf[0] == DEFAULT_PASSWD_LEN
 	       && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
 	      || (neug_passwd[0] == usbbuf[0]
 		  && !memcmp (neug_passwd+1, usbbuf+1, neug_passwd[0]))
 #endif
@@ -405,9 +406,7 @@ usb_setup (struct usb_dev *dev)
 	{
 	  if (arg->request == USB_FSIJ_MEMINFO)
 	    {
-#ifdef GNU_LINUX_EMULATION
-	      return -1;
-#else
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -416,6 +415,8 @@ usb_setup (struct usb_dev *dev)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 	      return usb_lld_ctrl_send (dev, mem_info, sizeof (mem_info));
+#else
+	      return -1;
 #endif
 	    }
 	  else if (arg->request == USB_NEUG_GET_INFO)
@@ -442,13 +443,13 @@ usb_setup (struct usb_dev *dev)
 	}
       else /* SETUP_SET */
 	{
+#ifdef FLASH_UPGRADE_SUPPORT
 	  uint8_t *addr = (uint8_t *)(0x20000000UL + arg->value * 0x100 + arg->index);
+#endif
 
 	  if (arg->request == USB_FSIJ_DOWNLOAD)
 	    {
-#ifdef GNU_LINUX_EMULATION
-	      return -1;
-#else
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -464,13 +465,13 @@ usb_setup (struct usb_dev *dev)
 		memset (addr + arg->index + arg->len, 0, 256 - (arg->index + arg->len));
 
 	      return usb_lld_ctrl_recv (dev, addr, arg->len);
+#else
+	      return -1;
 #endif
 	    }
 	  else if (arg->request == USB_FSIJ_EXEC && arg->len == 0)
 	    {
-#ifdef GNU_LINUX_EMULATION
-	      return -1;
-#else
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -483,6 +484,8 @@ usb_setup (struct usb_dev *dev)
 		return -1;
 
 	      return download_check_crc32 (dev, (uint32_t *)addr);
+#else
+	      return -1;
 #endif
 	    }
 	  else if (arg->request == USB_NEUG_SET_PASSWD && arg->len <= 32)
@@ -1031,7 +1034,7 @@ static void copy_to_tx (uint32_t v, int i)
 #endif
 }
 
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
 /*
  * In Gnuk 1.0.[12], reGNUal was not relocatable.
  * Now, it's relocatable, but we need to calculate its entry address
@@ -1075,7 +1078,7 @@ check_usb_status (void *arg)
 int
 main (int argc, char **argv)
 {
-#ifndef GNU_LINUX_EMULATION
+#ifdef FLASH_UPGRADE_SUPPORT
   uintptr_t entry;
 #endif
   chopstx_t led_thread, usb_thd;
@@ -1288,9 +1291,7 @@ main (int argc, char **argv)
   chopstx_cancel (usb_thd);
   chopstx_join (usb_thd, NULL);
 
-#ifdef GNU_LINUX_EMULATION
-  exit (0);
-#else
+#ifdef FLASH_UPGRADE_SUPPORT
   /* Set vector */
   SCB->VTOR = (uintptr_t)&_regnual_start;
   entry = calculate_regnual_entry_address (&_regnual_start);
@@ -1300,7 +1301,7 @@ main (int argc, char **argv)
 #define CHIP_ID_REG ((uint32_t *)0xE0042000)
   {
     extern uint8_t _sys;
-    uint32_t addr;
+    uintptr_t addr;
     handler *new_vector = (handler *)FLASH_SYS_START_ADDR;
     void (*func) (void (*)(void)) = (void (*)(void (*)(void)))new_vector[9];
     uint32_t flash_page_size = 1024; /* 1KiB default */
@@ -1324,6 +1325,8 @@ main (int argc, char **argv)
   /* Leave NeuG to exec reGNUal */
   flash_erase_all_and_exec ((void (*)(void))entry);
 #endif
+#else
+  exit (0);
 #endif
 
   /* Never reached */
