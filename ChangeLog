@@ -1,3 +1,7 @@
+2017-10-03  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Add FST-01G.
+
 2017-10-02  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c [GNU_LINUX_EMULATION]: Clean up.

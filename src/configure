@@ -113,16 +113,18 @@ Configuration:
   --target=TARGET	specify target			[FST_01]
 			supported targets are:
 			   FST_01
+			   FST_01G
 			   STM8S_DISCOVERY
 			   OLIMEX_STM32_H103
-			   STM32_PRIMER2
-			   STBEE
-			   STBEE_MINI
 			   MAPLE_MINI
 			   ST_DONGLE
 			   ST_NUCLEO_F103
 			   NITROKEY_START
+			   BLUE_PILL
 			   CQ_STARM
+			   STM32_PRIMER2
+			   STBEE
+			   STBEE_MINI
 			   FST_01_00 (unreleased version with 8MHz XTAL)
   --enable-sys1-compat	enable SYS 1.0 compatibility	[yes]
 			   executable is target dependent
@@ -160,8 +162,8 @@ else
 fi
 
 BOARD_HEADER_FILE=board-$(echo $target | tr '_[:upper:]' '-[:lower:]').h
-echo Header file is: $BOARD_HEADER_FILE
-ln -sf ../chopstx/board/$BOARD_HEADER_FILE board.h
+echo "Header file is: $BOARD_HEADER_FILE"
+ln -sf "../chopstx/board/$BOARD_HEADER_FILE" board.h
 
 # Flash page size in byte
 FLASH_PAGE_SIZE=1024
@@ -219,13 +221,14 @@ fi
 
 # --with-dfu option
 if test "$with_dfu" = "yes"; then
-  if test "$target" = "FST_01" -o "$target" = "FST_01_00"; then
+  if test "$target" = "FST_01" -o "$target" = "FST_01G" \
+     -o "$target" = "FST_01_00"; then
       echo "FST-01 doesn't have DFU loader, you should not use --with-dfu." >&2
       exit 1
   fi
   echo "Configured for DFU"
   ORIGIN=0x08003000
-  FLASH_SIZE=$(expr $FLASH_SIZE - 12)
+  FLASH_SIZE=$(($FLASH_SIZE - 12))
   DFU_DEFINE="#define DFU_SUPPORT 1"
 else
   with_dfu=no
@@ -235,7 +238,7 @@ else
 fi
 
 ### !!! Replace following string of "FSIJ" to yours !!! ####
-SERIALNO="FSIJ-$(cat ../VERSION | sed -e 's%^[^/]*/%%')-"
+SERIALNO="FSIJ-$(sed -e 's%^[^/]*/%%' <../VERSION)-"
 
 SERIALNO_STR_LEN_DEFINE="#define SERIALNO_STR_LEN ${#SERIALNO}"
 
@@ -255,48 +258,48 @@ else
 fi
 
 output_vid_pid_version () {
-  echo $VIDPID | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\):\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* idVendor  */\\${nl}  0x\4, 0x\3, /* idProduct */%p"
-  echo $VERSION | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* bcdDevice */%p"
+  echo "$VIDPID" | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\):\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* idVendor  */\\${nl}  0x\4, 0x\3, /* idProduct */%p"
+  echo "$VERSION" | sed -n -e "s%^\([0-9a-f][0-9a-f]\)\([0-9a-f][0-9a-f]\)$%  0x\2, 0x\1, /* bcdDevice */%p"
 }
 
 output_vendor_product_serial_strings () {
   prefix=$1
 
   echo "static const uint8_t ${prefix}string_vendor[] = {"
-  echo "  ${#VENDOR}*2+2,			/* bLength */"
-  echo "  STRING_DESCRIPTOR,		/* bDescriptorType */"
+  echo "  ${#VENDOR}*2+2,                       /* bLength */"
+  echo "  STRING_DESCRIPTOR,            /* bDescriptorType */"
   echo "  /* Manufacturer: \"$VENDOR\" */"
-  echo $VENDOR | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
+  echo "$VENDOR" | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
   echo '};'
   echo
   echo "static const uint8_t ${prefix}string_product[] = {"
-  echo "  ${#PRODUCT}*2+2,			/* bLength */"
-  echo "  STRING_DESCRIPTOR,		/* bDescriptorType */"
+  echo "  ${#PRODUCT}*2+2,                      /* bLength */"
+  echo "  STRING_DESCRIPTOR,            /* bDescriptorType */"
   echo "  /* Product name: \"$PRODUCT\" */"
-  echo $PRODUCT | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
+  echo "$PRODUCT" | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
   echo '};'
 
   if test -n "$prefix"; then
   echo
   echo "static uint8_t ${prefix}string_serial[] = {"
-  echo "  ${#SERIALNO}*2+2+16,			/* bLength */"
-  echo "  STRING_DESCRIPTOR,    	/* bDescriptorType */"
+  echo "  ${#SERIALNO}*2+2+16,                  /* bLength */"
+  echo "  STRING_DESCRIPTOR,            /* bDescriptorType */"
   echo "  /* Serial number: \"$SERIALNO\" */"
-  echo $SERIALNO | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
+  echo "$SERIALNO" | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
   echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
   echo "  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,"
   echo '};'
   echo
   echo "static const uint8_t ${prefix}revision_detail[] = {"
-  echo "  ${#REVISION}*2+2,			/* bLength */"
-  echo "  STRING_DESCRIPTOR,    	/* bDescriptorType */"
+  echo "  ${#REVISION}*2+2,                     /* bLength */"
+  echo "  STRING_DESCRIPTOR,            /* bDescriptorType */"
   echo "  /* revision detail: \"$REVISION\" */"
-  echo $REVISION | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
+  echo "$REVISION" | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
   echo '};'
   echo
   echo "static const uint8_t ${prefix}config_options[] = {"
-  echo "  ${#CONFIG}*2+2,			/* bLength */"
-  echo "  STRING_DESCRIPTOR,    	/* bDescriptorType */"
+  echo "  ${#CONFIG}*2+2,                       /* bLength */"
+  echo "  STRING_DESCRIPTOR,            /* bDescriptorType */"
   echo "  /* configure options: \"$CONFIG\" */"
   echo $CONFIG | sed -e "s/\(........\)/\1\\${nl}/g" | sed -n -e "s/\(.\)/'\1', 0, /g" -e "s/^/  /" -e "/^  ./s/ $//p"
   echo '};'
@@ -304,7 +307,7 @@ output_vendor_product_serial_strings () {
 }
 
 if !(IFS="	"
-  while read VIDPID VERSION PRODUCT VENDOR; do
+  while read -r VIDPID VERSION PRODUCT VENDOR; do
     if test "$vidpid" = "$VIDPID"; then
       output_vid_pid_version > usb-vid-pid-ver.c.inc
       output_vendor_product_serial_strings neug_ >usb-strings.c.inc
