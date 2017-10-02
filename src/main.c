@@ -33,7 +33,10 @@
 #include "neug.h"
 #include "usb_lld.h"
 #include "sys.h"
-#ifndef GNU_LINUX_EMULATION
+#ifdef GNU_LINUX_EMULATION
+#include <stdlib.h>
+#define main emulated_main
+#else
 #include "mcu/stm32f103.h"
 #define FLASH_UPGRADE_SUPPORT 1
 #endif
@@ -1064,11 +1067,6 @@ check_usb_status (void *arg)
 }
 
 
-#ifdef GNU_LINUX_EMULATION
-#include <stdlib.h>
-
-#define main emulated_main
-#endif
 
 /*
  * Entry point.

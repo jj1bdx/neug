@@ -1,3 +1,7 @@
+2017-10-02  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c [GNU_LINUX_EMULATION]: Clean up.
+
 2017-09-29  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c (FLASH_UPGRADE_SUPPORT): New.
