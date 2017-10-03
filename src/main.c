@@ -1304,7 +1304,7 @@ main (int argc, char **argv)
     void (*func) (void (*)(void)) = (void (*)(void (*)(void)))new_vector[9];
     uint32_t flash_page_size = 1024; /* 1KiB default */
 
-   if ((*CHIP_ID_ADDR)&0x07 == 0x04) /* High dencity device.  */
+   if ((*CHIP_ID_REG)&0x07 == 0x04) /* High dencity device.  */
      flash_page_size += 0x0400; /* It's 2KiB. */
 
     /* Kill DFU */

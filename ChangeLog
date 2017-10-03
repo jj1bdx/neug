@@ -1,5 +1,7 @@
 2017-10-03  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* src/main.c [DFU_SUPPORT] (main): Fix flash_page_size.
+
 	* src/configure: Add FST-01G.
 
 2017-10-02  NIIBE Yutaka  <gniibe@fsij.org>
