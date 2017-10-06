@@ -1,3 +1,7 @@
+2017-10-06  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.ld.in (.stacks): Specify NOLOAD type.
+
 2017-10-03  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/main.c [DFU_SUPPORT] (main): Fix flash_page_size.
