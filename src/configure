@@ -153,15 +153,15 @@ EOF
   exit 0
 fi
 
-if ! test "$with_fraucheky" = "no"; then
+if test "$with_fraucheky" = "no"; then
+  enable_fraucheky=""
+  FRAUCHEKY_DEFINE="#undef FRAUCHEKY_SUPPORT"
+  FRAUCHEKY_MSC_DEFINE="#undef MSC_INTERFACE_NO"
+else
   ../fraucheky/configure $with_fraucheky $with_index $REVISION $REVISION_CHOPSTX $REVISION_FRAUCHEKY
   enable_fraucheky=yes
   FRAUCHEKY_DEFINE="#define FRAUCHEKY_SUPPORT 1"
   FRAUCHEKY_MSC_DEFINE="#define MSC_INTERFACE_NO    2"
-else
-  enable_fraucheky=""
-  FRAUCHEKY_DEFINE="#undef FRAUCHEKY_SUPPORT"
-  FRAUCHEKY_MSC_DEFINE="#undef MSC_INTERFACE_NO"
   if ! test -f ../fraucheky/build.mk; then
     echo "Submodule 'fraucheky' not found" >&2
     echo "You might need: git submodule update --init" >&2

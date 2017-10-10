@@ -29,6 +29,13 @@ OPT   = -O3 -Os -g
 include $(CHOPSTX)/rules.mk
 
 ifneq ($(ENABLE_FRAUCHEKY),)
+ifeq ($(EMULATION),)
+BFDNAME_OBJ = elf32-little
+else
+# For now, it assumes x86_64
+BFDNAME_OBJ = elf64-x86-64
+BFDARCH = i386
+endif
 include $(FRAUCHEKY)/build.mk
 endif
 ###################################
