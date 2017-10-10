@@ -43,3 +43,16 @@ build/neug.o: OPT = -O3 -g
 distclean:: clean
 	-rm -f neug.ld config.h board.h config.mk \
 	       usb-strings.c.inc usb-vid-pid-ver.c.inc
+
+ifneq ($(EMULATION),)
+# By specifying DESTDIR on invocation of "make", you can install
+# program to different ROOT.
+
+# The variables prefix, exec_prefix, libexecdir are defined in
+# config.mk.
+
+install: build/neug
+	test -d "$(DESTDIR)$(libexecdir)" || mkdir -p "$(DESTDIR)$(libexecdir)"
+	install -c build/neug "$(DESTDIR)$(libexecdir)"
+
+endif

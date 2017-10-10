@@ -1,3 +1,14 @@
+2017-10-10  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Allow not specifying VIDPID.
+	(prefix. exec_prefix, libexecdir): Add.
+
+	* src/Makefile (install): New target.
+
+	* NEUG_USB_DEVICE_ID (0000:0000): New.
+
+	* chopstx: Update to 1.5.
+
 2017-10-06  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/neug.ld.in (.stacks): Specify NOLOAD type.
