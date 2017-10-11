@@ -10,6 +10,7 @@ CSRC = main.c sha256.c neug.c
 
 include config.mk
 
+USE_SYS = yes
 USE_USB = yes
 USE_ADC = yes
 

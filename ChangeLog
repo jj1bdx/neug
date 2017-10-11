@@ -1,3 +1,10 @@
+2017-10-11  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c [GNU_LINUX_EMULATION] (main): Support --vidpid
+	option.
+
+	* fraucheky: Update to 0.5.
+
 2017-10-10  NIIBE Yutaka  <gniibe@fsij.org>
 
 	* src/configure: Allow not specifying VIDPID.

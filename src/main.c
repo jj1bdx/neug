@@ -34,6 +34,7 @@
 #include "usb_lld.h"
 #include "sys.h"
 #ifdef GNU_LINUX_EMULATION
+#include <stdio.h>
 #include <stdlib.h>
 #define main emulated_main
 #else
@@ -76,7 +77,11 @@ static uint8_t connected;
 #define USB_CDC_REQ_SEND_BREAK                  0x23
 
 /* USB Device Descriptor */
-static const uint8_t vcom_device_desc[18] = {
+static
+#if !defined(GNU_LINUX_EMULATION)
+const
+#endif
+uint8_t vcom_device_desc[18] = {
   18,   /* bLength */
   DEVICE_DESCRIPTOR,	        /* bDescriptorType */
   0x10, 0x01,			/* bcdUSB = 1.1 */
@@ -1082,8 +1087,43 @@ main (int argc, char **argv)
   chopstx_t led_thread, usb_thd;
   unsigned int count;
 
+#ifdef GNU_LINUX_EMULATION
+  if (argc >= 4 || (argc == 2 && !strcmp (argv[1], "--help")))
+    {
+      fprintf (stdout, "Usage: %s [--vidpid=Vxxx:Pxxx]", argv[0]);
+      exit (0);
+    }
+
+  if (argc >= 2 && !strncmp (argv[1], "--debug=", 8))
+    {
+      debug = strtol (&argv[1][8], NULL, 10);
+      argc--;
+      argv++;
+    }
+
+  if (argc >= 2 && !strncmp (argv[1], "--vidpid=", 9))
+    {
+      uint32_t id;
+      char *p;
+
+      id = (uint32_t)strtol (&argv[1][9], &p, 16);
+      vcom_device_desc[8] = (id & 0xff);
+      vcom_device_desc[9] = (id >> 8);
+
+      if (p && p[0] == ':')
+	{
+	  id = (uint32_t)strtol (&p[1], NULL, 16);
+	  vcom_device_desc[10] = (id & 0xff);
+	  vcom_device_desc[11] = (id >> 8);
+	}
+
+      argc--;
+      argv++;
+    }
+#else
   (void)argc;
   (void)argv;
+#endif
 
   fill_serial_no_by_unique_id ();
 
