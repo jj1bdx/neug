@@ -1,5 +1,7 @@
 2017-10-11  NIIBE Yutaka  <gniibe@fsij.org>
 
+	* VERSION: 1.0.6.
+
 	* src/main.c [GNU_LINUX_EMULATION] (main): Support --vidpid
 	option.
 

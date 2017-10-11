@@ -1,7 +1,7 @@
 NeuG - a true random number generator implementation (for STM32F103)
 
-							  Version 1.0.5
-							     2015-10-17
+							  Version 1.0.6
+							     2017-10-11
 						           Niibe Yutaka
 				      Free Software Initiative of Japan
 
@@ -28,15 +28,20 @@ NeuG was named after my daughter, but I don't say she is noisy.
 Release notes
 =============
 
-This is the fifth minor release of NeuG, after 1.0.
+This is the sixth minor release of NeuG, after 1.0.
 
 Basic features (generating random numbers) are stable, but newly added
 things like Fraucheky (USB Mass Storage Class) support and reGNUal
 (firmware upgrad) support should be considered experimental.
 
 Note that you need Chopstx (the thread library) as external source
-code (instead of ChibiOS/RT).  If you get the source code by Git,
-Chopstx is submodule of NeuG.
+code.  If you get the source code by Git, Chopstx is a submodule of
+NeuG.
+
+You can test how the NeuG stand-alone device works on GNU/Linux,
+without real hardware, by USBIP emulation (--target=GNU_LINUX).
+Please note that this is only for testing.  Use of its generated
+randomness is not recommended, because of no entropy source.
 
 
 FAQ
@@ -109,7 +114,9 @@ NeuG source code is under src/ directory.
 Note that SHA-256 hash function implementation, src/sha256.c, is based
 on the original implementation by Dr. Brian Gladman.  See:
 
-  http://gladman.plushost.co.uk/oldsite/cryptography_technology/sha/index.php
+  http://brg.a2hosted.com//oldsite/cryptography_technology/sha/index.php
+(was at:
+ http://gladman.plushost.co.uk/oldsite/cryptography_technology/sha/index.php)
 
 
 License
@@ -178,10 +185,10 @@ You need GNU toolchain and newlib for 'arm-none-eabi' target.
 On Debian we can install the packages of gcc-arm-none-eabi,
 gdb-arm-none-eabi and its friends.  I'm using:
 
-	binutils-arm-none-eabi	2.26-4+8
-	gcc-arm-none-eabi 	15:4.9.3+svn231177-1
-	gdb-arm-none-eabi 	7.10-1+9
-	libnewlib-arm-none-eabi	2.2.0+git20150830.5a3d536-1
+	binutils-arm-none-eabi	2.28-5+9+b3
+	gcc-arm-none-eabi 	15:5.4.1+svn241155-1
+	gdb-arm-none-eabi 	7.12-6+9+b2
+	libnewlib-arm-none-eabi	2.4.0.20160527-2
 
 Or else, see https://launchpad.net/gcc-arm-embedded for preparation of
 GNU Toolchain for 'arm-none-eabi' target.
@@ -407,11 +414,13 @@ Information on the Web
 
 Please see the FST-01 support pages:
 
-    http://www.gniibe.org/category/fst-01.html
+    https://www.gniibe.org/category/fst-01.html
 
 Please consider to join Gnuk-users mailing list:
 
     https://lists.alioth.debian.org/mailman/listinfo/gnuk-users
+
+The mailing list will be moved to lists.debian.org.
 
 
 
