@@ -2,7 +2,7 @@
  * main.c - main routine of neug
  *
  * Main routine:
- * Copyright (C) 2011, 2012, 2013, 2015, 2016
+ * Copyright (C) 2011, 2012, 2013, 2015, 2016, 2017
  *		 Free Software Initiative of Japan
  * Author: NIIBE Yutaka <gniibe@fsij.org>
  *
@@ -33,7 +33,14 @@
 #include "neug.h"
 #include "usb_lld.h"
 #include "sys.h"
+#ifdef GNU_LINUX_EMULATION
+#include <stdio.h>
+#include <stdlib.h>
+#define main emulated_main
+#else
 #include "mcu/stm32f103.h"
+#define FLASH_UPGRADE_SUPPORT 1
+#endif
 #include "adc.h"
 
 enum {
@@ -70,7 +77,11 @@ static uint8_t connected;
 #define USB_CDC_REQ_SEND_BREAK                  0x23
 
 /* USB Device Descriptor */
-static const uint8_t vcom_device_desc[18] = {
+static
+#if !defined(GNU_LINUX_EMULATION)
+const
+#endif
+uint8_t vcom_device_desc[18] = {
   18,   /* bLength */
   DEVICE_DESCRIPTOR,	        /* bDescriptorType */
   0x10, 0x01,			/* bcdUSB = 1.1 */
@@ -182,7 +193,8 @@ static const uint8_t vcom_string0[4] = {
 
 #include "usb-strings.c.inc"
 
-static void neug_setup_endpoints_for_interface (uint16_t interface, int stop);
+static void neug_setup_endpoints_for_interface (struct usb_dev *dev,
+						uint16_t interface, int stop);
 #ifdef FRAUCHEKY_SUPPORT
 #define MSC_MASS_STORAGE_RESET_COMMAND 0xFF
 extern int fraucheky_enabled (void);
@@ -203,11 +215,15 @@ usb_device_reset (struct usb_dev *dev)
   usb_lld_reset (dev, VCOM_FEATURE_BUS_POWERED);
 
   /* Initialize Endpoint 0.  */
+#ifdef GNU_LINUX_EMULATION
+  usb_lld_setup_endp (dev, ENDP0, 1, 1);
+#else
   usb_lld_setup_endpoint (ENDP0, EP_CONTROL, 0, ENDP0_RXADDR, ENDP0_TXADDR, 64);
+#endif
 
   /* Stop the interface */
   for (i = 0; i < NUM_INTERFACES; i++)
-    neug_setup_endpoints_for_interface (i, 1);
+    neug_setup_endpoints_for_interface (dev, i, 1);
 
   /* Notify upper layer.  */
   chopstx_mutex_lock (&usb_mtx);
@@ -217,9 +233,11 @@ usb_device_reset (struct usb_dev *dev)
   chopstx_mutex_unlock (&usb_mtx);
 }
 
+#ifdef FLASH_UPGRADE_SUPPORT
 extern uint8_t _regnual_start, __heap_end__;
 
 static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
+#endif
 
 /* USB vendor requests to control pipe */
 #define USB_FSIJ_MEMINFO	  0
@@ -229,6 +247,9 @@ static const uint8_t *const mem_info[] = { &_regnual_start,  &__heap_end__, };
 #define USB_NEUG_GET_INFO	254
 #define USB_NEUG_EXIT		255 /* Ask to exit and to receive reGNUal */
 
+#define DEFAULT_PASSWD "12345678"
+#define DEFAULT_PASSWD_LEN 8
+
 uint8_t neug_passwd[33] __attribute__ ((section(".passwd"))) = {
   0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -237,27 +258,18 @@ uint8_t neug_passwd[33] __attribute__ ((section(".passwd"))) = {
 };
 static uint8_t usbbuf[64];
 
-#define DEFAULT_PASSWD "12345678"
-#define DEFAULT_PASSWD_LEN 8
-
+#ifdef FLASH_UPGRADE_SUPPORT
 static void set_passwd (void)
 {
   flash_unlock ();
   if (neug_passwd[0] != 0xff)
-    flash_erase_page ((uint32_t)neug_passwd);
+    flash_erase_page ((uintptr_t)neug_passwd);
   if (usbbuf[0] == DEFAULT_PASSWD_LEN
       && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
     return;
-  flash_write ((uint32_t)neug_passwd, usbbuf, usbbuf[0] + 1);
+  flash_write ((uintptr_t)neug_passwd, usbbuf, usbbuf[0] + 1);
 }
 
-static uint32_t rbit (uint32_t v)
-{
-  uint32_t r;
-
-  asm ("rbit	%0, %1" : "=r" (r) : "r" (v));
-  return r;
-}
 
 /* After calling this function, CRC module remain enabled.  */
 static int download_check_crc32 (struct usb_dev *dev, const uint32_t *end_p)
@@ -265,17 +277,17 @@ static int download_check_crc32 (struct usb_dev *dev, const uint32_t *end_p)
   uint32_t crc32 = *end_p;
   const uint32_t *p;
 
-  RCC->AHBENR |= RCC_AHBENR_CRCEN;
-  CRC->CR = CRC_CR_RESET;
+  crc32_rv_reset ();
 
   for (p = (const uint32_t *)&_regnual_start; p < end_p; p++)
-    CRC->DR = rbit (*p);
+    crc32_rv_step (rbit (*p));
 
-  if ((rbit (CRC->DR) ^ crc32) == 0xffffffff)
+  if ((rbit (crc32_rv_get ()) ^ crc32) == 0xffffffff)
     return usb_lld_ctrl_ack (dev);
 
   return -1;
 }
+#endif
 
 
 #define NEUG_SPECIAL_BITRATE 110
@@ -316,14 +328,19 @@ usb_ctrl_write_finish (struct usb_dev *dev)
 	    }
 	  chopstx_mutex_unlock (&usb_mtx);
 	}
+#ifdef FLASH_UPGRADE_SUPPORT
       else if (arg->request == USB_NEUG_SET_PASSWD)
 	set_passwd ();
+#endif
       else if (arg->request == USB_NEUG_EXIT)
 	{
 	  if ((neug_passwd[0] == 0xff && usbbuf[0] == DEFAULT_PASSWD_LEN
 	       && !memcmp (usbbuf + 1, DEFAULT_PASSWD, DEFAULT_PASSWD_LEN))
+#ifdef FLASH_UPGRADE_SUPPORT
 	      || (neug_passwd[0] == usbbuf[0]
-		  && !memcmp (neug_passwd+1, usbbuf+1, neug_passwd[0])))
+		  && !memcmp (neug_passwd+1, usbbuf+1, neug_passwd[0]))
+#endif
+	      )
 	    {
 	      chopstx_mutex_lock (&usb_mtx);
 	      fsij_device_state = FSIJ_DEVICE_NEUG_EXIT_REQUESTED;
@@ -397,6 +414,7 @@ usb_setup (struct usb_dev *dev)
 	{
 	  if (arg->request == USB_FSIJ_MEMINFO)
 	    {
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -405,6 +423,9 @@ usb_setup (struct usb_dev *dev)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 	      return usb_lld_ctrl_send (dev, mem_info, sizeof (mem_info));
+#else
+	      return -1;
+#endif
 	    }
 	  else if (arg->request == USB_NEUG_GET_INFO)
 	    {
@@ -430,10 +451,13 @@ usb_setup (struct usb_dev *dev)
 	}
       else /* SETUP_SET */
 	{
-	  uint8_t *addr = (uint8_t *)(0x20000000 + arg->value * 0x100 + arg->index);
+#ifdef FLASH_UPGRADE_SUPPORT
+	  uint8_t *addr = (uint8_t *)(0x20000000UL + arg->value * 0x100 + arg->index);
+#endif
 
 	  if (arg->request == USB_FSIJ_DOWNLOAD)
 	    {
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -449,9 +473,13 @@ usb_setup (struct usb_dev *dev)
 		memset (addr + arg->index + arg->len, 0, 256 - (arg->index + arg->len));
 
 	      return usb_lld_ctrl_recv (dev, addr, arg->len);
+#else
+	      return -1;
+#endif
 	    }
 	  else if (arg->request == USB_FSIJ_EXEC && arg->len == 0)
 	    {
+#ifdef FLASH_UPGRADE_SUPPORT
 	      chopstx_mutex_lock (&usb_mtx);
 	      if (fsij_device_state != FSIJ_DEVICE_EXITED)
 		{
@@ -460,10 +488,13 @@ usb_setup (struct usb_dev *dev)
 		}
 	      chopstx_mutex_unlock (&usb_mtx);
 
-	      if (((uint32_t)addr & 0x03))
+	      if (((uintptr_t)addr & 0x03))
 		return -1;
 
 	      return download_check_crc32 (dev, (uint32_t *)addr);
+#else
+	      return -1;
+#endif
 	    }
 	  else if (arg->request == USB_NEUG_SET_PASSWD && arg->len <= 32)
 	    {
@@ -588,15 +619,24 @@ usb_get_descriptor (struct usb_dev *dev)
 }
 
 static void
-neug_setup_endpoints_for_interface (uint16_t interface, int stop)
+neug_setup_endpoints_for_interface (struct usb_dev *dev,
+				    uint16_t interface, int stop)
 {
+#if !defined(GNU_LINUX_EMULATION)
+  (void)dev;
+#endif
+  
   if (interface == 0)
     {
 #ifdef FRAUCHEKY_SUPPORT
       if (running_neug)
 	{
 	  if (!stop)
+#ifdef GNU_LINUX_EMULATION
+	    usb_lld_setup_endp (dev, ENDP2, 0, 1);
+#else
 	    usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
+#endif
 	  else
 	    usb_lld_stall_tx (ENDP2);
 	}
@@ -604,7 +644,11 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
 	fraucheky_setup_endpoints_for_interface (stop);
 #else
       if (!stop)
+#ifdef GNU_LINUX_EMULATION
+	usb_lld_setup_endp (dev, ENDP2, 0, 1);
+#else
 	usb_lld_setup_endpoint (ENDP2, EP_INTERRUPT, 0, 0, ENDP2_TXADDR, 0);
+#endif
       else
 	usb_lld_stall_tx (ENDP2);
 #endif
@@ -613,8 +657,13 @@ neug_setup_endpoints_for_interface (uint16_t interface, int stop)
     {
       if (!stop)
 	{
+#ifdef GNU_LINUX_EMULATION
+	  usb_lld_setup_endp (dev, ENDP1, 0, 1);
+	  usb_lld_setup_endp (dev, ENDP3, 1, 0);
+#else
 	  usb_lld_setup_endpoint (ENDP1, EP_BULK, 0, 0, ENDP1_TXADDR, 0);
 	  usb_lld_setup_endpoint (ENDP3, EP_BULK, 0, ENDP3_RXADDR, 0, 64);
+#endif
 	  /* Start with no data receiving (ENDP3 not enabled) */
 	}
       else
@@ -639,7 +688,7 @@ usb_set_configuration (struct usb_dev *dev)
 
       usb_lld_set_configuration (dev, 1);
       for (i = 0; i < NUM_INTERFACES; i++)
-	neug_setup_endpoints_for_interface (i, 0);
+	neug_setup_endpoints_for_interface (dev, i, 0);
       chopstx_mutex_lock (&usb_mtx);
       bDeviceState = CONFIGURED;
       chopstx_mutex_unlock (&usb_mtx);
@@ -651,7 +700,7 @@ usb_set_configuration (struct usb_dev *dev)
 
       usb_lld_set_configuration (dev, 0);
       for (i = 0; i < NUM_INTERFACES; i++)
-	neug_setup_endpoints_for_interface (i, 1);
+	neug_setup_endpoints_for_interface (dev, i, 1);
       chopstx_mutex_lock (&usb_mtx);
       bDeviceState = ADDRESSED;
       chopstx_cond_signal (&usb_cnd);
@@ -676,7 +725,7 @@ usb_set_interface (struct usb_dev *dev)
     return -1;
   else
     {
-      neug_setup_endpoints_for_interface (interface, 0);
+      neug_setup_endpoints_for_interface (dev, interface, 0);
       return usb_lld_ctrl_ack (dev);
     }
 }
@@ -710,7 +759,13 @@ static void usb_tx_done (uint8_t ep_num, uint16_t len);
 static void usb_rx_ready (uint8_t ep_num, uint16_t len);
 
 
+#ifdef GNU_LINUX_EMULATION
+#include <signal.h>
+#define INTR_REQ_USB SIGUSR1
+#else
 #define INTR_REQ_USB 20
+#endif
+
 #define PRIO_USB 3
 
 static void *
@@ -858,11 +913,19 @@ usb_tx_done (uint8_t ep_num, uint16_t len)
 #endif
 }
 
+#ifdef GNU_LINUX_EMULATION
+static uint8_t endp3_buf[64];
+#endif
+
 static void
 usb_rx_ready (uint8_t ep_num, uint16_t len)
 {
   if (ep_num == ENDP3)
+#ifdef GNU_LINUX_EMULATION
+    usb_lld_rx_enable_buf (ENDP3, endp3_buf, 64);
+#else
     usb_lld_rx_enable (ENDP3);
+#endif
 #ifdef FRAUCHEKY_SUPPORT
   else if (ep_num == ENDP6)
     EP6_OUT_Callback (len);
@@ -911,13 +974,14 @@ static void event_flag_signal (struct event_flag *ev, eventmask_t m)
   chopstx_mutex_unlock (&ev->mutex);
 }
 
-extern uint8_t __process1_stack_base__[], __process1_stack_size__[];
-extern uint8_t __process3_stack_base__[], __process3_stack_size__[];
-
-#define STACK_ADDR_LED ((uint32_t)__process1_stack_base__)
-#define STACK_SIZE_LED ((uint32_t)__process1_stack_size__)
-#define STACK_ADDR_USB ((uint32_t)__process3_stack_base__)
-#define STACK_SIZE_USB ((uint32_t)__process3_stack_size__)
+#define STACK_MAIN
+#define STACK_PROCESS_1
+#define STACK_PROCESS_3
+#include "stack-def.h"
+#define STACK_ADDR_LED ((uintptr_t)process1_base)
+#define STACK_SIZE_LED (sizeof process1_base)
+#define STACK_ADDR_USB ((uintptr_t)process3_base)
+#define STACK_SIZE_USB (sizeof process3_base)
 
 
 #define PRIO_LED 3
@@ -965,11 +1029,20 @@ led_blinker (void *arg)
 #define RANDOM_BYTES_LENGTH 64
 static uint32_t random_word[RANDOM_BYTES_LENGTH/sizeof (uint32_t)];
 
+#ifdef GNU_LINUX_EMULATION
+static uint8_t endp1_buf[RANDOM_BYTES_LENGTH];
+#endif
+
 static void copy_to_tx (uint32_t v, int i)
 {
+#ifdef GNU_LINUX_EMULATION
+  memcpy (&endp1_buf[i*4], &v, 4);
+#else
   usb_lld_txcpy (&v, ENDP1, i * 4, 4);
+#endif
 }
 
+#ifdef FLASH_UPGRADE_SUPPORT
 /*
  * In Gnuk 1.0.[12], reGNUal was not relocatable.
  * Now, it's relocatable, but we need to calculate its entry address
@@ -980,12 +1053,13 @@ static uint32_t
 calculate_regnual_entry_address (const uint8_t *addr)
 {
   const uint8_t *p = addr + 4;
-  uint32_t v = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
+  uintptr_t v = p[0] + (p[1] << 8) + (p[2] << 16) + (p[3] << 24);
 
   v -= REGNUAL_START_ADDRESS_COMPATIBLE;
-  v += (uint32_t)addr;
+  v += (uintptr_t)addr;
   return v;
 }
+#endif
 
 
 static int
@@ -997,6 +1071,8 @@ check_usb_status (void *arg)
 	  || fsij_device_state != FSIJ_DEVICE_RUNNING);
 }
 
+
+
 /*
  * Entry point.
  *
@@ -1005,12 +1081,49 @@ check_usb_status (void *arg)
 int
 main (int argc, char **argv)
 {
-  uint32_t entry;
+#ifdef FLASH_UPGRADE_SUPPORT
+  uintptr_t entry;
+#endif
   chopstx_t led_thread, usb_thd;
   unsigned int count;
 
+#ifdef GNU_LINUX_EMULATION
+  if (argc >= 4 || (argc == 2 && !strcmp (argv[1], "--help")))
+    {
+      fprintf (stdout, "Usage: %s [--vidpid=Vxxx:Pxxx]", argv[0]);
+      exit (0);
+    }
+
+  if (argc >= 2 && !strncmp (argv[1], "--debug=", 8))
+    {
+      debug = strtol (&argv[1][8], NULL, 10);
+      argc--;
+      argv++;
+    }
+
+  if (argc >= 2 && !strncmp (argv[1], "--vidpid=", 9))
+    {
+      uint32_t id;
+      char *p;
+
+      id = (uint32_t)strtol (&argv[1][9], &p, 16);
+      vcom_device_desc[8] = (id & 0xff);
+      vcom_device_desc[9] = (id >> 8);
+
+      if (p && p[0] == ':')
+	{
+	  id = (uint32_t)strtol (&p[1], NULL, 16);
+	  vcom_device_desc[10] = (id & 0xff);
+	  vcom_device_desc[11] = (id >> 8);
+	}
+
+      argc--;
+      argv++;
+    }
+#else
   (void)argc;
   (void)argv;
+#endif
 
   fill_serial_no_by_unique_id ();
 
@@ -1082,11 +1195,11 @@ main (int argc, char **argv)
       chopstx_mutex_unlock (&usb_mtx);
       while (1)
 	{
+	  uint32_t usec = 5000*1000;
 	  chopstx_poll_cond_t poll_desc;
 	  struct chx_poll_head *pd_array[1] = {
 	    (struct chx_poll_head *)&poll_desc
 	  };
-	  uint32_t usec = 5000*1000;
 
 	  poll_desc.type = CHOPSTX_POLL_COND;
 	  poll_desc.ready = 0;
@@ -1153,7 +1266,11 @@ main (int argc, char **argv)
 		break;
 
 	      /* Prepare sending random data.  */
+#ifdef GNU_LINUX_EMULATION
+	      usb_lld_tx_enable_buf (ENDP1, endp1_buf, i * 4);
+#else
 	      usb_lld_tx_enable (ENDP1, i * 4);
+#endif
 	      chopstx_cond_wait (&usb_cnd, &usb_mtx);
 	      count++;
 	    }
@@ -1212,8 +1329,9 @@ main (int argc, char **argv)
   chopstx_cancel (usb_thd);
   chopstx_join (usb_thd, NULL);
 
+#ifdef FLASH_UPGRADE_SUPPORT
   /* Set vector */
-  SCB->VTOR = (uint32_t)&_regnual_start;
+  SCB->VTOR = (uintptr_t)&_regnual_start;
   entry = calculate_regnual_entry_address (&_regnual_start);
 #ifdef DFU_SUPPORT
 #define FLASH_SYS_START_ADDR 0x08000000
@@ -1221,12 +1339,12 @@ main (int argc, char **argv)
 #define CHIP_ID_REG ((uint32_t *)0xE0042000)
   {
     extern uint8_t _sys;
-    uint32_t addr;
+    uintptr_t addr;
     handler *new_vector = (handler *)FLASH_SYS_START_ADDR;
     void (*func) (void (*)(void)) = (void (*)(void (*)(void)))new_vector[9];
     uint32_t flash_page_size = 1024; /* 1KiB default */
 
-   if ((*CHIP_ID_ADDR)&0x07 == 0x04) /* High dencity device.  */
+   if ((*CHIP_ID_REG)&0x07 == 0x04) /* High dencity device.  */
      flash_page_size += 0x0400; /* It's 2KiB. */
 
     /* Kill DFU */
@@ -1244,6 +1362,9 @@ main (int argc, char **argv)
 #else
   /* Leave NeuG to exec reGNUal */
   flash_erase_all_and_exec ((void (*)(void))entry);
+#endif
+#else
+  exit (0);
 #endif
 
   /* Never reached */

@@ -96,7 +96,7 @@ with no echo and raw mode.</p>
 <p>Usually, you would like to use NeuG device under control of rng-tools,
 to feed entropy to /dev/random, the random device in kernel.</p>
 
-<p>Please see <a href="http://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debian usage</a> for detail.</p>
+<p>Please see <a href="https://www.gniibe.org/FST-01/q_and_a/neug-standalone-device.html">Debian usage</a> for detail.</p>
 
 <h2>README, GNU GPL and Corresponding Source code</h2>
 <p>In this product, it contains copyrighted software that is licensed under
@@ -111,15 +111,15 @@ to feed entropy to /dev/random, the random device in kernel.</p>
    You may examine the release tag of the product by the command,
    tool/neug_check.py which is available in the NeuG repository.
    It must be: @REVISION@.  If not, please file a bug report.</p>
-<p>You can also download tarballs from the repository (sorry, no https).</p>
+<p>You can also download tarballs from the repository.</p>
 <ul>
   <li><a href="README">README</a></li>
   <li><a href="COPYING">GNU GPLv3</a></li>
   <li><a href="https://anonscm.debian.org/cgit/gnuk/gnuk/">Gnuk Repository</a></li>
   <li><a href="https://anonscm.debian.org/cgit/gnuk/chopstx/">Chopstx Repository</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=gnuk/neug.git;a=snapshot;h=refs/tags/@REVISION@;sf=tgz">NeuG tarball</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=snapshot;h=@REVISION_CHOPSTX@;sf=tgz">Chopstx tarball</a></li>
-  <li><a href="http://git.gniibe.org/gitweb/?p=chopstx/fraucheky.git;a=snapshot;h=@REVISION_FRAUCHEKY@;sf=tgz">Fraucheky tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=gnuk/neug.git;a=snapshot;h=refs/tags/@REVISION@;sf=tgz">NeuG tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=chopstx/chopstx.git;a=snapshot;h=@REVISION_CHOPSTX@;sf=tgz">Chopstx tarball</a></li>
+  <li><a href="https://git.gniibe.org/gitweb/?p=chopstx/fraucheky.git;a=snapshot;h=@REVISION_FRAUCHEKY@;sf=tgz">Fraucheky tarball</a></li>
 </ul>
 
 <h3>Source code by physical media</h3>
@@ -139,17 +139,27 @@ to feed entropy to /dev/random, the random device in kernel.</p>
   <li>Gunma, 371-0031 JAPAN</li>
 </ul>
 
-<p>This source code offer will be valid for three years after the shipment of this device or at least until 2020-03-31.</p>
+<p>This source code offer will be valid for three years after the shipment of this device or at least until 2021-03-31.</p>
 
 <h2>Links</h2>
 <ul>
-  <li><a href="http://www.gniibe.org/category/fst-01.html">
+  <li><a href="https://www.gniibe.org/category/fst-01.html">
       FST-01 support pages</a></li>
   <li><a href="https://lists.alioth.debian.org/mailman/listinfo/gnuk-users">
       Mailing list: Gnuk Users</a></li>
-  <li><a href="http://www.gnu.org/gnu/manifesto.ja.html">
+  <li><a href="https://www.gnu.org/gnu/manifesto.ja.html">
       GNU Manifesto (Japanese Translation)</a></li>
 </ul>
+
+<h2>Free Software and TRNG</h2>
+<p>I realized that free software implementation of true random number
+  generator has an interesting philosophical issue.  While Free
+  Software is to control our computing by ourselves (collectively),
+  the central idea of TRNG is that no one (even the owner and the
+  developer) can control the generation of the random number as a bit
+  stream.  In the meta level, we control it so that no one can control
+  the bit stream.
+</p>
 
 <h2>Concluding remarks</h2>
 <p>I wish you enjoy your freedom on computing with NeuG.

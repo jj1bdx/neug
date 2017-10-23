@@ -1,3 +1,96 @@
+2017-10-11  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* VERSION: 1.0.6.
+
+	* src/main.c [GNU_LINUX_EMULATION] (main): Support --vidpid
+	option.
+
+	* fraucheky: Update to 0.5.
+
+2017-10-10  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Allow not specifying VIDPID.
+	(prefix. exec_prefix, libexecdir): Add.
+
+	* src/Makefile (install): New target.
+
+	* NEUG_USB_DEVICE_ID (0000:0000): New.
+
+	* chopstx: Update to 1.5.
+
+2017-10-06  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.ld.in (.stacks): Specify NOLOAD type.
+
+2017-10-03  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c [DFU_SUPPORT] (main): Fix flash_page_size.
+
+	* src/configure: Add FST-01G.
+
+2017-10-02  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c [GNU_LINUX_EMULATION]: Clean up.
+
+2017-09-29  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (FLASH_UPGRADE_SUPPORT): New.
+
+2017-09-05  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.c: Use stack-def.h.
+	* src/main.c: Likewise.
+
+	* src/neug.ld.in: Remove stack definitions.
+
+	* src/stack-def.h: New.
+
+2017-09-04  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c: Support GNU_LINUX_EMULATION.
+
+	* src/Makefile: Rename from src/Makefile.in (as done in gnuk).
+	* src/configure: Generate config.mk.
+
+2017-09-01  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/neug.c (crc32_reset, crc32_step, crc32_get): Move CRC32
+	routines from main.c.
+	(ep_fill_initial_string, ep_process, neug_init): Use them.
+
+2017-08-31  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c (crc32_reset, crc32_step, crc32_get): New.
+	(download_check_crc32): Use new CRC32 routine.
+
+2017-08-02  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/main.c: Support GNU/Linux target.
+	* src/neug.c: Support GNU/Linux target.
+
+2017-08-01  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/Makefile.in: Support GNU/Linux target.
+	* src/configure: Support GNU/Linux target.
+
+2017-08-01  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* src/configure: Support build without git.
+
+2016-10-17  NIIBE Yutaka  <gniibe@fsij.org>
+
+	* VERSION: 1.0.5.
+
+2016-10-14  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/collect-neug-output.sh: New.
+
+2016-10-13  Niibe Yutaka  <gniibe@fsij.org>
+
+	* tool/intel_hex.py, tool/hub_ctrl.py: Update from Gnuk.
+
+	* chopstx: Update to 1.2.
+
 2016-07-15  Kenji Rikitake  <kenji@k2r.org>
 
 	* src/main.c (main): Fix call of chopstx_poll to follow

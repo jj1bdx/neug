@@ -1,8 +1,11 @@
-*.o
-*.lst
 *.pyc
-src/board.h
+src/*.inc
+src/.dep/
 src/INDEX
 src/README
-src/*.inc
+src/board.h
+src/build/
+src/config.h
+src/config.mk
 src/disk-on-rom.h
+src/neug.ld

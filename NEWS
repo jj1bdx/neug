@@ -1,5 +1,30 @@
 NeuG NEWS - User visible changes
 
+
+* Major changes in NeuG 1.0.6
+
+  Released 2017-10-11, by NIIBE Yutaka
+
+** Port to GNU/Linux emulation
+We can "run" NeuG stand-alone device on GNU/Linux by emulation through
+USBIP.
+
+** Upgrade of Fraucheky
+We use Fraucheky 0.4, which can work well with GNU/Linux emulation.
+
+** Upgrade of Chopstx
+We use Chopstx 1.5, which supports Blue Pill and the emulation on
+GNU/Linux.
+
+
+* Major changes in NeuG 1.0.5
+
+  Released 2016-10-17, by NIIBE Yutaka
+
+** Upgrade of Chopstx
+We use Chopstx 1.2, which supports FST-01G.
+
+
 * Major changes in NeuG 1.0.4
 
   Released 2015-09-18, by NIIBE Yutaka
