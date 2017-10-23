@@ -15,3 +15,8 @@ For the further details, see
 # NeuG on ST Dongle
 
 See <https://gist.github.com/jj1bdx/b78b3747196fd303f49d829a7e36ed8d>
+
+# No binary images
+
+Binary images are removed from this repository due to USB-IF agreement violation concerns as shown in <http://lists.alioth.debian.org/pipermail/gnuk-users/2017q4/000603.html> by Yutaka Niibe.
+
