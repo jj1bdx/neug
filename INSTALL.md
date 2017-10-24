@@ -16,9 +16,8 @@ Use of USB VID/PID for FSIJ is restricted under their license. In summary: for e
 
 ## Compilation environment
 
-* OS X 10.13
-* arm-none-eabi-gcc (GNU Tools for ARM Embedded Processors) 4.9.3 20150529
-* FreeBSD Port/package devel/gcc-arm-embedded will also work
+* [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) will work
+* Tested on macOS and FreeBSD (Port devel/gcc-arm-embedded)
 
 ## Commands used
 
@@ -62,7 +61,7 @@ reset
 
 Writing the ELF file to an FST-01 with protection:
 
-```
+```sh
 cd build
 openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
 # OpenOCD commands via telnet (localhost TCP port 4444)
